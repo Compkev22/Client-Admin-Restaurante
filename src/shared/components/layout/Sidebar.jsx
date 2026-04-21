@@ -6,6 +6,7 @@ import iconDashboard from "../../../assets/icons/Dashboard.svg";
 import iconOrders from "../../../assets/icons/Orders.svg";
 import iconReservations from "../../../assets/icons/Reservations.svg";
 import iconMenu from "../../../assets/icons/Menú.svg";
+import iconCombos from "../../../assets/icons/Combos.svg";
 import iconInventory from "../../../assets/icons/Inventory.svg";
 import iconTables from "../../../assets/icons/Tables.svg";
 import iconBilling from "../../../assets/icons/Billing.svg";
@@ -37,6 +38,7 @@ export const Sidebar = ({ onNavigate, activeTab }) => {
             allowedRoles: ["PLATFORM_ADMIN_ROLE", "BRANCH_ADMIN_ROLE"],
             items: [
                 { label: "Menú", icon: iconMenu },
+                { label: "Combos", icon: iconCombos },
                 { label: "Inventario", icon: iconInventory },
                 { label: "Mesas", icon: iconTables },
             ]

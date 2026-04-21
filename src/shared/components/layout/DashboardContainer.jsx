@@ -5,6 +5,7 @@ import { Sidebar } from "./Sidebar";
 // Importa tus páginas (Entidades)
 import { BillingPage } from "../../../features/billing/pages/BillingPage";
 import { BranchPage } from "../../../features/branches/pages/BranchPage"; 
+import { ComboPage } from "../../../features/combos/pages/ComboPage";
 
 export const DashboardContainer = () => {
   // 1. Creamos el estado para saber qué ver
@@ -20,6 +21,8 @@ export const DashboardContainer = () => {
       // Aquí irás agregando los demás cases:
       case "Sucursales": 
         return <BranchPage />;
+      case "Combos": 
+        return <ComboPage />;
       default:
         return <BillingPage />;
     }
