@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 
-// Agregamos { onForgot } como parámetro (prop)
 export const LoginForm = ({ onForgot }) => {
     const navigate = useNavigate();
 
@@ -10,38 +9,33 @@ export const LoginForm = ({ onForgot }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div className="form-group">
-                <label className="form-label">Usuario o Correo</label>
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="flex flex-col gap-1">
+                <label className="text-sm font-bold text-gray-700">Usuario o Correo</label>
                 <input 
                     type="text" 
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-kinal-orange transition-all"
                     placeholder="admin@kinalrest.com"
-                    className="form-input"
                     required
                 />
             </div>
 
-            <div className="form-group">
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                    <label className="form-label" style={{ marginBottom: 0 }}>Contraseña</label>
-                    {/* Conectamos la función onForgot al botón */}
-                    <button 
-                        type="button" 
-                        onClick={onForgot} 
-                        style={{ background: 'none', border: 'none', color: '#e11d48', fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer' }}
-                    >
+            <div className="flex flex-col gap-1">
+                <div className="flex justify-between items-center">
+                    <label className="text-sm font-bold text-gray-700">Contraseña</label>
+                    <button type="button" onClick={onForgot} className="text-xs font-bold text-kinal-red hover:underline">
                         ¿Olvidaste tu contraseña?
                     </button>
                 </div>
                 <input 
                     type="password" 
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-kinal-orange transition-all"
                     placeholder="••••••••"
-                    className="form-input"
                     required
                 />
             </div>
 
-            <button type="submit" className="btn-submit">
+            <button type="submit" className="w-full bg-kinal-red text-white font-black py-4 rounded-xl shadow-lg hover:bg-red-700 transition-colors uppercase tracking-widest mt-2">
                 Ingresar al Sistema
             </button>
         </form>

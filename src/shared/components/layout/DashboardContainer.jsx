@@ -1,26 +1,39 @@
+import { useState } from "react";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
 
-export const DashboardContainer = ({ children }) => {
+// Importa tus páginas (Entidades)
+import { BillingPage } from "../../../features/billing/pages/BillingPage";
+// import { BranchPage } from "../../../features/branches/pages/BranchPage"; 
+
+export const DashboardContainer = () => {
+  // 1. Creamos el estado para saber qué ver
+  const [currentView, setCurrentView] = useState("Dashboard");
+
+  // 2. Función para renderizar el contenido dinámicamente
+  const renderContent = () => {
+    switch (currentView) {
+      case "Facturación":
+        return <BillingPage />;
+      case "Dashboard":
+        return <div className="p-10 text-center font-bold text-gray-400">BIENVENIDO A KINAL FRIED CHICKEN</div>;
+      // Aquí irás agregando los demás cases:
+      // case "Sucursales": return <BranchPage />;
+      default:
+        return <BillingPage />;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar /> 
 
       <div className="flex flex-1">
-        <Sidebar />
+        {/* 3. Le pasamos la función para cambiar de vista al Sidebar */}
+        <Sidebar onNavigate={setCurrentView} activeTab={currentView} />
         
-        <main className="flex-1 p-8 overflow-y-auto animate-fade-in">
-          {/* Aquí es donde se renderizarán los componentes de cada tarea (T92, T93...) */}
-          <div className="max-w-7xl mx-auto">
-             {children || (
-               <div className="text-center py-20">
-                 <h2 className="text-3xl font-black text-gray-300 uppercase tracking-tighter">
-                   Selecciona un módulo para comenzar
-                 </h2>
-                 <p className="text-gray-400">Panel de Administración KinalRest v1.0</p>
-               </div>
-             )}
-          </div>
+        <main className="flex-1 p-6">
+          {renderContent()}
         </main>
       </div>
     </div>

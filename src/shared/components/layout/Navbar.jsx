@@ -14,7 +14,7 @@ export const Navbar = () => {
                     />
                     <h1 className="font-black text-2xl tracking-tight italic hidden sm:block">
                         <span className="text-kinal-red">KINAL</span>
-                        <span className="text-kinal-orange">REST</span>
+                        <span className="text-kinal-orange">FRIEDCHICKEN</span>
                         <span className="text-gray-500 text-sm ml-2 font-normal not-italic">ADMIN</span>
                     </h1>
                 </div>

@@ -2,38 +2,34 @@ import { useState } from "react";
 import { LoginForm } from "../components/LoginForm";
 import { ForgotPasswordForm } from "../components/ForgotPasswordForm"; 
 import logo from "../../../assets/img/KinalFriedChickenLogo.png";
-import './auth.css'; 
 
 export const AuthPage = () => {
     const [isForgot, setIsForgot] = useState(false);
 
     return (
-        <div className="login-wrapper">
-            <div className="login-card">
+        <div className="min-h-screen w-full flex items-center justify-center bg-kinal-yellow/20 relative overflow-hidden">
+            
+            {/* El card ahora con clases de Tailwind v4 */}
+            <div className="w-full max-w-md p-10 bg-white rounded-3xl shadow-2xl z-10 mx-4 border border-gray-100 animate-fadeIn">
                 
-                <div className="login-header">
+                <div className="flex flex-col items-center mb-8">
                     <img 
                         src={logo} 
                         alt="Kinal Fried Chicken Logo" 
-                        className="login-logo" 
+                        className="h-32 w-auto object-contain mb-4" 
                     />
                     
-                    {/* Título Actualizado con salto de línea (br) para que se vea ordenado */}
-                    <h2 className="login-title" style={{ textAlign: 'center' }}>
+                    <h2 className="text-3xl font-black italic tracking-tighter text-center leading-none">
                         {isForgot 
-                            ? "Recuperar Acceso" 
-                            : <>
-                                <span className="text-red">KINAL</span>
-                                <br />
-                                <span className="text-orange" style={{ fontSize: '1.25rem' }}>FRIED CHICKEN</span>
-                              </>
+                            ? "RECUPEAR ACCESO" 
+                            : <><span className="text-kinal-red">KINAL</span><br/><span className="text-kinal-orange text-xl">FRIED CHICKEN</span></>
                         }
                     </h2>
                     
-                    <p className="login-subtitle">
+                    <p className="text-gray-500 text-sm font-medium mt-2">
                         {isForgot 
-                            ? "Ingresa tu correo para recuperar tu contraseña" 
-                            : "Acceso Administrativo"
+                            ? "Ingresa tu correo para continuar" 
+                            : "PANEL ADMINISTRATIVO"
                         }
                     </p>
                 </div>
@@ -43,7 +39,6 @@ export const AuthPage = () => {
                 ) : (
                     <LoginForm onForgot={() => setIsForgot(true)} />
                 )}
-
             </div>
         </div>
     );

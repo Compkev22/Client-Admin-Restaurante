@@ -15,13 +15,11 @@ import iconReviews from "../../../assets/icons/Reviews.svg";
 import iconBranches from "../../../assets/icons/Branches.svg";
 import iconUsers from "../../../assets/icons/Users.svg";
 
-export const Sidebar = () => {
+export const Sidebar = ({ onNavigate, activeTab }) => {
     // Simulamos el rol del usuario actual.
     // TODO: En el futuro esto vendrá de tu Zustand (useAuthStore).
-    const currentUserRole = "PLATFORM_ADMIN_ROLE"; 
-    
-    // Estado para simular cuál pestaña está activa
-    const [activeTab, setActiveTab] = useState("Dashboard");
+    const currentUserRole = "PLATFORM_ADMIN_ROLE";
+
 
     // Estructura del menú segmentada por categorías y roles
     const menuGroups = [
@@ -64,48 +62,39 @@ export const Sidebar = () => {
     ];
 
     // Filtramos las secciones según el rol del usuario logueado
-    const visibleGroups = menuGroups.filter(group => 
+    const visibleGroups = menuGroups.filter(group =>
         group.allowedRoles.includes(currentUserRole)
     );
 
     return (
-        <aside className="w-64 bg-white min-h-[calc(100vh-4rem)] shadow-xl border-r border-gray-100 flex flex-col justify-between overflow-y-auto custom-scrollbar">
+        <aside className="w-64 bg-white min-h-[calc(100vh-4rem)] shadow-xl border-r border-gray-100 flex flex-col justify-between overflow-y-auto">
             <div className="p-4 space-y-6">
                 {visibleGroups.map((group, groupIndex) => (
                     <div key={groupIndex}>
-                        {/* Título de la Categoría */}
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 px-4">
+                        <p className="text-[10px] font-black text-gray-400 uppercase mb-2 px-4 italic">
                             {group.title}
                         </p>
-                        
-                        {/* Items de la Categoría */}
                         <ul className="space-y-1">
-                            {group.items.map((item) => {
-                                const isActive = activeTab === item.label;
-
-                                return (
-                                    <li key={item.label}>
-                                        <div 
-                                            onClick={() => setActiveTab(item.label)}
-                                            className={`
-                                                flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold transition-all duration-200 cursor-pointer
-                                                ${isActive 
-                                                    ? "bg-kinal-red text-white shadow-md shadow-red-200" 
-                                                    : "text-gray-500 hover:bg-orange-50 hover:text-kinal-orange"}
-                                            `}
-                                        >
-                                            <img 
-                                                src={item.icon} 
-                                                alt={`${item.label} icon`} 
-                                                className={`w-5 h-5 object-contain transition-all duration-200 
-                                                    ${isActive ? "invert brightness-0" : "opacity-60 grayscale"}
-                                                `}
-                                            />
-                                            <span className="text-sm">{item.label}</span>
-                                        </div>
-                                    </li>
-                                );
-                            })}
+                            {group.items.map((item) => (
+                                <li key={item.label}>
+                                    <div
+                                        // 4. Al hacer clic, le avisamos al DashboardContainer
+                                        onClick={() => onNavigate(item.label)}
+                                        className={`
+                                            flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer
+                                            ${activeTab === item.label
+                                                ? "bg-kinal-red text-white shadow-md"
+                                                : "text-gray-500 hover:bg-orange-50 hover:text-kinal-orange"}
+                                        `}
+                                    >
+                                        <img
+                                            src={item.icon}
+                                            className={`w-5 h-5 ${activeTab === item.label ? "invert brightness-0" : "opacity-60"}`}
+                                        />
+                                        <span className="text-sm">{item.label}</span>
+                                    </div>
+                                </li>
+                            ))}
                         </ul>
                     </div>
                 ))}
