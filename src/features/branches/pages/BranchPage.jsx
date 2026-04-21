@@ -2,6 +2,8 @@ import { BranchCard } from "../components/BranchCard";
 import { BranchModal } from "../components/BranchModal";
 import { useState } from "react";
 
+import createIcon from "../../../assets/icons/Create.svg";
+
 export const BranchPage = () => {
   const [isBranchModalOpen, setIsBranchModalOpen] = useState(false);
 
@@ -23,8 +25,9 @@ export const BranchPage = () => {
         </div>
         <button
             onClick={() => setIsBranchModalOpen(true)}
-            className="bg-kinal-orange text-white font-black px-6 py-3 rounded-2xl shadow-lg hover:bg-orange-600 transition-all uppercase tracking-tighter">
-          + Nueva Sucursal
+            className="bg-kinal-orange text-white font-black px-6 py-3 rounded-2xl shadow-xl hover:bg-orange-600 transition-all uppercase tracking-tighter flex flex-row items-center justify-center gap-2">
+          <img src={createIcon} alt="Crear" className="w-5 h-5 invert opacity-90" /> 
+          <span>Nueva Sucursal</span>
         </button>
       </div>
 

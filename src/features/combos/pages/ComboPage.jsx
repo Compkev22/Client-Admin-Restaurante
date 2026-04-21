@@ -2,6 +2,7 @@
 import imgCombo1 from "../../../assets/img/Combo1.png";
 import imgCombo2 from "../../../assets/img/Combo2.png";
 import imgCombo3 from "../../../assets/img/Combo3.png";
+import createIcon from "../../../assets/icons/Create.svg";
 
 import { ComboCard } from "../components/ComboCard";
 import { ComboModal } from "../components/ComboModal";
@@ -27,8 +28,9 @@ export const ComboPage = () => {
                 </div>
                 <button
                     onClick={() => setIsComboModalOpen(true)}
-                    className="bg-kinal-orange text-white font-black px-8 py-4 rounded-2xl shadow-xl hover:bg-orange-600 transition-all uppercase tracking-tighter">
-                    + Nuevo Combo
+                    className="bg-kinal-orange text-white font-black px-6 py-3 rounded-2xl shadow-xl hover:bg-orange-600 transition-all uppercase tracking-tighter flex flex-row items-center justify-center gap-2">
+                    <img src={createIcon} alt="Crear" className="w-5 h-5 invert opacity-90" />
+                    <span>Nuevo Combo</span>
                 </button>
             </div>
 

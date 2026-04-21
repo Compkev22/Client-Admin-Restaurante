@@ -9,6 +9,7 @@ import { ComboPage } from "../../../features/combos/pages/ComboPage";
 import { CouponPage } from "../../../features/coupons/pages/CouponPage";
 import { EventPage } from "../../../features/events/pages/EventPage";
 import { InventoryPage } from "../../../features/inventory/Pages/InventoryPage";
+import { MenuPage } from "../../../features/menu/pages/MenuPage";
 
 export const DashboardContainer = () => {
   // 1. Creamos el estado para saber qué ver
@@ -32,6 +33,8 @@ export const DashboardContainer = () => {
         return <EventPage />;
       case "Inventario":
         return <InventoryPage />;
+      case "Menú":
+        return <MenuPage />;
       default:
         return <BillingPage />;
     }
