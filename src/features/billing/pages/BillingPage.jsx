@@ -1,7 +1,11 @@
 import { BillingStats } from "../components/BillingStats";
 import { InvoicesTable } from "../components/InvoicesTable";
+import { BillingModal } from "../components/BillingModal";
+import { useState } from "react";
 
 export const BillingPage = () => {
+  const [isComboModalOpen, setIsComboModalOpen] = useState(false);
+
   return (
     <div className="space-y-8 animate-fade-in">
       <div>
