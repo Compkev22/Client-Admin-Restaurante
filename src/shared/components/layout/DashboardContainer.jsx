@@ -4,7 +4,7 @@ import { Sidebar } from "./Sidebar";
 
 // Importa tus páginas (Entidades)
 import { BillingPage } from "../../../features/billing/pages/BillingPage";
-// import { BranchPage } from "../../../features/branches/pages/BranchPage"; 
+import { BranchPage } from "../../../features/branches/pages/BranchPage"; 
 
 export const DashboardContainer = () => {
   // 1. Creamos el estado para saber qué ver
@@ -18,7 +18,8 @@ export const DashboardContainer = () => {
       case "Dashboard":
         return <div className="p-10 text-center font-bold text-gray-400">BIENVENIDO A KINAL FRIED CHICKEN</div>;
       // Aquí irás agregando los demás cases:
-      // case "Sucursales": return <BranchPage />;
+      case "Sucursales": 
+        return <BranchPage />;
       default:
         return <BillingPage />;
     }
