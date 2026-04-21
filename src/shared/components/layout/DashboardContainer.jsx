@@ -6,6 +6,7 @@ import { Sidebar } from "./Sidebar";
 import { BillingPage } from "../../../features/billing/pages/BillingPage";
 import { BranchPage } from "../../../features/branches/pages/BranchPage"; 
 import { ComboPage } from "../../../features/combos/pages/ComboPage";
+import { CouponPage } from "../../../features/coupons/pages/CouponPage";
 
 export const DashboardContainer = () => {
   // 1. Creamos el estado para saber qué ver
@@ -23,6 +24,8 @@ export const DashboardContainer = () => {
         return <BranchPage />;
       case "Combos": 
         return <ComboPage />;
+      case "Cupones":
+        return <CouponPage />;
       default:
         return <BillingPage />;
     }
