@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colores Principales del Restaurante */
+  --color-kinal-red: #e11d48;
+  --color-kinal-orange: #fb923c;
+  --color-kinal-yellow: #facc15;
+  --color-kinal-dark-red: #7f1d1d; /* text-red-900 para contraste */
+}
+
+:root {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  background-color: #f3f4f6; /* bg-gray-100 */
+}
+
+/* Efectos de Glassmorphism para los Modales y Cards */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-white-20 {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+}
+
+/* Animación suave para cambios de vista */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
