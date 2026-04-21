@@ -1,0 +1,100 @@
+/* src/features/auth/pages/auth.css */
+
+.login-wrapper {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Amarillo pastel/crema suave para no lastimar la vista */
+  background-color: #fef3c7; 
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  margin: 1rem;
+}
+
+.login-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+/* ¡Aquí controlamos al pollo rebelde! */
+.login-logo {
+  height: 120px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 1rem;
+}
+
+.login-title {
+  font-size: 1.875rem;
+  font-weight: 900;
+  font-style: italic;
+  margin: 0;
+}
+
+.text-red { color: #e11d48; }
+.text-orange { color: #fb923c; }
+
+.login-subtitle {
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-top: 0.25rem;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #d1d5db;
+  box-sizing: border-box;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.form-input:focus {
+  border-color: #fb923c;
+  box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.2);
+}
+
+.btn-submit {
+  width: 100%;
+  background-color: #e11d48;
+  color: white;
+  font-weight: bold;
+  padding: 0.875rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.btn-submit:hover {
+  background-color: #be123c;
+}
