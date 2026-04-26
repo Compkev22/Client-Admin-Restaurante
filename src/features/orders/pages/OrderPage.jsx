@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { OrderModal } from "../components/OrderModal";
+import { PaymentWizardModal } from "../../billing/components/PaymentModal";
 import createIcon from "../../../assets/icons/Create.svg"; 
 import orderTimeIcon from "../../../assets/icons/OrderTime.svg";
 
 export const OrderPage = () => {
   const [activeTab, setActiveTab] = useState("Todos");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [selectedOrderToPay, setSelectedOrderToPay] = useState(null);
 
   // Mock data basada EXACTAMENTE en tu modelo Order
   const orders = [
@@ -127,20 +130,31 @@ export const OrderPage = () => {
               </div>
 
               {/* Botón de Acción Principal (El que detonará el Feat 1) */}
-              <button className={`w-full py-3 rounded-xl font-black uppercase tracking-widest transition-all mt-auto ${
-                order.estado === 'Pendiente' || order.estado === 'Listo'
-                  ? 'bg-kinal-red text-white hover:bg-red-700 shadow-lg'
-                  : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
-              }`}>
+            <button 
+                onClick={() => {
+                  if (order.estado === 'Pendiente' || order.estado === 'Listo') {
+                    // Abrimos el Feat 1: Wizard de Pago
+                    setSelectedOrderToPay(order);
+                    setIsPaymentOpen(true);
+                  } else {
+                    // Aquí conectaremos el Feat 2 más adelante
+                    console.log("Ver detalles de la orden:", order._id);
+                  }
+                }}
+                className={`w-full py-3 rounded-xl font-black uppercase tracking-widest transition-all mt-auto ${
+                  order.estado === 'Pendiente' || order.estado === 'Listo'
+                    ? 'bg-kinal-red text-white hover:bg-red-700 shadow-lg'
+                    : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                }`}
+              >
                 {order.estado === 'Pendiente' || order.estado === 'Listo' ? 'Facturar y Cobrar' : 'Ver Detalles'}
-              </button>
-
+            </button>
             </div>
           );
         })}
       </div>
-
         <OrderModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+        <PaymentWizardModal isOpen={isPaymentOpen} onClose={() => setIsPaymentOpen(false)} orderData={selectedOrderToPay} />
     </div>
   );
 };
