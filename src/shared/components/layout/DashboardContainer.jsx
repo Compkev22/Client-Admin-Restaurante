@@ -12,6 +12,7 @@ import { InventoryPage } from "../../../features/inventory/Pages/InventoryPage";
 import { MenuPage } from "../../../features/menu/pages/MenuPage";
 import { OrderPage } from "../../../features/orders/pages/OrderPage";
 import { ReservationPage } from "../../../features/reservations/pages/ReservationPage";
+import { ReviewPage } from "../../../features/reviews/pages/ReviewPage";
 
 export const DashboardContainer = () => {
   // 1. Creamos el estado para saber qué ver
@@ -41,6 +42,8 @@ export const DashboardContainer = () => {
         return <OrderPage />;
       case "Reservaciones":
         return <ReservationPage />;
+      case "Reseñas":
+        return <ReviewPage />;
       default:
         return <BillingPage />;
     }
