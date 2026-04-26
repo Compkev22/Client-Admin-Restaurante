@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { OrderModal } from "../components/OrderModal";
 import { PaymentWizardModal } from "../../billing/components/PaymentModal";
+import { OrderDetailModal } from "../components/OrderDetailModal";
 import createIcon from "../../../assets/icons/Create.svg"; 
 import orderTimeIcon from "../../../assets/icons/OrderTime.svg";
 
@@ -9,6 +10,8 @@ export const OrderPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [selectedOrderToPay, setSelectedOrderToPay] = useState(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
 
   // Mock data basada EXACTAMENTE en tu modelo Order
   const orders = [
@@ -138,7 +141,8 @@ export const OrderPage = () => {
                     setIsPaymentOpen(true);
                   } else {
                     // Aquí conectaremos el Feat 2 más adelante
-                    console.log("Ver detalles de la orden:", order._id);
+                    setSelectedOrderDetails(order);
+                    setIsDetailOpen(true);
                   }
                 }}
                 className={`w-full py-3 rounded-xl font-black uppercase tracking-widest transition-all mt-auto ${
@@ -155,6 +159,7 @@ export const OrderPage = () => {
       </div>
         <OrderModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
         <PaymentWizardModal isOpen={isPaymentOpen} onClose={() => setIsPaymentOpen(false)} orderData={selectedOrderToPay} />
+        <OrderDetailModal isOpen={isDetailOpen} onClose={() => setIsDetailOpen(false)} orderData={selectedOrderDetails} />
     </div>
   );
 };
