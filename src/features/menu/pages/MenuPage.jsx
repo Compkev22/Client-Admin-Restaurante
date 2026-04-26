@@ -10,15 +10,20 @@ export const MenuPage = () => {
   const [activeCategory, setActiveCategory] = useState("Todos");
 
   // Extraemos las categorías para los botones de filtro
-  const categories = ["Todos", "Pollo", "Hamburguesas", "Complementos", "Bebidas"];
+const categories = ["Todos", "Combos", "Pollo", "Hamburguesas", "Complementos", "Bebidas"];
 
-  // Data falsa adaptada AL MODELO REAL (nombre, categoria, precio, estado, ProductStatus)
+  // Data falsa adaptada (Agregamos algunos combos simulados)
   const products = [
+    // --- Combos ---
+    { _id: "c1", nombre: "Combo Familiar Kinal", categoria: "Combos", precio: 155.00, estado: "Disponible", ProductStatus: "ACTIVE" },
+    { _id: "c2", nombre: "Combo Pareja", categoria: "Combos", precio: 85.00, estado: "Disponible", ProductStatus: "ACTIVE" },
+    
+    // --- Productos Individuales ---
     { _id: "1", nombre: "Pieza de Pollo Original", categoria: "Pollo", precio: 15.00, estado: "Disponible", ProductStatus: "ACTIVE" },
     { _id: "2", nombre: "Hamburguesa Crispy", categoria: "Hamburguesas", precio: 35.00, estado: "Disponible", ProductStatus: "ACTIVE" },
     { _id: "3", nombre: "Papas Fritas Medianas", categoria: "Complementos", precio: 12.00, estado: "Disponible", ProductStatus: "ACTIVE" },
     { _id: "4", nombre: "Ensalada de Repollo", categoria: "Complementos", precio: 10.00, estado: "Agotado", ProductStatus: "ACTIVE" },
-    { _id: "5", nombre: "Soda 16oz", categoria: "Bebidas", precio: 8.00, estado: "Disponible", ProductStatus: "INACTIVE" }, // Este está borrado lógicamente
+    { _id: "5", nombre: "Soda 16oz", categoria: "Bebidas", precio: 8.00, estado: "Disponible", ProductStatus: "INACTIVE" },
   ];
 
   // Filtro
