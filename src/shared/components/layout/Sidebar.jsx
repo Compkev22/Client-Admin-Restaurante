@@ -15,6 +15,7 @@ import iconEvents from "../../../assets/icons/Events.svg";
 import iconReviews from "../../../assets/icons/Reviews.svg";
 import iconBranches from "../../../assets/icons/Branches.svg";
 import iconUsers from "../../../assets/icons/Users.svg";
+import iconService from "../../../assets/icons/ExtraServices.svg"
 
 export const Sidebar = ({ onNavigate, activeTab }) => {
     // Simulamos el rol del usuario actual.
@@ -51,6 +52,7 @@ export const Sidebar = ({ onNavigate, activeTab }) => {
                 { label: "Cupones", icon: iconCoupons },
                 { label: "Eventos", icon: iconEvents },
                 { label: "Reseñas", icon: iconReviews },
+                { label: "Servicios Extras", icon: iconService }
             ]
         },
         {

@@ -15,6 +15,7 @@ import { ReservationPage } from "../../../features/reservations/pages/Reservatio
 import { ReviewPage } from "../../../features/reviews/pages/ReviewPage";
 import { TablePage } from "../../../features/tables/pages/TablePage";
 import { UserPage } from "../../../features/users/pages/UserPage";
+import { ServicePage } from "../../../features/services/pages/ServicePage";
 
 export const DashboardContainer = () => {
   // 1. Creamos el estado para saber qué ver
@@ -50,6 +51,8 @@ export const DashboardContainer = () => {
         return <TablePage />;
       case "Usuarios":
         return <UserPage />;
+      case "Servicios Extras":
+        return <ServicePage />;
       default:
         return <BillingPage />;
     }
