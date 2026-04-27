@@ -1,7 +1,20 @@
 import { axiosAuth } from "./api";
 
 export const login = async (data) => {
-    return await axiosAuth.post("/api/v1/Auth/login", data);
+    // 1. Creamos un objeto FormData
+    const formData = new FormData();
+    
+    // 2. Agregamos los campos que espera el LoginDto de C#
+    // Asegúrate de que los nombres coincidan exactamente con tu LoginDto en el backend
+    formData.append("emailOrUsername", data.emailOrUsername);
+    formData.append("password", data.password);
+
+    // 3. Enviamos el formData en lugar del objeto plano
+    return await axiosAuth.post("/api/v1/Auth/login", formData, {
+        headers: {
+            "Content-Type": "multipart/form-data"
+        }
+    });
 };
 
 export const register = async (data) => {

@@ -48,32 +48,33 @@ export const useAuthStore = create(
                 })
             },
             //------------------------------------------------------------------
-            login: async ({emailOrUsername, password}) => { 
+            login: async ({ emailOrUsername, password }) => {
+                set({ loading: true, error: null }); // Indicamos que está cargando y limpiamos errores
                 
-                const { data } = await loginRequest({emailOrUsername, password}) 
+                try {
+                    const { data } = await loginRequest({ emailOrUsername, password });
 
-                //Solo administradores pueden iniciar sesion en cliente-admin
-                const role = data?.userDetails?.role;
-                if(role !== "PLATFORM_ADMIN_ROLE"){
-                    const message = "No tienes permisos para acceder como administrador";
+                    // Solo administradores pueden iniciar sesion en cliente-admin
+                    const role = data?.userDetails?.role;
+                    if (role !== "PLATFORM_ADMIN_ROLE") {
+                        const message = "No tienes permisos para acceder como administrador";
 
+                        set({
+                            user: null,
+                            token: null,
+                            refreshToken: null,
+                            expiresAt: null,
+                            isAuthenticated: false,
+                            loading: false,
+                            error: message,
+                        });
+
+                        toast.error(message);
+                        return { success: false, error: message };
+                    }
+
+                    // Si todo está bien, guardamos los datos
                     set({
-                        user: null,
-                        token: null,
-                        refreshToken: null,
-                        expiresAt: null,
-                        isAuthenticated: false,
-                        loading: false,
-                        error: message,
-                    });
-
-                   // showError(message);
-                   toast.error(message)
-                    return {success: false, error: message};
-                }
-
-                set(
-                    {
                         user: data.userDetails,
                         token: data.accessToken || data.token,
                         refreshToken: data.refreshToken,
@@ -82,7 +83,28 @@ export const useAuthStore = create(
                         loading: false,
                     });
 
-                    return { success: true};
+                    return { success: true };
+
+                } catch (err) {
+                    // AQUÍ CAPTURAMOS EL ERROR 401 O CUALQUIER OTRO
+                    let errorMessage = "Ocurrió un error al intentar iniciar sesión";
+
+                    if (err.response) {
+                        // Si el status es 401, son credenciales incorrectas
+                        if (err.response.status === 401) {
+                            errorMessage = "Credenciales inválidas. Revisa tu usuario o contraseña.";
+                        } else {
+                            errorMessage = err.response.data?.message || "Error en el servidor";
+                        }
+                    } else if (err.request) {
+                        errorMessage = "No se pudo conectar con el servidor. Revisa tu conexión.";
+                    }
+
+                    set({ loading: false, error: errorMessage });
+                    toast.error(errorMessage); // Lanzamos el toast rojo
+                    
+                    return { success: false, error: errorMessage };
+                }
             }
             //--------------------------------------------------------------
         }),
