@@ -16,6 +16,7 @@ import { ReviewPage } from "../../../features/reviews/pages/ReviewPage";
 import { TablePage } from "../../../features/tables/pages/TablePage";
 import { UserPage } from "../../../features/users/pages/UserPage";
 import { ServicePage } from "../../../features/services/pages/ServicePage";
+import { DashboardOverview } from "../../../features/dashboard/pages/DashboardOverview";
 
 export const DashboardContainer = () => {
   // 1. Creamos el estado para saber qué ver
@@ -27,7 +28,7 @@ export const DashboardContainer = () => {
       case "Facturación":
         return <BillingPage />;
       case "Dashboard":
-        return <div className="p-10 text-center font-bold text-gray-400">BIENVENIDO A KINAL FRIED CHICKEN</div>;
+        return <DashboardOverview onNavigate={setCurrentView} />;
       // Aquí irás agregando los demás cases:
       case "Sucursales": 
         return <BranchPage />;
