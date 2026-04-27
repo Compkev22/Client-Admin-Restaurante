@@ -4,7 +4,7 @@ import { useAuthStore } from '../../features/auth/authStore.js';
 
 //Instancia de axios
 const axiosAuth = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
+    baseURL: import.meta.env.VITE_AUTH_URL,
     timeout: 8000,
     headers: {
         'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ const handleRefreshToken = async function (_error) {
   const status = _error.response?.status;
   const errorCode = _error.response?.data?.error;
   const requestUrl = _original.url || "";
-  const isRefreshEndpoint = requestUrl.includes("/auth/refresh");
+const isRefreshEndpoint = requestUrl.includes("/api/v1/Auth/refresh");
   const shouldAttemptRefresh =
     !isRefreshEndpoint &&
     // La mayoría de casos es 401 (TokenExpiredError)
@@ -75,7 +75,7 @@ const handleRefreshToken = async function (_error) {
       return Promise.reject(_error);
     }
     try {
-      const response = await axiosAuth.post("/auth/refresh", { refreshToken });
+      const response = await axiosAuth.post("/api/v1/Auth/refresh", { refreshToken });
       const {
         accessToken,
         refreshToken: newRefreshToken,
@@ -105,8 +105,10 @@ const handleRefreshToken = async function (_error) {
  
 axiosAuth.interceptors.response.use((res) => res, handleRefreshToken);
  
-axiosAdmin.interceptors.response.use((res) => res, handleRefreshToken);
+//axiosAdmin.interceptors.response.use((res) => res, handleRefreshToken);
  
 // ================= EXPORT AXIOS =================
-export { axiosAuth, axiosAdmin };
+//export { axiosAuth, axiosAdmin };
+export {axiosAuth}
 export { handleRefreshToken };
+

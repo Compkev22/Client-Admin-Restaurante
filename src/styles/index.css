@@ -1,6 +1,13 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+
+
+/* En Tailwind v4, los colores personalizados se agregan así: */
+@theme {
+  --color-main-blue: #2563EB;
+  --color-kinal-red: #E53E3E;
+  --color-kinal-orange: #ED8936;
+}
 
 :root {
   font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
