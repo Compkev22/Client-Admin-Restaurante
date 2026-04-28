@@ -1,5 +1,5 @@
 // src/shared/components/layout/Sidebar.jsx
-import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 // Importación de todos tus SVG oficiales
 import iconDashboard from "../../../assets/icons/Dashboard.svg";
@@ -15,60 +15,57 @@ import iconEvents from "../../../assets/icons/Events.svg";
 import iconReviews from "../../../assets/icons/Reviews.svg";
 import iconBranches from "../../../assets/icons/Branches.svg";
 import iconUsers from "../../../assets/icons/Users.svg";
-import iconService from "../../../assets/icons/ExtraServices.svg"
+import iconService from "../../../assets/icons/ExtraServices.svg";
 
-export const Sidebar = ({ onNavigate, activeTab }) => {
+export const Sidebar = () => {
+    const location = useLocation();
+    
     // Simulamos el rol del usuario actual.
-    // TODO: En el futuro esto vendrá de tu Zustand (useAuthStore).
     const currentUserRole = "PLATFORM_ADMIN_ROLE";
 
-
-    // Estructura del menú segmentada por categorías y roles
+    // Estructura adaptada para React Router
     const menuGroups = [
         {
             title: "Principal",
             allowedRoles: ["PLATFORM_ADMIN_ROLE", "BRANCH_ADMIN_ROLE", "EMPLOYEE_ROLE"],
             items: [
-                { label: "Dashboard", icon: iconDashboard },
-                { label: "Órdenes", icon: iconOrders },
-                { label: "Reservaciones", icon: iconReservations },
+                { label: "Dashboard", to: "/dashboard", icon: iconDashboard },
+                { label: "Órdenes", to: "/dashboard/orders", icon: iconOrders },
+                { label: "Reservaciones", to: "/dashboard/reservations", icon: iconReservations },
             ]
         },
         {
             title: "Restaurante",
             allowedRoles: ["PLATFORM_ADMIN_ROLE", "BRANCH_ADMIN_ROLE"],
             items: [
-                { label: "Menú", icon: iconMenu },
-                { label: "Combos", icon: iconCombos },
-                { label: "Inventario", icon: iconInventory },
-                { label: "Mesas", icon: iconTables },
+                { label: "Menú", to: "/dashboard/menu", icon: iconMenu },
+                { label: "Combos", to: "/dashboard/combos", icon: iconCombos },
+                { label: "Inventario", to: "/dashboard/inventory", icon: iconInventory },
+                { label: "Mesas", to: "/dashboard/tables", icon: iconTables },
             ]
         },
         {
             title: "Comercial",
             allowedRoles: ["PLATFORM_ADMIN_ROLE", "BRANCH_ADMIN_ROLE"],
             items: [
-                { label: "Facturación", icon: iconBilling },
-                { label: "Cupones", icon: iconCoupons },
-                { label: "Eventos", icon: iconEvents },
-                { label: "Reseñas", icon: iconReviews },
-                { label: "Servicios Extras", icon: iconService }
+                { label: "Facturación", to: "/dashboard/billing", icon: iconBilling },
+                { label: "Cupones", to: "/dashboard/coupons", icon: iconCoupons },
+                { label: "Eventos", to: "/dashboard/events", icon: iconEvents },
+                { label: "Reseñas", to: "/dashboard/reviews", icon: iconReviews },
+                { label: "Servicios Extras", to: "/dashboard/services", icon: iconService }
             ]
         },
         {
             title: "Administración",
-            allowedRoles: ["PLATFORM_ADMIN_ROLE"], // Solo el admin supremo ve esto
+            allowedRoles: ["PLATFORM_ADMIN_ROLE"],
             items: [
-                { label: "Sucursales", icon: iconBranches },
-                { label: "Usuarios", icon: iconUsers },
+                { label: "Sucursales", to: "/dashboard/branches", icon: iconBranches },
+                { label: "Usuarios", to: "/dashboard/users", icon: iconUsers },
             ]
         }
     ];
 
-    // Filtramos las secciones según el rol del usuario logueado
-    const visibleGroups = menuGroups.filter(group =>
-        group.allowedRoles.includes(currentUserRole)
-    );
+    const visibleGroups = menuGroups.filter(group => group.allowedRoles.includes(currentUserRole));
 
     return (
         <aside className="w-64 bg-white min-h-[calc(100vh-4rem)] shadow-xl border-r border-gray-100 flex flex-col justify-between overflow-y-auto">
@@ -79,32 +76,37 @@ export const Sidebar = ({ onNavigate, activeTab }) => {
                             {group.title}
                         </p>
                         <ul className="space-y-1">
-                            {group.items.map((item) => (
-                                <li key={item.label}>
-                                    <div
-                                        // 4. Al hacer clic, le avisamos al DashboardContainer
-                                        onClick={() => onNavigate(item.label)}
-                                        className={`
-                                            flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer
-                                            ${activeTab === item.label
-                                                ? "bg-kinal-red text-white shadow-md"
-                                                : "text-gray-500 hover:bg-orange-50 hover:text-kinal-orange"}
-                                        `}
-                                    >
-                                        <img
-                                            src={item.icon}
-                                            className={`w-5 h-5 ${activeTab === item.label ? "invert brightness-0" : "opacity-60"}`}
-                                        />
-                                        <span className="text-sm">{item.label}</span>
-                                    </div>
-                                </li>
-                            ))}
+                            {group.items.map((item) => {
+                                // Lógica de la ruta activa del profe
+                                const active = location.pathname === item.to || (item.to !== "/dashboard" && location.pathname.startsWith(item.to));
+
+                                return (
+                                    <li key={item.label}>
+                                        <Link
+                                            to={item.to}
+                                            className={`
+                                                flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold transition-all
+                                                ${active
+                                                    ? "bg-kinal-red text-white shadow-md"
+                                                    : "text-gray-500 hover:bg-orange-50 hover:text-kinal-orange"}
+                                            `}
+                                        >
+                                            <img
+                                                src={item.icon}
+                                                className={`w-5 h-5 ${active ? "invert brightness-0" : "opacity-60"}`}
+                                                alt={item.label}
+                                            />
+                                            <span className="text-sm">{item.label}</span>
+                                        </Link>
+                                    </li>
+                                );
+                            })}
                         </ul>
                     </div>
                 ))}
             </div>
 
-            {/* Footer del Sidebar con efecto Glassmorphism */}
+            {/* Tu footer original del estado del sistema */}
             <div className="m-4 p-4 rounded-2xl bg-kinal-yellow/10 border border-kinal-yellow/20">
                 <p className="text-[10px] uppercase tracking-widest text-kinal-dark-red font-black mb-1">Estado del Sistema</p>
                 <div className="flex items-center gap-2">

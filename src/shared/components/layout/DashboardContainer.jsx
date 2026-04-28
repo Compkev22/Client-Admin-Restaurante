@@ -1,74 +1,19 @@
-import { useState } from "react";
+// src/shared/components/layout/DashboardContainer.jsx
+import { Outlet } from "react-router-dom";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
 
-// Importa tus páginas (Entidades)
-import { BillingPage } from "../../../features/billing/pages/BillingPage";
-import { BranchPage } from "../../../features/branches/pages/BranchPage"; 
-import { ComboPage } from "../../../features/combos/pages/ComboPage";
-import { CouponPage } from "../../../features/coupons/pages/CouponPage";
-import { EventPage } from "../../../features/events/pages/EventPage";
-import { InventoryPage } from "../../../features/inventory/Pages/InventoryPage";
-import { MenuPage } from "../../../features/menu/pages/MenuPage";
-import { OrderPage } from "../../../features/orders/pages/OrderPage";
-import { ReservationPage } from "../../../features/reservations/pages/ReservationPage";
-import { ReviewPage } from "../../../features/reviews/pages/ReviewPage";
-import { TablePage } from "../../../features/tables/pages/TablePage";
-import { UserPage } from "../../../features/users/pages/UserPage";
-import { ServicePage } from "../../../features/services/pages/ServicePage";
-import { DashboardOverview } from "../../../features/dashboard/pages/DashboardOverview";
-
 export const DashboardContainer = () => {
-  // 1. Creamos el estado para saber qué ver
-  const [currentView, setCurrentView] = useState("Dashboard");
-
-  // 2. Función para renderizar el contenido dinámicamente
-  const renderContent = () => {
-    switch (currentView) {
-      case "Facturación":
-        return <BillingPage />;
-      case "Dashboard":
-        return <DashboardOverview onNavigate={setCurrentView} />;
-      // Aquí irás agregando los demás cases:
-      case "Sucursales": 
-        return <BranchPage />;
-      case "Combos": 
-        return <ComboPage />;
-      case "Cupones":
-        return <CouponPage />;
-      case "Eventos":
-        return <EventPage />;
-      case "Inventario":
-        return <InventoryPage />;
-      case "Menú":
-        return <MenuPage />;
-      case "Órdenes":
-        return <OrderPage />;
-      case "Reservaciones":
-        return <ReservationPage />;
-      case "Reseñas":
-        return <ReviewPage />;
-      case "Mesas":
-        return <TablePage />;
-      case "Usuarios":
-        return <UserPage />;
-      case "Servicios Extras":
-        return <ServicePage />;
-      default:
-        return <BillingPage />;
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar /> 
 
       <div className="flex flex-1">
-        {/* 3. Le pasamos la función para cambiar de vista al Sidebar */}
-        <Sidebar onNavigate={setCurrentView} activeTab={currentView} />
+        <Sidebar />
         
         <main className="flex-1 p-6">
-          {renderContent()}
+          {/* El Outlet renderiza automáticamente la página correspondiente a la URL */}
+          <Outlet />
         </main>
       </div>
     </div>

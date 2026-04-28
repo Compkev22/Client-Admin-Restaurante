@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 
 import { 
     login as loginRequest
-} from "../../shared/api/auth.js"
+} from "../../../shared/api/auth.js"
 
 
 export const useAuthStore = create(

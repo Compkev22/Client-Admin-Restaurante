@@ -1,4 +1,4 @@
-import { useAuthStore } from '../authStore';
+import { useAuthStore } from '../store/authStore';
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -16,12 +16,24 @@ export const LoginForm = ({ onForgot }) => {
     } = useForm();
 
     const onSubmit = async (data) => {
+    try {
         const res = await login(data);
-        if (res.success) {
-            navigate("/dashboard");
-            toast.success("¡Bienvenido al Panel de Administración!");
+        
+        // Si 'res' trae un mensaje de error o devuelve falso, lo detenemos aquí
+        if (res?.error || res === false) {
+            toast.error(res?.error || "Credenciales incorrectas");
+            return; // El return hace que la función muera aquí y no navegue
         }
-    };
+
+        // Si todo salió bien, entra al sistema
+        navigate("/dashboard");
+        toast.success("¡Bienvenido al sistema!");
+        
+    } catch (error) {
+        // Por si el servidor se apaga repentinamente
+        toast.error("Error al conectar con el servidor.");
+    }
+};
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
