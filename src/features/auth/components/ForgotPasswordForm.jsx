@@ -1,37 +1,47 @@
+// src/features/auth/components/ForgotPasswordForm.jsx
 export const ForgotPasswordForm = ({ onSwitch }) => {
     
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Aquí iría la petición Axios para recuperar la clave
+        // TODO: Integrar Axios
         alert("Si el correo existe, te enviaremos las instrucciones.");
-        onSwitch(); // Regresa al login después de enviar
+        onSwitch(); 
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div className="form-group">
-                <label className="form-label">Correo Electrónico</label>
-                <input 
-                    type="email" 
+        <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Campo de Email */}
+            <div>
+                <label className="block text-sm font-medium text-gray-800 mb-1.5">
+                    Email
+                </label>
+                <input
+                    type="email"
                     placeholder="admin@kinalrest.com"
-                    className="form-input"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-kinal-red"
                     required
                 />
             </div>
 
-            <button type="submit" className="btn-submit">
-                Enviar Instrucciones
-            </button>
-            
-            {/* Botón para regresar al Login */}
-            <button 
-                type="button" 
-                onClick={onSwitch}
-                className="btn-submit" 
-                style={{ backgroundColor: '#6b7280', marginTop: '1rem' }}
+            {/* Botón de Submit */}
+            <button
+                type="submit"
+                className="w-full bg-kinal-red text-white py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-kinal-dark-red transition-colors"
             >
-                Volver al Login
+                Enviar correo
             </button>
+
+            {/* Link para regresar a Iniciar Sesión */}
+            <p className="text-center text-sm text-gray-600">
+                ¿Recordaste tu contraseña?{" "}
+                <button
+                    type="button"
+                    onClick={onSwitch}
+                    className="text-kinal-orange font-medium hover:underline"
+                >
+                    Iniciar sesión
+                </button>
+            </p>
         </form>
     );
 };
