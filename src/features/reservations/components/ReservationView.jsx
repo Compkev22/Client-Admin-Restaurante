@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ReservationModal } from "../components/ReservationModal";
+import { ReservationModal } from "./ReservationModal";
 
 // Asumiendo que sigues teniendo estos iconos disponibles
 import createIcon from "../../../assets/icons/Create.svg";

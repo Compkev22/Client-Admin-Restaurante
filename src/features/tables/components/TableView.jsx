@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TableModal } from "../components/TableModal";
+import { TableModal } from "./TableModal";
 
 import createIcon from "../../../assets/icons/Create.svg";
 import iconEdit from "../../../assets/icons/Edit.svg";
