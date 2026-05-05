@@ -22,7 +22,7 @@ export const useAuthStore = create(
             checkAuth: () => {
                 const token = get().token;
                 const user = get().user;
-                const isAdmin = user?.role === "PLATFORM_ADMIN_ROLE";
+                const isAdmin = user?.role === "PLATFORM_ADMIN";
 
                 // SIEMPRE que inicie la app, reseteamos loading y error para evitar bloqueos
                 set({ loading: false, error: null, isLoadingAuth: false });
@@ -52,7 +52,7 @@ export const useAuthStore = create(
                     const { data } = await loginRequest({ emailOrUsername, password });
 
                     const role = data?.userDetails?.role;
-                    if (role !== "PLATFORM_ADMIN_ROLE") {
+                    if (role !== "PLATFORM_ADMIN") {
                         const message = "No tienes permisos para acceder como administrador";
                         set({
                             user: null, token: null, isAuthenticated: false,

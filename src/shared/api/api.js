@@ -11,6 +11,12 @@ const axiosAuth = axios.create({
     },
 });
 
+const axiosAdmin = axios.create({
+    baseURL: import.meta.env.VITE_ADMIN_URL, // Debe ser http://localhost:3001/restaurantSystem/v1
+    timeout: 8000,
+    headers: { 'Content-Type': 'application/json' },
+});
+
 // configuracion de interceptores
 axiosAuth.interceptors.request.use( (config) => {
     config._axiosClient = "auth";
@@ -18,6 +24,13 @@ axiosAuth.interceptors.request.use( (config) => {
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
+    return config;
+});
+
+axiosAdmin.interceptors.request.use((config) => {
+    config._axiosClient = "admin";
+    const token = useAuthStore.getState().token;
+    if (token) config.headers.Authorization = `Bearer ${token}`; // Node espera Bearer token ahora
     return config;
 });
 
@@ -105,10 +118,9 @@ const isRefreshEndpoint = requestUrl.includes("/api/v1/Auth/refresh");
  
 axiosAuth.interceptors.response.use((res) => res, handleRefreshToken);
  
-//axiosAdmin.interceptors.response.use((res) => res, handleRefreshToken);
+axiosAdmin.interceptors.response.use((res) => res, handleRefreshToken);
  
 // ================= EXPORT AXIOS =================
-//export { axiosAuth, axiosAdmin };
-export {axiosAuth}
+export { axiosAuth, axiosAdmin };
 export { handleRefreshToken };
 

@@ -1,13 +1,28 @@
+import { useBranchStore } from "../../users/store/adminStore"; // Ajustar ruta luego
+import { useUIStore } from "../../auth/store/uiStore";
+
 import branchLocationIcon from "../../../assets/icons/BranchLocation.svg";
 import branchPhoneIcon from "../../../assets/icons/BranchPhone.svg";
 import DeleteIcon from "../../../assets/icons/Delete.svg";
 
-export const BranchCard = ({ branch }) => {
+export const BranchCard = ({ branch, onEdit }) => {
   const isActive = branch.branchStatus === 'ACTIVE';
+  
+  // FALTA: Que este método exista en el store
+  const deleteBranch = useBranchStore((state) => state.deleteBranch);
+  const { openConfirm } = useUIStore();
+
+  const handleDelete = () => {
+    openConfirm(
+      "Eliminar Sucursal",
+      `¿Estás seguro de que deseas eliminar la sucursal ${branch.name}?`,
+      () => deleteBranch(branch._id)
+    );
+  };
 
   return (
     <div className="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow animate-fadeIn">
-      <div className={`h-2 bg-gradient-to-r ${isActive ? 'from-green-400 to-green-600' : 'from-red-400 to-red-600'}`} />
+      <div className={`h-2 bg-gradient-t-r ${isActive ? 'from-green-400 to-green-600' : 'from-red-400 to-red-600'}`} />
       
       <div className="p-6">
         <div className="flex justify-between items-start mb-4">
@@ -36,10 +51,16 @@ export const BranchCard = ({ branch }) => {
         </div>
 
         <div className="mt-6 flex gap-2">
-          <button className="flex-1 bg-kinal-red text-white text-xs font-black py-2.5 rounded-xl hover:bg-red-700 transition-colors uppercase">
+          <button 
+            onClick={onEdit}
+            className="flex-1 bg-kinal-red text-white text-xs font-black py-2.5 rounded-xl hover:bg-red-700 transition-colors uppercase"
+          >
             Editar
           </button>
-          <button className="px-4 py-2.5 border border-gray-200 text-gray-400 rounded-xl hover:bg-gray-50 transition-colors">
+          <button 
+            onClick={handleDelete}
+            className="px-4 py-2.5 border border-gray-200 text-gray-400 rounded-xl hover:bg-gray-50 transition-colors"
+          >
             <img src={DeleteIcon} alt="Delete" className="w-5 h-5" />
           </button>
         </div>

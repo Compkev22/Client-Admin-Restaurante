@@ -1,17 +1,32 @@
+import { useEffect, useState } from "react";
 import { BranchCard } from "./BranchCard";
 import { BranchModal } from "./BranchModal";
-import { useState } from "react";
+import { useBranchStore } from "../../users/store/adminStore"; // Ajustar ruta luego
+import { showError } from "../../../shared/utils/toast";
 
 import createIcon from "../../../assets/icons/Create.svg";
 
 export const BranchPage = () => {
+  // FALTA: Que estos métodos existan en el store
+  const { branches, loading, error, getBranches } = useBranchStore();
+  
   const [isBranchModalOpen, setIsBranchModalOpen] = useState(false);
+  const [selectedBranch, setSelectedBranch] = useState(null);
 
-// Sustituye el arreglo 'branches' actual por este:
-  const branches = [
+  // Efecto para traer la data real
+  useEffect(() => {
+    // Descomentar cuando el store esté listo
+    // getBranches(); 
+  }, []);
+
+  // Efecto para errores
+  useEffect(() => {
+    if (error) showError(error);
+  }, [error]);
+
+  // Arreglo temporal mientras se conecta el backend
+  const mockBranches = branches.length > 0 ? branches : [
     { _id: "1", name: "Sede Central Kinal", address: "6a. Avenida 13-54", city: "Guatemala", zone: 7, phone: 23812000, Email: "central@kinal.com", Category: "Familiar", OpenedAt: "06:00", ClosedAt: "22:00", branchStatus: "ACTIVE" },
-    { _id: "2", name: "KFC Arkadia", address: "Centro Comercial Arkadia", city: "Guatemala", zone: 10, phone: 22345566, Email: "arkadia@kinal.com", Category: "Fast Food", OpenedAt: "10:00", ClosedAt: "21:00", branchStatus: "ACTIVE" },
-    { _id: "3", name: "KFC Roosevelt", address: "Calzada Roosevelt 22-43", city: "Guatemala", zone: 11, phone: 24419090, Email: "roosevelt@kinal.com", Category: "Fast Food", OpenedAt: "06:00", ClosedAt: "23:00", branchStatus: "INACTIVE" }
   ];
 
   return (
@@ -24,23 +39,41 @@ export const BranchPage = () => {
           <p className="text-gray-500 font-medium">Administra las ubicaciones y horarios del restaurante.</p>
         </div>
         <button
-            onClick={() => setIsBranchModalOpen(true)}
+            onClick={() => {
+              setSelectedBranch(null);
+              setIsBranchModalOpen(true);
+            }}
             className="bg-kinal-orange text-white font-black px-6 py-3 rounded-2xl shadow-xl hover:bg-orange-600 transition-all uppercase tracking-tighter flex flex-row items-center justify-center gap-2">
           <img src={createIcon} alt="Crear" className="w-5 h-5 invert opacity-90" /> 
           <span>Nueva Sucursal</span>
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {branches.map(branch => (
-          <BranchCard key={branch.id} branch={branch} />
-        ))}
-      </div>
+      {loading ? (
+        <p className="text-center font-bold text-gray-500">Cargando sucursales...</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {mockBranches.map(branch => (
+            <BranchCard 
+              key={branch._id} 
+              branch={branch} 
+              onEdit={() => {
+                setSelectedBranch(branch);
+                setIsBranchModalOpen(true);
+              }}
+            />
+          ))}
+        </div>
+      )}
 
-    <BranchModal
+      <BranchModal
         isOpen={isBranchModalOpen}
-        onClose={() => setIsBranchModalOpen(false)}
-        />
+        onClose={() => {
+          setIsBranchModalOpen(false);
+          setSelectedBranch(null);
+        }}
+        branch={selectedBranch}
+      />
     </div>
   );
 };
