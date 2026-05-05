@@ -1,6 +1,6 @@
-import { BillingStats } from "../components/BillingStats";
-import { InvoicesTable } from "../components/InvoicesTable";
-import { BillingModal } from "../components/BillingModal";
+import { BillingStats } from "./BillingStats";
+import { InvoicesTable } from "./InvoicesTable";
+import { BillingModal } from "./BillingModal";
 import { useState } from "react";
 
 import createIcon from "../../../assets/icons/Create.svg";

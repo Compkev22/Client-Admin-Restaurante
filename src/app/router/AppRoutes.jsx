@@ -6,20 +6,20 @@ import { AuthPage } from "../../features/auth/pages/AuthPage.jsx";
 import { DashboardContainer } from "../../shared/components/layout/DashboardContainer.jsx";
 
 // Importa TODAS tus páginas del restaurante
-import { DashboardOverview } from "../../features/dashboard/pages/DashboardOverview";
-import { OrderPage } from "../../features/orders/pages/OrderPage";
-import { ReservationPage } from "../../features/reservations/pages/ReservationPage";
-import { MenuPage } from "../../features/menu/pages/MenuPage";
-import { ComboPage } from "../../features/combos/pages/ComboPage";
-import { InventoryPage } from "../../features/inventory/Pages/InventoryPage";
-import { TablePage } from "../../features/tables/pages/TablePage";
-import { BillingPage } from "../../features/billing/pages/BillingPage";
-import { CouponPage } from "../../features/coupons/pages/CouponPage";
-import { EventPage } from "../../features/events/pages/EventPage";
-import { ReviewPage } from "../../features/reviews/pages/ReviewPage";
-import { ServicePage } from "../../features/services/pages/ServicePage";
-import { BranchPage } from "../../features/branches/pages/BranchPage"; 
-import { UserPage } from "../../features/users/pages/UserPage";
+import { DashboardOverview } from "../../features/dashboard/components/DashboardOverview.jsx";
+import { OrderPage } from "../../features/orders/components/OrderView.jsx";
+import { ReservationPage } from "../../features/reservations/components/ReservationView.jsx";
+import { MenuPage } from "../../features/menu/components/MenuView.jsx";
+import { ComboPage } from "../../features/combos/components/ComboView.jsx";
+import { InventoryPage } from "../../features/inventory/components/InventoryView.jsx";
+import { TablePage } from "../../features/tables/components/TableView.jsx";
+import { BillingPage } from "../../features/billing/components/BillingView.jsx";
+import { CouponPage } from "../../features/coupons/components/CouponView.jsx";
+import { EventPage } from "../../features/events/components/EventView.jsx";
+import { ReviewPage } from "../../features/reviews/components/ReviewView.jsx";
+import { ServicePage } from "../../features/services/components/ServiceView.jsx";
+import { BranchPage } from "../../features/branches/components/BranchView.jsx"; 
+import { UserPage } from "../../features/users/components/UserView.jsx";
 
 export const AppRoutes = () => {
     return(

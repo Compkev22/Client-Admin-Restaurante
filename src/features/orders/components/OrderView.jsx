@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { OrderModal } from "../components/OrderModal";
+import { OrderModal } from "./OrderModal";
 import { PaymentWizardModal } from "../../billing/components/PaymentModal";
-import { OrderDetailModal } from "../components/OrderDetailModal";
+import { OrderDetailModal } from "./OrderDetailModal";
 import createIcon from "../../../assets/icons/Create.svg"; 
 import orderTimeIcon from "../../../assets/icons/OrderTime.svg";
 

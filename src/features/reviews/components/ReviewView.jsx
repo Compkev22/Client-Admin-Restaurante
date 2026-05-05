@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ReviewModal } from "../components/ReviewModal";
+import { ReviewModal } from "./ReviewModal";
 import StarIcon from "../../../assets/icons/Star.svg";
 import iconDelete from "../../../assets/icons/Delete.svg"; // Asegúrate de tener la ruta correcta
 

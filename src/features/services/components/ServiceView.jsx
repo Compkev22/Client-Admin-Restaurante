@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ServiceModal } from "../components/ServiceModal";
+import { ServiceModal } from "./ServiceModal";
 
 import createIcon from "../../../assets/icons/Create.svg";
 import iconEdit from "../../../assets/icons/Edit.svg";

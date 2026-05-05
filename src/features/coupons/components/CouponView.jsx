@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CouponModal } from "../components/CouponModal";
+import { CouponModal } from "./CouponModal";
 
 import iconEdit from "../../../assets/icons/Edit.svg";
 import iconDelete from "../../../assets/icons/Delete.svg";

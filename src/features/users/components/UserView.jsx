@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { UserModal } from "../components/UserModal";
+import { UserModal } from "./UserModal";
 
 import createIcon from "../../../assets/icons/Create.svg";
 import iconEdit from "../../../assets/icons/Edit.svg";

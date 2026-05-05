@@ -4,8 +4,8 @@ import imgCombo2 from "../../../assets/img/Combo2.png";
 import imgCombo3 from "../../../assets/img/Combo3.png";
 import createIcon from "../../../assets/icons/Create.svg";
 
-import { ComboCard } from "../components/ComboCard";
-import { ComboModal } from "../components/ComboModal";
+import { ComboCard } from "./ComboCard";
+import { ComboModal } from "./ComboModal";
 import { useState } from "react";
 
 export const ComboPage = () => {

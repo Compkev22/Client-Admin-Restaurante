@@ -1,5 +1,5 @@
-import { BranchCard } from "../components/BranchCard";
-import { BranchModal } from "../components/BranchModal";
+import { BranchCard } from "./BranchCard";
+import { BranchModal } from "./BranchModal";
 import { useState } from "react";
 
 import createIcon from "../../../assets/icons/Create.svg";

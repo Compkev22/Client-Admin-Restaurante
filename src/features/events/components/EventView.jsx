@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { EventModal } from "../components/EventModal";
+import { EventModal } from "./EventModal";
 
 import iconEdit from "../../../assets/icons/Edit.svg";
 import iconDelete from "../../../assets/icons/Delete.svg";

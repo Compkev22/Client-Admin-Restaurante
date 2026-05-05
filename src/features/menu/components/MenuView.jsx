@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ProductModal } from "../components/ProductModal";
+import { ProductModal } from "./ProductModal";
 
 import iconEdit from "../../../assets/icons/Edit.svg";
 import iconDelete from "../../../assets/icons/Delete.svg";
