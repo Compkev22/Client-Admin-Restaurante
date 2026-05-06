@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useAdditionalServicesStore } from "../../users/store/adminStore.js";
@@ -10,6 +10,7 @@ export const ServiceModal = ({ isOpen, onClose, serviceData = null }) => {
         register,
         handleSubmit,
         reset,
+        watch,
         formState: { errors },
     } = useForm();
 
@@ -21,6 +22,9 @@ export const ServiceModal = ({ isOpen, onClose, serviceData = null }) => {
         (state) => state.updateAdditionalService
     );
 
+    const [preview, setPreview] = useState(null);
+
+    // 🔹 Cargar datos al editar
     useEffect(() => {
         if (!isOpen) return;
 
@@ -30,37 +34,61 @@ export const ServiceModal = ({ isOpen, onClose, serviceData = null }) => {
                 Description: serviceData.Description || "",
                 AdditionalPrice: serviceData.AdditionalPrice || "",
                 status: serviceData.status || "ACTIVE",
+                image: null,
             });
+
+            setPreview(serviceData.image?.url || null);
         } else {
             reset({
                 Name: "",
                 Description: "",
                 AdditionalPrice: "",
                 status: "ACTIVE",
+                image: null,
             });
+
+            setPreview(null);
         }
     }, [isOpen, serviceData, reset]);
 
+    // 🔹 Preview en tiempo real
+    useEffect(() => {
+        const subscription = watch((value, { name }) => {
+            if (name === "image" && value.image?.length > 0) {
+                const file = value.image[0];
+                setPreview(URL.createObjectURL(file));
+            }
+        });
+
+        return () => subscription.unsubscribe();
+    }, [watch]);
+
     const handleClose = () => {
         reset();
+        setPreview(null);
         onClose();
     };
 
+    // 🔹 Envío con FormData
     const onSubmit = async (data) => {
         try {
-            const payload = {
-                Name: data.Name,
-                Description: data.Description,
-                AdditionalPrice: Number(data.AdditionalPrice),
-                status: data.status,
-            };
+            const formData = new FormData();
+
+            formData.append("Name", data.Name);
+            formData.append("Description", data.Description);
+            formData.append("AdditionalPrice", Number(data.AdditionalPrice));
+            formData.append("status", data.status);
+
+            if (data.image?.[0]) {
+                formData.append("image", data.image[0]);
+            }
 
             let ok;
 
             if (serviceData) {
-                ok = await updateAdditionalService(serviceData._id, payload);
+                ok = await updateAdditionalService(serviceData._id, formData);
             } else {
-                ok = await createAdditionalService(payload);
+                ok = await createAdditionalService(formData);
             }
 
             if (!ok) {
@@ -110,9 +138,26 @@ export const ServiceModal = ({ isOpen, onClose, serviceData = null }) => {
 
                 <form className="p-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
 
+                    {/* PREVIEW */}
+                    <div className="flex justify-center">
+                        <div className="w-28 h-28 rounded-2xl bg-gray-100 border flex items-center justify-center overflow-hidden shadow-inner">
+                            {preview ? (
+                                <img
+                                    src={preview}
+                                    alt="Preview"
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <span className="text-gray-400 text-xs">
+                                    Sin imagen
+                                </span>
+                            )}
+                        </div>
+                    </div>
+
                     <div className="grid grid-cols-1 gap-4">
 
-                        {/* NOMBRE DEL SERVICIO */}
+                        {/* NOMBRE */}
                         <div className="flex flex-col gap-1">
                             <label className="text-sm font-bold text-gray-700">
                                 Nombre del Servicio
@@ -150,10 +195,6 @@ export const ServiceModal = ({ isOpen, onClose, serviceData = null }) => {
                                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none resize-none text-gray-600 font-medium"
                                 {...register("Description", {
                                     required: "La descripción es obligatoria",
-                                    minLength: {
-                                        value: 5,
-                                        message: "La descripción debe tener al menos 5 caracteres",
-                                    },
                                 })}
                             />
 
@@ -164,8 +205,23 @@ export const ServiceModal = ({ isOpen, onClose, serviceData = null }) => {
                             )}
                         </div>
 
+                        {/* IMAGEN */}
+                        <div className="flex flex-col gap-1">
+                            <label className="text-sm font-bold text-gray-700">
+                                Imagen del servicio
+                            </label>
+
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="w-full px-4 py-3 rounded-xl border border-dashed border-gray-300 bg-gray-50 cursor-pointer"
+                                {...register("image")}
+                            />
+                        </div>
+
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {/* PRECIO ADICIONAL */}
+
+                            {/* PRECIO */}
                             <div className="flex flex-col gap-1">
                                 <label className="text-sm font-bold text-gray-700">
                                     Precio Extra (Q)
@@ -175,22 +231,11 @@ export const ServiceModal = ({ isOpen, onClose, serviceData = null }) => {
                                     type="number"
                                     step="0.01"
                                     min="0"
-                                    placeholder="Ej: 150.00"
                                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none font-black text-kinal-red"
                                     {...register("AdditionalPrice", {
                                         required: "El precio es obligatorio",
-                                        min: {
-                                            value: 0,
-                                            message: "El precio no puede ser negativo",
-                                        },
                                     })}
                                 />
-
-                                {errors.AdditionalPrice && (
-                                    <p className="text-red-600 text-xs font-bold mt-1">
-                                        {errors.AdditionalPrice.message}
-                                    </p>
-                                )}
                             </div>
 
                             {/* ESTADO */}
@@ -201,24 +246,17 @@ export const ServiceModal = ({ isOpen, onClose, serviceData = null }) => {
 
                                 <select
                                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none bg-white font-bold text-gray-700"
-                                    {...register("status", {
-                                        required: "El estado es obligatorio",
-                                    })}
+                                    {...register("status")}
                                 >
                                     <option value="ACTIVE">Activo</option>
                                     <option value="INACTIVE">Inactivo</option>
                                 </select>
-
-                                {errors.status && (
-                                    <p className="text-red-600 text-xs font-bold mt-1">
-                                        {errors.status.message}
-                                    </p>
-                                )}
                             </div>
                         </div>
                     </div>
 
-                    <div className="pt-4 flex flex-col-reverse sm:flex-row gap-3 mt-2 border-t border-gray-50">
+                    {/* BOTONES */}
+                    <div className="pt-4 flex flex-col-reverse sm:flex-row items-center gap-3 mt-2 border-t border-gray-50">
                         <button
                             type="button"
                             onClick={handleClose}
@@ -230,7 +268,8 @@ export const ServiceModal = ({ isOpen, onClose, serviceData = null }) => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex-1 sm:flex-2 bg-kinal-red text-white font-black py-3 px-8 rounded-xl shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest disabled:opacity-60"
+                            // Agregué "flex justify-center" para que el Spinner quede bien centrado dentro del botón
+                            className="flex-1 sm:flex-2 flex justify-center items-center bg-kinal-red text-white font-black py-3 px-8 rounded-xl shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest disabled:opacity-60"
                         >
                             {loading ? (
                                 <Spinner small />

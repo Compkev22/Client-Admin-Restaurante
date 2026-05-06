@@ -61,9 +61,8 @@ export const ServicePage = () => {
 
         ShowConfirmToast({
             title: isActive ? "Desactivar servicio" : "Activar servicio",
-            message: `¿Seguro que deseas ${
-                isActive ? "desactivar" : "activar"
-            } ${service.Name}?`,
+            message: `¿Seguro que deseas ${isActive ? "desactivar" : "activar"
+                } ${service.Name}?`,
             onConfirm: async () => {
                 const ok = await changeAdditionalServiceStatus(service._id);
 
@@ -112,11 +111,10 @@ export const ServicePage = () => {
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
-                        className={`px-6 py-2 rounded-full font-black text-sm uppercase transition-all whitespace-nowrap ${
-                            activeTab === tab
+                        className={`px-6 py-2 rounded-full font-black text-sm uppercase transition-all whitespace-nowrap ${activeTab === tab
                                 ? "bg-kinal-red text-white shadow-md"
                                 : "bg-white text-gray-500 border border-gray-200 hover:bg-gray-50"
-                        }`}
+                            }`}
                     >
                         {tab}
                     </button>
@@ -143,22 +141,28 @@ export const ServicePage = () => {
                     return (
                         <div
                             key={service._id}
-                            className={`bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all relative flex flex-col h-full ${
-                                !isActive ? "opacity-60 grayscale bg-gray-50" : ""
-                            }`}
+                            className={`bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all relative flex flex-col h-full ${!isActive ? "opacity-60 grayscale bg-gray-50" : ""
+                                }`}
                         >
                             {/* Badge de Estado */}
                             <div className="absolute top-4 right-4">
                                 <span
-                                    className={`text-[10px] font-black uppercase px-3 py-1 rounded-full border ${
-                                        isActive
+                                    className={`text-[10px] font-black uppercase px-3 py-1 rounded-full border ${isActive
                                             ? "bg-green-100 text-green-700 border-green-200"
                                             : "bg-gray-200 text-gray-500 border-gray-300"
-                                    }`}
+                                        }`}
                                 >
                                     {isActive ? "Activo" : "Inactivo"}
                                 </span>
                             </div>
+
+                            {service.image?.url && (
+                                <img
+                                    src={service.image.url}
+                                    alt={service.Name}
+                                    className="w-full h-40 object-cover rounded-xl mb-4"
+                                />
+                            )}
 
                             {/* Nombre y Precio */}
                             <div className="mb-4 pr-16">
@@ -194,11 +198,10 @@ export const ServicePage = () => {
                                 <button
                                     type="button"
                                     onClick={() => handleChangeStatus(service)}
-                                    className={`p-2 rounded-lg transition-colors ${
-                                        isActive
+                                    className={`p-2 rounded-lg transition-colors ${isActive
                                             ? "bg-red-50 hover:bg-red-100 text-red-600"
                                             : "bg-green-50 hover:bg-green-100 text-green-600"
-                                    }`}
+                                        }`}
                                     title={isActive ? "Desactivar servicio" : "Activar servicio"}
                                 >
                                     <img

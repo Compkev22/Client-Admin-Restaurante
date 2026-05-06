@@ -1,5 +1,26 @@
 import { axiosAdmin } from "./api";
 
+// ================= ADDITIONAL SERVICES =================
+export const getAdditionalServices = async () => {
+    return await axiosAdmin.get("/AS");
+};
+
+export const createAdditionalService = async (data) => {
+    return await axiosAdmin.post("/AS", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+};
+
+export const updateAdditionalService = async (id, data) => {
+    return await axiosAdmin.put(`/AS/${id}`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+};
+
+export const changeAdditionalServiceStatus = async (id) => {
+    return await axiosAdmin.patch(`/AS/${id}/status`);
+};
+
 // ================= BRANCHES (SUCURSALES) =================
 export const getBranches = async (params) => await axiosAdmin.get("/branches", { params });
 export const createBranch = async (data) => await axiosAdmin.post("/branches", data, { headers: { "Content-Type": "multipart/form-data" } });
