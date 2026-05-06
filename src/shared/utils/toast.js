@@ -23,7 +23,6 @@ export const showSuccess = (message) =>
       secondary: "#fff",
     },
   });
-
 export const showError = (message) =>
   toast.error(message, {
     style: {
@@ -37,7 +36,6 @@ export const showError = (message) =>
       secondary: "#fff",
     },
   });
-
 export const showInfo = (message) =>
   toast(message, {
     style: {
