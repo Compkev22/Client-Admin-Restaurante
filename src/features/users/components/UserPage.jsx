@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { UserModal } from "./UserModal";
+import { useUserStore, useBranchStore } from "../store/adminStore";
+import { showConfirmToast } from "../../auth/components/ConfirmModal";
 
 import createIcon from "../../../assets/icons/Create.svg";
 import iconEdit from "../../../assets/icons/Edit.svg";
@@ -8,40 +10,52 @@ import UserVerifyIcon from "../../../assets/icons/UserVerify.svg";
 
 export const UserPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [activeTab, setActiveTab] = useState("Todos");
 
-  // Tabs de filtrado
+  const { users, getUsers, deleteUser } = useUserStore();
+  const { getBranches } = useBranchStore();
+
+  useEffect(() => {
+    getUsers();
+    getBranches();
+  }, []);
+
   const tabs = ["Todos", "Admins", "Empleados", "Clientes", "Inactivos"];
 
-  // Mock data poblada
-  const users = [
-    { _id: "u1", UserName: "Kevin", UserSurname: "Velásquez", UserEmail: "kevin@kinal.edu.gt", role: "PLATFORM_ADMIN", UserStatus: "ACTIVE", branchName: "Global", isVerified: true },
-    { _id: "u2", UserName: "Roberto", UserSurname: "Milian", UserEmail: "roberto@kfc.com.gt", role: "BRANCH_ADMIN", UserStatus: "ACTIVE", branchName: "KFC Zona 10", isVerified: true },
-    { _id: "u3", UserName: "Diego", UserSurname: "López", UserEmail: "diego.empleado@kfc.com.gt", role: "EMPLOYEE", UserStatus: "ACTIVE", branchName: "KFC Miraflores", isVerified: false },
-    { _id: "u4", UserName: "María", UserSurname: "García", UserEmail: "maria.cliente@gmail.com", role: "CLIENT", UserStatus: "ACTIVE", branchName: null, isVerified: true },
-    { _id: "u5", UserName: "Carlos", UserSurname: "Pérez", UserEmail: "carlos.p@hotmail.com", role: "EMPLOYEE", UserStatus: "INACTIVE", branchName: "KFC Zona 10", isVerified: false },
-  ];
-
-  // Lógica de Filtrado
   const filteredUsers = users.filter(u => {
     if (activeTab === "Inactivos") return u.UserStatus === "INACTIVE";
-    if (u.UserStatus === "INACTIVE") return false; // Ocultamos inactivos de las otras pestañas
-    
+    if (u.UserStatus === "INACTIVE" && activeTab !== "Todos") return false;
     if (activeTab === "Admins") return u.role === "PLATFORM_ADMIN" || u.role === "BRANCH_ADMIN";
     if (activeTab === "Empleados") return u.role === "EMPLOYEE";
     if (activeTab === "Clientes") return u.role === "CLIENT";
-    return true; // "Todos"
+    return true;
   });
 
-  // Configuración de colores por Rol
   const getRoleStyle = (role) => {
     switch(role) {
       case 'PLATFORM_ADMIN': return { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Admin Plataforma' };
       case 'BRANCH_ADMIN': return { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Admin Sucursal' };
       case 'EMPLOYEE': return { bg: 'bg-orange-100', text: 'text-kinal-orange', label: 'Empleado' };
       case 'CLIENT': return { bg: 'bg-green-100', text: 'text-green-700', label: 'Cliente' };
-      default: return { bg: 'bg-gray-100', text: 'text-gray-500', label: 'Desconocido' };
+      default: return { bg: 'bg-gray-100', text: 'text-gray-500', label: 'Usuario' };
     }
+  };
+
+  const handleDelete = (user) => {
+    showConfirmToast({
+      title: "Cambiar Estado",
+      message: `¿Estás seguro de cambiar el estado de ${user.UserName}?`,
+      onConfirm: async () => {
+      await deleteUser(user.uid || user._id); 
+      getUsers(); 
+    }
+    });
+  };
+
+  const handleEdit = (user) => {
+    setSelectedUser(user);
+    setIsModalOpen(true);
   };
 
   return (
@@ -56,7 +70,7 @@ export const UserPage = () => {
         </div>
         
         <button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => { setSelectedUser(null); setIsModalOpen(true); }}
           className="bg-kinal-orange text-white font-black px-6 py-3 rounded-2xl shadow-xl hover:bg-orange-600 transition-all uppercase tracking-tighter flex items-center justify-center gap-2"
         >
           <img src={createIcon} alt="Crear" className="w-5 h-5 invert opacity-90" />
@@ -64,16 +78,14 @@ export const UserPage = () => {
         </button>
       </div>
 
-      {/* Tabs / Filtros */}
+      {/* Tabs */}
       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
         {tabs.map((tab) => (
           <button 
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-6 py-2 rounded-full font-black text-sm uppercase transition-all whitespace-nowrap ${
-              activeTab === tab 
-                ? 'bg-kinal-red text-white shadow-md' 
-                : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+              activeTab === tab ? 'bg-kinal-red text-white shadow-md' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
             }`}
           >
             {tab}
@@ -81,20 +93,17 @@ export const UserPage = () => {
         ))}
       </div>
 
-      {/* Grid de Usuarios (Lista tipo Tarjeta) */}
+      {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredUsers.map((user) => {
           const roleStyle = getRoleStyle(user.role);
           const isInactive = user.UserStatus === "INACTIVE";
-
-          // Generar iniciales para el Avatar
-          const initials = `${user.UserName.charAt(0)}${user.UserSurname.charAt(0)}`.toUpperCase();
+          const initials = `${user.UserName?.charAt(0)}${user.UserSurname?.charAt(0)}`.toUpperCase();
 
           return (
-            <div key={user._id} className={`bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all relative flex flex-col ${isInactive ? 'opacity-60 grayscale' : ''}`}>
+            <div key={user._id || user.uid} className={`bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all relative flex flex-col ${isInactive ? 'opacity-60 grayscale' : ''}`}>
               
               <div className="flex items-start gap-4 mb-6">
-                {/* Avatar Circular */}
                 <div className={`w-14 h-14 rounded-full flex items-center justify-center font-black text-xl shadow-inner border-2 ${roleStyle.bg} ${roleStyle.text} border-white ring-2 ring-gray-100`}>
                   {initials}
                 </div>
@@ -105,19 +114,13 @@ export const UserPage = () => {
                       {user.UserName} {user.UserSurname}
                     </h3>
                     {user.isVerified && (
-                      <img 
-                        src={UserVerifyIcon} 
-                        alt="Verificado" 
-                        title="Cuenta Verificada" 
-                        className="w-5 h-5 ml-1 object-contain" 
-                      />
+                      <img src={UserVerifyIcon} alt="Verificado" className="w-5 h-5 ml-1 object-contain" />
                     )}
                   </div>
                   <p className="text-xs font-bold text-gray-400 truncate mt-1">{user.UserEmail}</p>
                 </div>
               </div>
 
-              {/* Badges de Información */}
               <div className="space-y-3 mb-6 flex-grow">
                 <div>
                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Rol</p>
@@ -126,36 +129,42 @@ export const UserPage = () => {
                   </span>
                 </div>
 
-                {user.branchName && (
+                {['BRANCH_ADMIN', 'EMPLOYEE'].includes(user.role) && (
                   <div>
                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Sucursal Asignada</p>
-                    <p className="text-sm font-bold text-gray-700">{user.branchName}</p>
+                    <p className="text-sm font-bold text-gray-700">
+                      {user.branchId?.name || 
+                      useBranchStore.getState().branches.find(b => b._id === user.branchId)?.name || 
+                      "Sin asignar"}
+                    </p>
                   </div>
                 )}
               </div>
 
-              {/* Botones de Acción */}
               <div className="flex justify-between items-center border-t border-gray-50 pt-4 mt-auto">
                 <span className={`text-[10px] font-black uppercase px-2 py-1 rounded ${isInactive ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
                   {isInactive ? 'Inactivo' : 'Activo'}
                 </span>
 
                 <div className="flex gap-2">
-                  <button className="p-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-gray-600 transition-colors">
+                  <button onClick={() => handleEdit(user)} className="p-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-gray-600 transition-colors">
                     <img src={iconEdit} className="w-5 h-5 opacity-70" alt="Edit" />
                   </button>
-                  <button className="p-2 bg-red-50 hover:bg-red-100 rounded-lg text-red-600 transition-colors">
+                  <button onClick={() => handleDelete(user)} className="p-2 bg-red-50 hover:bg-red-100 rounded-lg text-red-600 transition-colors">
                     <img src={iconDelete} className="w-5 h-5 opacity-70" alt="Delete" />
                   </button>
                 </div>
               </div>
-
             </div>
           );
         })}
       </div>
 
-      <UserModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <UserModal 
+        isOpen={isModalOpen} 
+        onClose={() => { setIsModalOpen(false); setSelectedUser(null); }} 
+        userData={selectedUser}
+      />
     </div>
   );
 };

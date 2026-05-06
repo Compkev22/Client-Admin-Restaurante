@@ -19,7 +19,7 @@ import { EventPage } from "../../features/events/components/EventView.jsx";
 import { ReviewPage } from "../../features/reviews/components/ReviewView.jsx";
 import { ServicePage } from "../../features/services/components/ServiceView.jsx";
 import { BranchPage } from "../../features/branches/components/BranchView.jsx"; 
-import { UserPage } from "../../features/users/components/UserView.jsx";
+import { UserPage } from "../../features/users/components/UserPage.jsx";
 
 export const AppRoutes = () => {
     return(

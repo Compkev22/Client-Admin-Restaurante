@@ -3,7 +3,7 @@ import { OrderModal } from "./OrderModal";
 import { PaymentWizardModal } from "../../billing/components/PaymentModal";
 import { OrderDetailModal } from "./OrderDetailModal";
 import createIcon from "../../../assets/icons/Create.svg"; 
-import orderTimeIcon from "../../../assets/icons/OrderTime.svg";
+import orderTimeIcon from "../../../assets/icons/orderTime.svg";
 
 export const OrderPage = () => {
   const [activeTab, setActiveTab] = useState("Todos");
