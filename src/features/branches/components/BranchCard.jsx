@@ -22,7 +22,7 @@ export const BranchCard = ({ branch, onEdit }) => {
   // Validar si tiene foto
   const imageUrl = branch.Photos && branch.Photos.length > 0 
     ? branch.Photos[0].ImageURL 
-    : 'https://via.placeholder.com/400x200?text=Sin+Imagen';
+    : 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=400&h=200&auto=format&fit=crop';
 
   return (
     <div className="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow animate-fadeIn flex flex-col">

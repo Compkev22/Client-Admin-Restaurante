@@ -7,19 +7,26 @@ import createIcon from "../../../assets/icons/Create.svg";
 import iconEdit from "../../../assets/icons/Edit.svg";
 import iconDelete from "../../../assets/icons/Delete.svg";
 import UserVerifyIcon from "../../../assets/icons/UserVerify.svg";
+import { showError } from "../../../shared/utils/toast";
 
 export const UserPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [activeTab, setActiveTab] = useState("Todos");
 
-  const { users, getUsers, deleteUser } = useUserStore();
+  const { users, getUsers, error, deleteUser } = useUserStore();
   const { getBranches } = useBranchStore();
 
   useEffect(() => {
     getUsers();
     getBranches();
   }, []);
+
+    useEffect(() => {
+    if (error) {
+      showError(error);
+    }
+  }, [error]);
 
   const tabs = ["Todos", "Admins", "Empleados", "Clientes", "Inactivos"];
 

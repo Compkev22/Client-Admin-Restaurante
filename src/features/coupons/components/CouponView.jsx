@@ -8,9 +8,10 @@ import { Spinner } from "../../auth/components/Spinner.jsx";
 import iconEdit from "../../../assets/icons/Edit.svg";
 import iconDelete from "../../../assets/icons/Delete.svg";
 import createIcon from "../../../assets/icons/Create.svg";
+import { showError } from "../../../shared/utils/toast.js";
 
 export const CouponPage = () => {
-  const { coupons, loading, getCoupons, deleteCoupon } = useCouponStore();
+  const { coupons, loading, error, getCoupons, deleteCoupon } = useCouponStore();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCoupon, setSelectedCoupon] = useState(null);
@@ -18,7 +19,15 @@ export const CouponPage = () => {
   // Cargar cupones al montar componente
   useEffect(() => {
     getCoupons();
+    return () => {
+
+    };
   }, [getCoupons]);
+
+  // 2. Efecto para mostrar errores si falla la petición
+  useEffect(() => {
+    if (error) showError(error);
+  }, [error]);
 
   const handleEdit = (coupon) => {
     setSelectedCoupon(coupon);
@@ -60,8 +69,12 @@ export const CouponPage = () => {
       </div>
 
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-        {loading && coupons.length === 0 ? (
+        {loading ? (
           <div className="p-20 flex justify-center"><Spinner /></div>
+        ) : error ? (
+          <div className="p-20 text-center text-red-500 font-bold">
+            No se pudieron cargar los datos. {error}
+          </div>
         ) : (
           <table className="w-full text-left">
             <thead className="bg-gray-50">
