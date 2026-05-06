@@ -46,7 +46,11 @@ export const deleteCoupon = async (id) => await axiosAdmin.patch(`/coupons/${id}
 export const getTables = async (params) => await axiosAdmin.get("/tables", { params });
 export const createTable = async (data) => await axiosAdmin.post("/tables", data);
 export const updateTable = async (id, data) => await axiosAdmin.put(`/tables/${id}`, data);
-export const deleteTable = async (id) => await axiosAdmin.patch(`/tables/${id}/status`);
+
+// CORRECCIÓN: Cambiamos 'apiClient' por 'axiosAdmin' y quitamos el '/status'
+export const deleteTable = async (id) => await axiosAdmin.patch(`/tables/${id}`);
+
+
 
 // ================= USERS (USUARIOS/EMPLEADOS) =================
 export const getUsers = async (params) => await axiosAdmin.get("/users", { params });

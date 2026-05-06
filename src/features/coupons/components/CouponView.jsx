@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useCouponStore } from "../../users/store/adminStore.js";
-import { useUIStore } from "../../auth/store/uIStore.js";
+import { useUIStore } from "../../auth/store/uiStore.js";
 import { CouponModal } from "./CouponModal.jsx";
 import { showConfirmToast } from "../../auth/components/ConfirmModal.jsx";
 import { Spinner } from "../../auth/components/Spinner.jsx";

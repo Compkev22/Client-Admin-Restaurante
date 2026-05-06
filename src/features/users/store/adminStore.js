@@ -184,22 +184,58 @@ export const useCouponStore = create((set, get) => ({
 
 // ================= MESAS STORE =================
 export const useTableStore = create((set, get) => ({
-  tables: [], loading: false, error: null,
+  tables: [], 
+  loading: false, 
+  error: null,
+
   getTables: async () => {
-    try { set({ loading: true, error: null }); const res = await api.getTables(); set({ tables: res.data.tables, loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al obtener mesas", loading: false }); }
+    try { 
+      set({ loading: true, error: null }); 
+      const res = await api.getTables(); 
+      set({ tables: res.data.tables || [], loading: false }); 
+    } catch (error) { 
+      set({ error: error.response?.data?.message || "Error al obtener mesas", loading: false }); 
+    }
   },
+
   createTable: async (data) => {
-    try { set({ loading: true, error: null }); const res = await api.createTable(data); set({ tables: [res.data.table, ...get().tables], loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al crear mesa", loading: false }); throw error; }
+    try { 
+      set({ loading: true, error: null }); 
+      const res = await api.createTable(data); 
+      set({ tables: [res.data.table, ...get().tables], loading: false }); 
+    } catch (error) { 
+      set({ error: error.response?.data?.message || "Error al crear mesa", loading: false }); 
+      throw error; 
+    }
   },
+
   updateTable: async (id, data) => {
-    try { set({ loading: true, error: null }); const res = await api.updateTable(id, data); set({ tables: get().tables.map(t => t._id === id ? res.data.updated : t), loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al actualizar mesa", loading: false }); throw error; }
+    try { 
+      set({ loading: true, error: null }); 
+      const res = await api.updateTable(id, data); 
+      set({ 
+        tables: get().tables.map(t => t._id === id ? res.data.updated : t), 
+        loading: false 
+      }); 
+    } catch (error) { 
+      set({ error: error.response?.data?.message || "Error al actualizar mesa", loading: false }); 
+      throw error; 
+    }
   },
+
   deleteTable: async (id) => {
-    try { set({ loading: true, error: null }); await api.deleteTable(id); set({ tables: get().tables.filter(t => t._id !== id), loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al eliminar mesa", loading: false }); }
+    try { 
+      set({ loading: true }); 
+      await api.deleteTable(id); 
+      // Si la API responde 200, quitamos la mesa del estado local
+      set({ 
+        tables: get().tables.filter(t => t._id !== id), 
+        loading: false 
+      }); 
+    } catch (error) { 
+      console.error("Error al eliminar:", error);
+      set({ error: "No se pudo eliminar la mesa", loading: false }); 
+    }
   },
 }));
 

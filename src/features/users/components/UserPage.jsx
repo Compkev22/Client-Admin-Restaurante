@@ -17,12 +17,14 @@ export const UserPage = () => {
   const { users, getUsers, error, deleteUser } = useUserStore();
   const { getBranches } = useBranchStore();
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   useEffect(() => {
     getUsers();
     getBranches();
   }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     if (error) {
       showError(error);
     }
@@ -31,16 +33,22 @@ export const UserPage = () => {
   const tabs = ["Todos", "Admins", "Empleados", "Clientes", "Inactivos"];
 
   const filteredUsers = users.filter(u => {
+    const matchesSearch =
+      u.UserName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.UserEmail?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    if (!matchesSearch) return false;
     if (activeTab === "Inactivos") return u.UserStatus === "INACTIVE";
-    if (u.UserStatus === "INACTIVE" && activeTab !== "Todos") return false;
-    if (activeTab === "Admins") return u.role === "PLATFORM_ADMIN" || u.role === "BRANCH_ADMIN";
-    if (activeTab === "Empleados") return u.role === "EMPLOYEE";
-    if (activeTab === "Clientes") return u.role === "CLIENT";
+
+    if (activeTab === "Admins") return u.role === 'PLATFORM_ADMIN' || u.role === 'BRANCH_ADMIN';
+    if (activeTab === "Empleados") return u.role === 'EMPLOYEE';
+    if (activeTab === "Clientes") return u.role === 'CLIENT';
+
     return true;
   });
 
   const getRoleStyle = (role) => {
-    switch(role) {
+    switch (role) {
       case 'PLATFORM_ADMIN': return { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Admin Plataforma' };
       case 'BRANCH_ADMIN': return { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Admin Sucursal' };
       case 'EMPLOYEE': return { bg: 'bg-orange-100', text: 'text-kinal-orange', label: 'Empleado' };
@@ -54,9 +62,9 @@ export const UserPage = () => {
       title: "Cambiar Estado",
       message: `¿Estás seguro de cambiar el estado de ${user.UserName}?`,
       onConfirm: async () => {
-      await deleteUser(user.uid || user._id); 
-      getUsers(); 
-    }
+        await deleteUser(user.uid || user._id);
+        getUsers();
+      }
     });
   };
 
@@ -75,8 +83,23 @@ export const UserPage = () => {
           </h1>
           <p className="text-gray-500 font-medium">Gestión de personal, clientes y administradores.</p>
         </div>
-        
-        <button 
+
+        <div className="relative w-full xl:max-w-sm">
+          <input
+            type="text"
+            placeholder="Buscar por nombre o correo..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-5 pr-12 py-3 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-kinal-red outline-none font-medium shadow-sm transition-all"
+          />
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+
+        <button
           onClick={() => { setSelectedUser(null); setIsModalOpen(true); }}
           className="bg-kinal-orange text-white font-black px-6 py-3 rounded-2xl shadow-xl hover:bg-orange-600 transition-all uppercase tracking-tighter flex items-center justify-center gap-2"
         >
@@ -88,12 +111,11 @@ export const UserPage = () => {
       {/* Tabs */}
       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
         {tabs.map((tab) => (
-          <button 
+          <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-6 py-2 rounded-full font-black text-sm uppercase transition-all whitespace-nowrap ${
-              activeTab === tab ? 'bg-kinal-red text-white shadow-md' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
-            }`}
+            className={`px-6 py-2 rounded-full font-black text-sm uppercase transition-all whitespace-nowrap ${activeTab === tab ? 'bg-kinal-red text-white shadow-md' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+              }`}
           >
             {tab}
           </button>
@@ -109,14 +131,14 @@ export const UserPage = () => {
 
           return (
             <div key={user._id || user.uid} className={`bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all relative flex flex-col ${isInactive ? 'opacity-60 grayscale' : ''}`}>
-              
+
               <div className="flex items-start gap-4 mb-6">
                 <div className={`w-14 h-14 rounded-full flex items-center justify-center font-black text-xl shadow-inner border-2 ${roleStyle.bg} ${roleStyle.text} border-white ring-2 ring-gray-100`}>
                   {initials}
                 </div>
-                
+
                 <div className="flex-1 overflow-hidden">
-                    <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center">
                     <h3 className="text-lg font-black text-gray-800 truncate leading-tight">
                       {user.UserName} {user.UserSurname}
                     </h3>
@@ -140,9 +162,9 @@ export const UserPage = () => {
                   <div>
                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Sucursal Asignada</p>
                     <p className="text-sm font-bold text-gray-700">
-                      {user.branchId?.name || 
-                      useBranchStore.getState().branches.find(b => b._id === user.branchId)?.name || 
-                      "Sin asignar"}
+                      {user.branchId?.name ||
+                        useBranchStore.getState().branches.find(b => b._id === user.branchId)?.name ||
+                        "Sin asignar"}
                     </p>
                   </div>
                 )}
@@ -167,9 +189,9 @@ export const UserPage = () => {
         })}
       </div>
 
-      <UserModal 
-        isOpen={isModalOpen} 
-        onClose={() => { setIsModalOpen(false); setSelectedUser(null); }} 
+      <UserModal
+        isOpen={isModalOpen}
+        onClose={() => { setIsModalOpen(false); setSelectedUser(null); }}
         userData={selectedUser}
       />
     </div>
