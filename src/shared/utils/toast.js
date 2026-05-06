@@ -1,13 +1,14 @@
-import {toast} from 'react-hot-toast';
+import { toast } from "react-hot-toast";
 
+// Colores y estilos personalizados
 const baseStyle = {
-    borderRadius: '8px',
-    fontWeight: 600,
-    fontFamily: "inherit",
-    fontSize: "1rem",
-    padding: "16px 24px",
-    boxShadow: "0px 2px 16px 0 rgba(0, 0, 0, 0.8)",
-}
+  borderRadius: "8px",
+  fontWeight: 600,
+  fontFamily: "inherit",
+  fontSize: "1rem",
+  padding: "16px 24px",
+  boxShadow: "0 2px 16px 0 rgba(0,0,0,0.08)",
+};
 
 export const showSuccess = (message) =>
   toast.success(message, {
@@ -22,7 +23,6 @@ export const showSuccess = (message) =>
       secondary: "#fff",
     },
   });
- 
 export const showError = (message) =>
   toast.error(message, {
     style: {
@@ -36,7 +36,6 @@ export const showError = (message) =>
       secondary: "#fff",
     },
   });
- 
 export const showInfo = (message) =>
   toast(message, {
     style: {
