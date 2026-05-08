@@ -35,6 +35,10 @@ export const updateUser = async (id, data) => await axiosAdmin.put(`/users/${id}
 export const deleteUser = async (id) => await axiosAdmin.patch(`/users/${id}/status`);
 
 // ================= RESERVATIONS (RESERVAS) =================
+export const getReservations = async (params) => await axiosAdmin.get("/reservation", { params });
+export const createReservation = async (data) => await axiosAdmin.post("/reservation", data);
+export const updateReservation = async (id, data) => await axiosAdmin.put(`/reservation/${id}`, data);
+export const deleteReservation = async (id) => await axiosAdmin.patch(`/reservation/${id}/status`);
 
 // ================= INVENTORY (INVENTARIO) =================
 export const getInventory = async (params) => await axiosAdmin.get("/inventory", { params });

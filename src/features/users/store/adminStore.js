@@ -116,6 +116,65 @@ export const useUserStore = create((set, get) => ({
 }));
 
 // ================= RESERVATIONS STORE =================
+export const useReservationStore = create((set, get) => ({
+  reservations: [],
+  loading: false,
+  error: null,
+
+  getReservations: async (params) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.getReservations(params);
+      // El controlador devuelve { success: true, reservations: [...] }
+      set({ reservations: res.data.reservations, loading: false });
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al obtener reservaciones", loading: false });
+    }
+  },
+
+  createReservation: async (data) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.createReservation(data);
+      // El controlador devuelve { success: true, data: {...} }
+      set({ reservations: [res.data.data, ...get().reservations], loading: false });
+      return res.data; // Útil para mostrar la mesa asignada en el componente
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al crear reservación", loading: false });
+      throw error;
+    }
+  },
+
+  updateReservation: async (id, data) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.updateReservation(id, data);
+      // El controlador devuelve { success: true, updated: {...} }
+      set({
+        reservations: get().reservations.map((r) =>
+          r._id === id ? res.data.updated : r
+        ),
+        loading: false,
+      });
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al actualizar reservación", loading: false });
+      throw error;
+    }
+  },
+
+  deleteReservation: async (id) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.deleteReservation(id);
+      // El controlador hace un toggle y devuelve el objeto modificado o mensaje
+      // Para mantener sincronía con tu controlador que cambia statusRes y status:
+      await get().getReservations(); // Recargamos para ver los cambios de estado aplicados
+      set({ loading: false });
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al cambiar estado de reservación", loading: false });
+    }
+  },
+}));
 
 // ================= INVENTORY STORE =================
 export const useInventoryStore = create((set, get) => ({

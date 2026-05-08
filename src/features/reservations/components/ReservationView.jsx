@@ -1,32 +1,43 @@
-import { useState } from "react";
-import { ReservationModal } from "./ReservationModal";
+import { useEffect, useState } from "react";
+import { useReservationStore } from "../../users/store/adminStore.js";
+import { ReservationModal } from "./ReservationModal.jsx";
+import { Spinner } from "../../auth/components/Spinner.jsx";
+import { showConfirmToast } from "../../auth/components/ConfirmModal.jsx";
 
-// Asumiendo que sigues teniendo estos iconos disponibles
 import createIcon from "../../../assets/icons/Create.svg";
 import iconEdit from "../../../assets/icons/Edit.svg";
 import iconDelete from "../../../assets/icons/Delete.svg";
 
 export const ReservationPage = () => {
+  const { reservations, loading, getReservations, deleteReservation } = useReservationStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
   const [activeTab, setActiveTab] = useState("Todas");
 
-  // Tabs basados en tu schema enum de status
   const tabs = ["Todas", "Pendiente", "Confirmada", "Completada", "Cancelada"];
 
-  // Mock data poblada con la estructura del backend (simulando los .populate())
-  const reservations = [
-    { _id: "res1", date: "2026-05-01", time: "18:30", numberOfPersons: 4, status: "Confirmada", clientName: "Carlos Argüello", branchName: "KFC Zona 10", tableName: "Mesa 4", notes: "Silla de bebé requerida" },
-    { _id: "res2", date: "2026-05-02", time: "13:00", numberOfPersons: 2, status: "Pendiente", clientName: "María López", branchName: "KFC Miraflores", tableName: "Mesa 12", notes: "" },
-    { _id: "res3", date: "2026-04-25", time: "19:00", numberOfPersons: 8, status: "Completada", clientName: "Roberto Milian", branchName: "KFC Zona 10", tableName: "VIP 1", notes: "Celebración de cumpleaños" },
-    { _id: "res4", date: "2026-05-03", time: "20:00", numberOfPersons: 3, status: "Cancelada", clientName: "Ana Méndez", branchName: "KFC Miraflores", tableName: "Mesa 2", notes: "Canceló por teléfono" },
-  ];
+  useEffect(() => {
+    getReservations();
+  }, [getReservations]);
 
-  // Filtro
+  // Filtrado de datos reales
   const filteredReservations = activeTab === "Todas" 
     ? reservations 
     : reservations.filter(r => r.status === activeTab);
 
-  // Auxiliar para colores de los estados
+  const handleEdit = (reservation) => {
+    setSelectedItem(reservation);
+    setIsModalOpen(true);
+  };
+
+  const handleToggleStatus = (id, name) => {
+    showConfirmToast({
+      title: "Cambiar Estado",
+      message: `¿Deseas cambiar el estado (ACTIVADO/DESACTIVADO) de la reserva de ${name}?`,
+      onConfirm: () => deleteReservation(id),
+    });
+  };
+
   const getStatusColor = (status) => {
     switch(status) {
       case 'Pendiente': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
@@ -38,9 +49,9 @@ export const ReservationPage = () => {
   };
 
   return (
-    <div className="space-y-8 animate-fadeIn">
+    <div className="space-y-8 animate-fadeIn p-4">
       {/* Header */}
-      <div className="flex justify-between items-end">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
           <h1 className="text-3xl font-black text-gray-800 italic uppercase">
             Gestión de <span className="text-kinal-red">Reservas</span>
@@ -48,12 +59,11 @@ export const ReservationPage = () => {
           <p className="text-gray-500 font-medium">Control de agenda, mesas y clientes en sucursal.</p>
         </div>
         
-        {/* Botón con el Icono Blanco */}
         <button 
-          onClick={() => setIsModalOpen(true)}
-          className="bg-kinal-orange text-white font-black px-6 py-3 rounded-2xl shadow-xl hover:bg-orange-600 transition-all uppercase tracking-tighter flex items-center justify-center gap-2"
+          onClick={() => { setSelectedItem(null); setIsModalOpen(true); }}
+          className="bg-kinal-orange text-white font-black px-6 py-3 rounded-2xl shadow-xl hover:bg-orange-600 transition-all uppercase tracking-tighter flex items-center justify-center gap-2 w-full md:w-auto"
         >
-          <img src={createIcon} alt="Crear" className="w-5 h-5 invert opacity-90" />
+          <img src={createIcon} alt="+" className="w-5 h-5 invert opacity-90" />
           <span>Nueva Reserva</span>
         </button>
       </div>
@@ -64,10 +74,10 @@ export const ReservationPage = () => {
           <button 
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-6 py-2 rounded-full font-black text-sm uppercase transition-all whitespace-nowrap ${
+            className={`px-6 py-2 rounded-full font-black text-xs uppercase transition-all whitespace-nowrap border-2 ${
               activeTab === tab 
-                ? 'bg-kinal-red text-white shadow-md' 
-                : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+                ? 'bg-kinal-red border-kinal-red text-white shadow-md' 
+                : 'bg-white text-gray-400 border-gray-100 hover:border-gray-200'
             }`}
           >
             {tab}
@@ -75,82 +85,124 @@ export const ReservationPage = () => {
         ))}
       </div>
 
-      {/* Grid de Tarjetas tipo "Agenda" */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {filteredReservations.map((res) => {
-          // Extraemos el día para el diseño del calendario
-          const dateObj = new Date(res.date);
-          const day = dateObj.getDate() + 1; // Ajuste básico de timezone local
-          const month = dateObj.toLocaleString('es-ES', { month: 'short' }).toUpperCase();
+      {/* Grid de Tarjetas */}
+      {loading && reservations.length === 0 ? (
+        <div className="py-20 flex justify-center"><Spinner /></div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {filteredReservations.map((res) => {
+            // Lógica de fecha para el icono de calendario
+            const dateObj = new Date(res.date);
+            const day = dateObj.getUTCDate(); // Usamos UTC para evitar desfases de zona horaria
+            const month = dateObj.toLocaleString('es-ES', { month: 'short', timeZone: 'UTC' }).toUpperCase();
 
-          return (
-            <div key={res._id} className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all relative group flex flex-col">
-              
-              {/* Badge de Estado flotante */}
-              <div className="absolute top-6 right-6">
-                <span className={`text-[10px] font-black uppercase px-3 py-1 rounded-full border ${getStatusColor(res.status)}`}>
-                  {res.status}
-                </span>
-              </div>
-
-              {/* Fecha y Hora (Estilo Calendario) */}
-              <div className="flex items-center gap-4 mb-6">
-                <div className="bg-orange-50 border border-orange-100 rounded-xl px-4 py-2 flex flex-col items-center justify-center min-w-[70px]">
-                  <span className="text-kinal-orange text-xs font-black uppercase">{month}</span>
-                  <span className="text-gray-800 text-2xl font-black leading-none">{day}</span>
+            return (
+              <div key={res._id} className={`bg-white rounded-3xl p-6 shadow-sm border-2 transition-all relative group flex flex-col ${res.statusRes === 'DESACTIVADO' ? 'opacity-60 border-red-100' : 'border-gray-50 hover:border-orange-100 hover:shadow-xl'}`}>
+                
+                {/* Badge de Estado */}
+                <div className="absolute top-6 right-6">
+                  <span className={`text-[10px] font-black uppercase px-3 py-1 rounded-full border ${getStatusColor(res.status)}`}>
+                    {res.status}
+                  </span>
                 </div>
-                <div>
-                  <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Hora</p>
-                  <p className="text-2xl font-black text-gray-800 italic">{res.time}</p>
-                </div>
-              </div>
 
-              {/* Información del Cliente y Mesa */}
-              <div className="space-y-3 mb-4">
-                <div className="bg-gray-50 rounded-xl p-3 border border-gray-100 flex items-center justify-between">
+                {/* Fecha y Hora */}
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="bg-orange-50 border border-orange-100 rounded-2xl px-4 py-2 flex flex-col items-center justify-center min-w-[70px]">
+                    <span className="text-kinal-orange text-[10px] font-black uppercase">{month}</span>
+                    <span className="text-gray-800 text-2xl font-black leading-none">{day}</span>
+                  </div>
                   <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase">Cliente</p>
-                    <p className="font-bold text-gray-800">{res.clientName}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-black text-gray-400 uppercase">Personas</p>
-                    <p className="font-black text-kinal-orange text-lg leading-none">{res.numberOfPersons}</p>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Hora de reserva</p>
+                    <p className="text-2xl font-black text-gray-800 italic">{res.time}</p>
                   </div>
                 </div>
 
-                <div className="flex gap-2 text-sm">
-                  <span className="bg-blue-50 text-blue-700 font-bold px-3 py-1 rounded-lg border border-blue-100 flex-1 text-center truncate">
-                    {res.branchName}
-                  </span>
-                  <span className="bg-purple-50 text-purple-700 font-bold px-3 py-1 rounded-lg border border-purple-100 flex-1 text-center truncate">
-                    {res.tableName}
-                  </span>
+                {/* Info Cliente y Mesa */}
+                <div className="space-y-3 mb-4">
+                  <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex items-center justify-between">
+                    <div>
+                      <p className="text-[9px] font-black text-gray-400 uppercase">Responsable</p>
+                      <p className="font-bold text-gray-800 truncate max-w-[150px]">
+                        {res.clientId?.UserName} {res.clientId?.UserSurname}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[9px] font-black text-gray-400 uppercase">Pax</p>
+                      <p className="font-black text-kinal-orange text-xl leading-none">{res.numberOfPersons}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <div className="flex-1 bg-blue-50/50 border border-blue-100 p-2 rounded-xl text-center">
+                      <p className="text-[8px] font-black text-blue-400 uppercase">Sucursal</p>
+                      <p className="text-xs font-bold text-blue-700 truncate">{res.branchId?.name}</p>
+                    </div>
+                    <div className="flex-1 bg-purple-50/50 border border-purple-100 p-2 rounded-xl text-center">
+                      <p className="text-[8px] font-black text-purple-400 uppercase">Asignación</p>
+                      <p className="text-xs font-bold text-purple-700 truncate">Mesa #{res.tableId?.numberTable}</p>
+                    </div>
+                  </div>
                 </div>
+
+                {/* Notas */}
+                {res.notes && (
+                  <div className="mb-4">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1 ml-1 text-right">Comentarios</p>
+                    <p className="text-xs text-gray-500 font-medium italic border-r-4 border-kinal-orange pr-2 text-right line-clamp-2 bg-orange-50/30 py-1 rounded">
+                      "{res.notes}"
+                    </p>
+                  </div>
+                )}
+
+                {/* Acciones */}
+                <div className="flex justify-end gap-2 mt-auto pt-4 border-t border-gray-50">
+                  <button 
+                    onClick={() => handleEdit(res)}
+                    className="p-2.5 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all text-gray-600 hover:text-kinal-orange font-black text-[10px] uppercase flex items-center gap-2"
+                  >
+                    <img src={iconEdit} className="w-4 h-4 opacity-70" alt="Edit" /> Editar
+                  </button>
+                  <button 
+                    onClick={() => handleToggleStatus(res._id, res.clientId?.UserName)}
+                    className={`p-2.5 rounded-xl transition-all font-black text-[10px] uppercase flex items-center gap-2 ${
+                        res.statusRes === 'DESACTIVADO' 
+                        ? 'bg-green-50 text-green-600 hover:bg-green-100' 
+                        : 'bg-red-50 text-red-600 hover:bg-red-100'
+                    }`}
+                  >
+                    <img src={iconDelete} className="w-4 h-4 opacity-70" alt="Delete" />
+                    {res.statusRes === 'DESACTIVADO' ? 'Activar' : 'Eliminar'}
+                  </button>
+                </div>
+
+                {/* Indicador de Desactivado */}
+                {res.statusRes === 'DESACTIVADO' && (
+                  <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] rounded-3xl flex items-center justify-center pointer-events-none">
+                    <span className="bg-red-600 text-white px-4 py-1 rounded-full font-black text-[10px] uppercase -rotate-12 shadow-lg">
+                      Registro Inactivo
+                    </span>
+                  </div>
+                )}
+
               </div>
+            );
+          })}
+        </div>
+      )}
 
-              {/* Notas (si existen) */}
-              {res.notes && (
-                <p className="text-xs text-gray-500 font-medium italic border-l-2 border-kinal-orange pl-2 line-clamp-2 mt-2 mb-4">
-                  "{res.notes}"
-                </p>
-              )}
+      {/* Si no hay resultados */}
+      {!loading && filteredReservations.length === 0 && (
+        <div className="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+          <p className="text-gray-400 font-bold uppercase italic">No se encontraron reservaciones en esta categoría</p>
+        </div>
+      )}
 
-              {/* Acciones */}
-              <div className="flex justify-end gap-2 mt-auto pt-4 border-t border-gray-50">
-                <button className="p-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all text-gray-600 hover:text-kinal-orange font-bold text-xs uppercase flex items-center gap-2">
-                  <img src={iconEdit} className="w-4 h-4 opacity-60" alt="Edit" /> Editar
-                </button>
-                <button className="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-all text-red-600 font-bold text-xs uppercase flex items-center gap-2">
-                  <img src={iconDelete} className="w-4 h-4 opacity-60" alt="Delete" />
-                </button>
-              </div>
-
-            </div>
-          );
-        })}
-      </div>
-
-      <ReservationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <ReservationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        item={selectedItem}
+      />
     </div>
   );
 };
