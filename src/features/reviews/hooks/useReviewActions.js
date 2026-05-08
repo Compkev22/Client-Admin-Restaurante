@@ -43,7 +43,7 @@ export const useReviewActions = () => {
         }
     };
 
-    // SIMULACIÓN DE DELETE LOCAL
+   
     const deleteReview = async (id) => {
         // No llamamos al servidor porque no tienes ruta DELETE
         setReviews(prev => prev.filter(r => r._id !== id));
