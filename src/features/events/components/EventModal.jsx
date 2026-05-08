@@ -6,7 +6,7 @@ import { useBranchStore, useUserStore } from '../../users/store/adminStore';
 export const EventModal = ({ isOpen, onClose, eventToEdit = null, onRefresh }) => {
     const { register, handleSubmit, reset, setValue } = useForm();
     const { saveEvent } = useSaveEvent();
-    
+
     const { branches, getBranches } = useBranchStore();
     const { users, getUsers } = useUserStore();
 
@@ -14,13 +14,6 @@ export const EventModal = ({ isOpen, onClose, eventToEdit = null, onRefresh }) =
     const minDate = new Date();
     minDate.setMonth(minDate.getMonth() + 1);
     const minDateStr = minDate.toISOString().split('T')[0];
-
-    useEffect(() => {
-        if (isOpen) {
-            getBranches();
-            getUsers();
-        }
-    }, [isOpen, getBranches, getUsers]);
 
     useEffect(() => {
         if (eventToEdit && isOpen) {
@@ -31,8 +24,10 @@ export const EventModal = ({ isOpen, onClose, eventToEdit = null, onRefresh }) =
             setValue('endTime', eventToEdit.endTime);
             setValue('numberOfPersons', eventToEdit.numberOfPersons);
             setValue('status', eventToEdit.status || 'Pendiente');
+
+            // FIX: Aseguramos obtener solo el ID para el select
             setValue('branchId', eventToEdit.branchId?._id || eventToEdit.branchId);
-            setValue('clientId', eventToEdit.clientId?._id || eventToEdit.clientId || eventToEdit.clientId?.uid);
+            setValue('clientId', eventToEdit.clientId?._id || eventToEdit.clientId?.uid || eventToEdit.clientId);
         } else {
             reset();
             setValue('status', 'Pendiente');
@@ -42,7 +37,7 @@ export const EventModal = ({ isOpen, onClose, eventToEdit = null, onRefresh }) =
     const onSubmit = async (data) => {
         const success = await saveEvent(data, eventToEdit?._id);
         if (success) {
-            onRefresh(); 
+            onRefresh();
             onClose();
         }
     };
@@ -67,9 +62,9 @@ export const EventModal = ({ isOpen, onClose, eventToEdit = null, onRefresh }) =
 
                     <div className="space-y-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase ml-2 italic">Seleccionar Cliente</label>
-                        <select 
-                            {...register('clientId', { required: 'Cliente es requerido' })} 
-                            className="w-full px-6 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-600 outline-none" 
+                        <select
+                            {...register('clientId', { required: 'Cliente es requerido' })}
+                            className="w-full px-6 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-600 outline-none"
                             required
                         >
                             <option value="">Elegir cliente...</option>
@@ -83,9 +78,9 @@ export const EventModal = ({ isOpen, onClose, eventToEdit = null, onRefresh }) =
 
                     <div className="space-y-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase ml-2 italic">Sucursal</label>
-                        <select 
-                            {...register('branchId', { required: 'Sucursal es requerida' })} 
-                            className="w-full px-6 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-600 outline-none" 
+                        <select
+                            {...register('branchId', { required: 'Sucursal es requerida' })}
+                            className="w-full px-6 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-600 outline-none"
                             required
                         >
                             <option value="">Elegir sucursal...</option>
@@ -119,8 +114,8 @@ export const EventModal = ({ isOpen, onClose, eventToEdit = null, onRefresh }) =
 
                     <div className="col-span-2 space-y-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase ml-2 italic">Estado del Evento</label>
-                        <select 
-                            {...register('status')} 
+                        <select
+                            {...register('status')}
                             className="w-full px-6 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-600 outline-none"
                         >
                             <option value="Pendiente">Pendiente</option>
