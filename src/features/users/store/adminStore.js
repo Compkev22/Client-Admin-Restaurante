@@ -114,3 +114,68 @@ export const useUserStore = create((set, get) => ({
     catch (error) { set({ error: error.response?.data?.message || "Error al eliminar usuario", loading: false }); }
   },
 }));
+
+// ================= RESERVATIONS STORE =================
+
+// ================= INVENTORY STORE =================
+export const useInventoryStore = create((set, get) => ({
+  inventory: [],
+  loading: false,
+  error: null,
+
+  getInventory: async (params) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.getInventory(params);
+      // Tu controlador devuelve { success: true, items: [...] }
+      set({ inventory: res.data.items, loading: false });
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al obtener inventario", loading: false });
+    }
+  },
+
+  createInventory: async (data) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.createInventory(data);
+      // Tu controlador devuelve { inventory: {...} }
+      set({ inventory: [res.data.inventory, ...get().inventory], loading: false });
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al crear insumo", loading: false });
+      throw error;
+    }
+  },
+
+  updateInventory: async (id, data) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.updateInventory(id, data);
+      // Tu controlador devuelve { updatedItem: {...} }
+      set({
+        inventory: get().inventory.map((item) =>
+          item._id === id ? res.data.updatedItem : item
+        ),
+        loading: false,
+       Suk});
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al actualizar insumo", loading: false });
+      throw error;
+    }
+  },
+
+  deleteInventory: async (id) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.deleteInventory(id);
+      // Como es un soft delete (toggle status), actualizamos el objeto en el store
+      set({
+        inventory: get().inventory.map((item) =>
+          item._id === id ? res.data.updatedItem : item
+        ),
+        loading: false,
+      });
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al cambiar estado del insumo", loading: false });
+    }
+  },
+}));
