@@ -58,3 +58,9 @@ export const getUserById = async (id) => await axiosAdmin.get(`/users/${id}`);
 export const createUser = async (data) => await axiosAdmin.post("/users", data);
 export const updateUser = async (id, data) => await axiosAdmin.put(`/users/${id}`, data);
 export const deleteUser = async (id) => await axiosAdmin.patch(`/users/${id}/status`);
+
+// ================= BILLING (FACTURACIÓN) =================
+export const getBillings = async () => await axiosAdmin.get("/billings");
+export const getBillingById = async (id) => await axiosAdmin.get(`/billings/${id}`);
+export const createBilling = async (data) => await axiosAdmin.post("/billings", data);
+export const payBilling = async (id, data) => await axiosAdmin.patch(`/billings/pay/${id}`, data);

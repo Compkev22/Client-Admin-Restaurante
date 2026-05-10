@@ -184,57 +184,57 @@ export const useCouponStore = create((set, get) => ({
 
 // ================= MESAS STORE =================
 export const useTableStore = create((set, get) => ({
-  tables: [], 
-  loading: false, 
+  tables: [],
+  loading: false,
   error: null,
 
   getTables: async () => {
-    try { 
-      set({ loading: true, error: null }); 
-      const res = await api.getTables(); 
-      set({ tables: res.data.tables || [], loading: false }); 
-    } catch (error) { 
-      set({ error: error.response?.data?.message || "Error al obtener mesas", loading: false }); 
+    try {
+      set({ loading: true, error: null });
+      const res = await api.getTables();
+      set({ tables: res.data.tables || [], loading: false });
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al obtener mesas", loading: false });
     }
   },
 
   createTable: async (data) => {
-    try { 
-      set({ loading: true, error: null }); 
-      const res = await api.createTable(data); 
-      set({ tables: [res.data.table, ...get().tables], loading: false }); 
-    } catch (error) { 
-      set({ error: error.response?.data?.message || "Error al crear mesa", loading: false }); 
-      throw error; 
+    try {
+      set({ loading: true, error: null });
+      const res = await api.createTable(data);
+      set({ tables: [res.data.table, ...get().tables], loading: false });
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al crear mesa", loading: false });
+      throw error;
     }
   },
 
   updateTable: async (id, data) => {
-    try { 
-      set({ loading: true, error: null }); 
-      const res = await api.updateTable(id, data); 
-      set({ 
-        tables: get().tables.map(t => t._id === id ? res.data.updated : t), 
-        loading: false 
-      }); 
-    } catch (error) { 
-      set({ error: error.response?.data?.message || "Error al actualizar mesa", loading: false }); 
-      throw error; 
+    try {
+      set({ loading: true, error: null });
+      const res = await api.updateTable(id, data);
+      set({
+        tables: get().tables.map(t => t._id === id ? res.data.updated : t),
+        loading: false
+      });
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al actualizar mesa", loading: false });
+      throw error;
     }
   },
 
   deleteTable: async (id) => {
-    try { 
-      set({ loading: true }); 
-      await api.deleteTable(id); 
+    try {
+      set({ loading: true });
+      await api.deleteTable(id);
       // Si la API responde 200, quitamos la mesa del estado local
-      set({ 
-        tables: get().tables.filter(t => t._id !== id), 
-        loading: false 
-      }); 
-    } catch (error) { 
+      set({
+        tables: get().tables.filter(t => t._id !== id),
+        loading: false
+      });
+    } catch (error) {
       console.error("Error al eliminar:", error);
-      set({ error: "No se pudo eliminar la mesa", loading: false }); 
+      set({ error: "No se pudo eliminar la mesa", loading: false });
     }
   },
 }));
@@ -257,5 +257,64 @@ export const useUserStore = create((set, get) => ({
   deleteUser: async (id) => {
     try { set({ loading: true, error: null }); await api.deleteUser(id); set({ users: get().users.filter(u => u._id !== id), loading: false }); }
     catch (error) { set({ error: error.response?.data?.message || "Error al eliminar usuario", loading: false }); }
+  },
+}));
+
+// ================= BILLING STORE =================
+export const useBillingStore = create((set, get) => ({
+  billings: [],
+  loading: false,
+  error: null,
+
+  getBillings: async () => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.getBillings();
+      // Accedemos a res.data.data basándonos en tu estructura común
+      set({ billings: res.data.data || [], loading: false });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error al obtener facturas",
+        loading: false
+      });
+    }
+  },
+
+  createBilling: async (data) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.createBilling(data);
+      const newBilling = res.data?.data || res.data;
+      set({ billings: [res.data.data, ...get().billings], loading: false });
+      return res.data.data;
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al crear factura", loading: false });
+      throw error;
+    }
+  },
+
+  payBilling: async (id) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.payBilling(id);
+      set({
+        billings: get().billings.map((billing) =>
+          billing._id === id
+            ? res.data.data
+            : billing
+        ),
+        loading: false,
+      });
+      return res.data;
+    } catch (error) {
+      console.error(error);
+      set({
+        error:
+          error.response?.data?.message ||
+          "Error al pagar factura",
+        loading: false,
+      });
+      throw error;
+    }
   },
 }));
