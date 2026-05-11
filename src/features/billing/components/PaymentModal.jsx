@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useBillingStore } from "../../../features/users/store/adminStore";
-
+import { useUserStore } from "../../users/store/adminStore"
 // --- IMPORTACIÓN DE TUS ICONOS ---
 import CashIcon from "../../../assets/icons/Cash.svg";
 import CardIcon from "../../../assets/icons/CreditCard.svg";
@@ -11,9 +11,22 @@ export const PaymentWizardModal = ({
   onClose,
   orderData,
 }) => {
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const { users, getUsers } = useUserStore();
   const payBilling = useBillingStore(
     (state) => state.payBilling
+  );
+
+  useEffect(() => {
+    if (isOpen) {
+      getUsers(); // 3. Cargamos los clientes reales al abrir el modal
+    }
+  }, [isOpen, getUsers]);
+
+  const filteredClients = users.filter(u =>
+    u.UserName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    u.UserSurname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    u.UserEmail?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // --- ESTADOS DEL WIZARD ---
@@ -47,8 +60,13 @@ export const PaymentWizardModal = ({
   // --- ESTADOS CLIENTE ---
   const [searchQuery, setSearchQuery] =
     useState("");
-  const [selectedClient, setSelectedClient] =
-    useState(mockUsers[0]);
+  const [selectedClient, setSelectedClient] = useState(null);
+  useEffect(() => {
+    if (users.length > 0 && !selectedClient) {
+      setSelectedClient(users[0]);
+    }
+  }, [users]);
+
   const [isCreatingClient, setIsCreatingClient] =
     useState(false);
   const [newClient, setNewClient] = useState({
@@ -219,22 +237,22 @@ export const PaymentWizardModal = ({
           <div className="flex items-center gap-2">
             <span
               className={`w-8 h-8 flex items-center justify-center rounded-full font-black text-sm ${step === 1
-                  ? "bg-kinal-red text-white"
-                  : "bg-green-100 text-green-600"
+                ? "bg-kinal-red text-white"
+                : "bg-green-100 text-green-600"
                 }`}
             >
               1
             </span>
             <div
               className={`w-8 h-1 rounded-full ${step === 2
-                  ? "bg-kinal-red"
-                  : "bg-gray-200"
+                ? "bg-kinal-red"
+                : "bg-gray-200"
                 }`}
             />
             <span
               className={`w-8 h-8 flex items-center justify-center rounded-full font-black text-sm ${step === 2
-                  ? "bg-kinal-red text-white"
-                  : "bg-gray-200 text-gray-400"
+                ? "bg-kinal-red text-white"
+                : "bg-gray-200 text-gray-400"
                 }`}
             >
               2
@@ -270,51 +288,56 @@ export const PaymentWizardModal = ({
               </div>
 
               {/* CLIENTE */}
-              <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm space-y-4">
+              <div className="relative bg-white border border-gray-200 p-6 rounded-2xl shadow-sm space-y-4">
                 <div className="flex justify-between items-end mb-2">
                   <h3 className="text-sm font-black text-gray-800 uppercase tracking-widest">
                     Datos de Facturación
                   </h3>
-                  {!isCreatingClient && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsCreatingClient(true);
-                        setSelectedClient(null);
-                      }}
-                      className="text-xs font-bold text-kinal-orange hover:underline"
-                    >
-                      + Crear Nuevo Cliente
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsCreatingClient(!isCreatingClient);
+                      setSelectedClient(isCreatingClient ? users[0] : null);
+                    }}
+                    className="text-xs font-bold text-kinal-orange hover:underline"
+                  >
+                    {isCreatingClient ? "← Volver a buscar" : "+ Crear Nuevo Cliente"}
+                  </button>
                 </div>
+
                 {!isCreatingClient ? (
-                  <div className="flex flex-col gap-1">
+                  <div className="relative">
                     <input
                       type="text"
-                      placeholder="Buscar cliente..."
-                      value={searchQuery}
-                      onChange={(e) =>
-                        handleSearchClient(
-                          e.target.value
-                        )
-                      }
+                      placeholder="Buscar por nombre o correo..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none bg-gray-50"
                     />
+                    {/* DROPDOWN DE RESULTADOS */}
+                    {searchTerm.length > 0 && !selectedClient && (
+                      <div className="absolute z-[110] bg-white border rounded-xl w-full shadow-2xl max-h-48 overflow-y-auto mt-1">
+                        {filteredClients.map(client => (
+                          <div
+                            key={client._id}
+                            className="p-4 hover:bg-orange-50 cursor-pointer border-b border-gray-50 last:border-none"
+                            onClick={() => {
+                              setSelectedClient(client);
+                              setSearchTerm(`${client.UserName} ${client.UserSurname}`);
+                            }}
+                          >
+                            <p className="font-bold text-gray-800">{client.UserName} {client.UserSurname}</p>
+                            <p className="text-xs text-gray-500">{client.UserEmail}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     {selectedClient && (
-                      <div className="mt-2 p-3 bg-green-50 border border-green-100 rounded-lg flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-black text-green-800">
-                            {selectedClient.UserName}{" "}
-                            {selectedClient.UserSurname}
-                          </p>
-                          <p className="text-xs font-bold text-green-600">
-                            {selectedClient.UserEmail}
-                          </p>
-                        </div>
-                        <span className="bg-green-200 text-green-800 text-[10px] px-2 py-1 rounded-full font-black">
-                          SELECCIONADO
-                        </span>
+                      <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-xl flex justify-between items-center">
+                        <p className="text-sm font-bold text-green-700">
+                          Seleccionado: {selectedClient.UserName} {selectedClient.UserSurname}
+                        </p>
+                        <button onClick={() => { setSelectedClient(null); setSearchTerm(""); }} className="text-green-900 text-xs font-black">CAMBIAR</button>
                       </div>
                     )}
                   </div>
@@ -377,8 +400,8 @@ export const PaymentWizardModal = ({
                       setPaymentMethod("CASH")
                     }
                     className={`p-4 rounded-xl border-2 font-black uppercase transition-all flex items-center justify-center gap-2 ${paymentMethod === "CASH"
-                        ? "border-kinal-red bg-red-50 text-kinal-red"
-                        : "border-gray-100 text-gray-400"
+                      ? "border-kinal-red bg-red-50 text-kinal-red"
+                      : "border-gray-100 text-gray-400"
                       }`}
                   >
                     <img
@@ -394,8 +417,8 @@ export const PaymentWizardModal = ({
                       setPaymentMethod("CARD")
                     }
                     className={`p-4 rounded-xl border-2 font-black uppercase transition-all flex items-center justify-center gap-2 ${paymentMethod === "CARD"
-                        ? "border-kinal-red bg-red-50 text-kinal-red"
-                        : "border-gray-100 text-gray-400"
+                      ? "border-kinal-red bg-red-50 text-kinal-red"
+                      : "border-gray-100 text-gray-400"
                       }`}
                   >
                     <img
@@ -461,15 +484,15 @@ export const PaymentWizardModal = ({
                     />
                   </div>
                   <div className={`p-6 rounded-2xl border-2 ${change > 0
-                      ? "bg-green-100 border-green-300"
-                      : "bg-gray-50 border-gray-100"
+                    ? "bg-green-100 border-green-300"
+                    : "bg-gray-50 border-gray-100"
                     }`}>
                     <p className="text-sm font-bold text-gray-500 uppercase mb-1">
                       Cambio
                     </p>
                     <p className={`text-4xl font-black ${change > 0
-                        ? "text-green-600"
-                        : "text-gray-300"
+                      ? "text-green-600"
+                      : "text-gray-300"
                       }`}>
                       Q {change.toFixed(2)}
                     </p>
@@ -540,8 +563,8 @@ export const PaymentWizardModal = ({
                     )
                   }
                   className={`flex-1 font-black px-8 py-4 rounded-xl shadow-lg transition-all uppercase tracking-widest ${loading
-                      ? "bg-gray-300 text-gray-500"
-                      : "bg-green-500 text-white hover:bg-green-600"
+                    ? "bg-gray-300 text-gray-500"
+                    : "bg-green-500 text-white hover:bg-green-600"
                     }`}
                 >
                   {loading

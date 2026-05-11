@@ -571,4 +571,77 @@ export const useReviewStore = create((set, get) => ({
   },
 }));
 
+// ================= ORDER STORE =================
+export const useOrderStore = create((set, get) => ({
+  orders: [],
+  currentOrderDetails: [],
+  loading: false,
+  error: null,
+
+  getOrders: async (params) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.getOrders(params);
+      set({ orders: res.data.data, loading: false });
+    } catch (error) {
+      set({ orders: [], error: error.response?.data?.message || "Error al obtener órdenes", loading: false });
+    }
+  },
+
+  getOrderDetails: async (orderId) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.getOrderDetailsByOrder(orderId);
+      set({ currentOrderDetails: res.data.data, loading: false });
+      return res.data.data;
+    } catch (error) {
+      set({ currentOrderDetails: [], error: "Error al obtener detalles", loading: false });
+      return [];
+    }
+  },
+
+createFullOrder: async (orderData, cartItems) => {
+    try {
+      set({ loading: true, error: null });
+      // 1. Crear la orden (Cabecera)
+      const orderRes = await api.createOrder(orderData);
+      const newOrder = orderRes.data.data;
+
+      // 2. Insertar cada producto del carrito como OrderDetail
+      for (const item of cartItems) {
+        await api.createOrderDetail({
+          order: newOrder._id,
+          productoId: item.type === 'Individual' ? item.productId : null,
+          comboId: item.type === 'Combo' ? item.productId : null,
+          cantidad: item.quantity 
+        });
+      }
+
+      // 3. Recargar las órdenes para ver la nueva en la lista
+      // Usamos getOrders sin branchId obligatorio para que recargue todo
+      await get().getOrders(); 
+      set({ loading: false });
+      return true;
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al crear la orden completa", loading: false });
+      throw error;
+    }
+  },
+
+  changeOrderStatus: async (id, estado) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.changeOrderStatus(id, estado);
+      set({
+        orders: get().orders.map((o) => o._id === id ? res.data.data : o),
+        loading: false,
+      });
+      return true;
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al cambiar estado", loading: false });
+      return false;
+    }
+  }
+}));
+
 

@@ -91,3 +91,20 @@ export const getBillings = async (params) => await axiosAdmin.get("/billings", {
 export const getBillingById = async (id) => await axiosAdmin.get(`/billings/${id}`);
 export const createBilling = async (data) => await axiosAdmin.post("/billings", data);
 export const payBilling = async (id) => await axiosAdmin.patch(`/billings/pay/${id}`);
+
+// ================= ORDERS (ÓRDENES) =================
+export const getOrders = async (params) => await axiosAdmin.get("/orders", { params });
+export const getOrderById = async (id) => await axiosAdmin.get(`/orders/${id}`);
+export const createOrder = async (data) => await axiosAdmin.post("/orders", data);
+export const changeOrderStatus = async (id, estado) => await axiosAdmin.patch(`/orders/${id}/status`, { estado });
+
+// ================= ORDER DETAILS (DETALLE DE ÓRDENES) =================
+export const createOrderDetail = async (data) => await axiosAdmin.post("/orderDetails", data);
+export const getOrderDetailsByOrder = async (orderId) => await axiosAdmin.get(`/orderDetails/order/${orderId}`);
+export const deleteOrderDetail = async (id) => await axiosAdmin.delete(`/orderDetails/${id}`);
+
+// ================= ORDER REQUESTS (PEDIDOS DE APP) =================
+export const getBranchOrderRequests = async (branchId) => await axiosAdmin.get(`/orderRequests/branch/${branchId}`);
+export const updateOrderRequestStatus = async (id, orderStatus) => await axiosAdmin.patch(`/orderRequests/${id}/status`, { orderStatus });
+
+
