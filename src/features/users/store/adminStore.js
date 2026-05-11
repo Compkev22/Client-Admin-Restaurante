@@ -17,7 +17,7 @@ export const useAdditionalServicesStore = create((set, get) => ({
         loading: false,
       });
     } catch (error) {
-      console.log("ERROR GET:", error); 
+      console.log("ERROR GET:", error);
       set({
         error:
           error.response?.data?.message ||
@@ -34,10 +34,7 @@ export const useAdditionalServicesStore = create((set, get) => ({
       const response = await api.createAdditionalService(data);
 
       set({
-        additionalServices: [
-          response.data.data,
-          ...get().additionalServices,
-        ],
+        additionalServices: [response.data.data, ...get().additionalServices],
         loading: false,
       });
 
@@ -63,7 +60,7 @@ export const useAdditionalServicesStore = create((set, get) => ({
 
       set({
         additionalServices: get().additionalServices.map((service) =>
-          service._id === id ? response.data.data : service
+          service._id === id ? response.data.data : service,
         ),
         loading: false,
       });
@@ -90,7 +87,7 @@ export const useAdditionalServicesStore = create((set, get) => ({
 
       set({
         additionalServices: get().additionalServices.map((service) =>
-          service._id === id ? response.data.data : service
+          service._id === id ? response.data.data : service,
         ),
         loading: false,
       });
@@ -112,73 +109,209 @@ export const useAdditionalServicesStore = create((set, get) => ({
 
 // ================= SUCURSALES STORE =================
 export const useBranchStore = create((set, get) => ({
-  branches: [], loading: false, error: null,
+  branches: [],
+  loading: false,
+  error: null,
   getBranches: async () => {
-    try { set({ loading: true, error: null }); const res = await api.getBranches(); set({ branches: res.data.data, loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al obtener sucursales", loading: false }); }
+    try {
+      set({ loading: true, error: null });
+      const res = await api.getBranches();
+      set({ branches: res.data.data, loading: false });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error al obtener sucursales",
+        loading: false,
+      });
+    }
   },
   createBranch: async (data) => {
-    try { set({ loading: true, error: null }); const res = await api.createBranch(data); set({ branches: [res.data.data, ...get().branches], loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al crear", loading: false }); throw error; }
+    try {
+      set({ loading: true, error: null });
+      const res = await api.createBranch(data);
+      set({ branches: [res.data.data, ...get().branches], loading: false });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error al crear",
+        loading: false,
+      });
+      throw error;
+    }
   },
   updateBranch: async (id, data) => {
-    try { set({ loading: true, error: null }); const res = await api.updateBranch(id, data); set({ branches: get().branches.map(b => b._id === id ? res.data.data : b), loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al actualizar", loading: false }); throw error; }
+    try {
+      set({ loading: true, error: null });
+      const res = await api.updateBranch(id, data);
+      set({
+        branches: get().branches.map((b) => (b._id === id ? res.data.data : b)),
+        loading: false,
+      });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error al actualizar",
+        loading: false,
+      });
+      throw error;
+    }
   },
   deleteBranch: async (id) => {
-    try { set({ loading: true, error: null }); await api.deleteBranch(id); set({ branches: get().branches.filter(b => b._id !== id), loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al eliminar", loading: false }); }
+    try {
+      set({ loading: true, error: null });
+      await api.deleteBranch(id);
+      set({
+        branches: get().branches.filter((b) => b._id !== id),
+        loading: false,
+      });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error al eliminar",
+        loading: false,
+      });
+    }
   },
 }));
 
 // ================= PRODUCTOS STORE =================
 export const useProductStore = create((set, get) => ({
-  products: [], loading: false, error: null,
+  products: [],
+  loading: false,
+  error: null,
   getProducts: async () => {
-    try { set({ loading: true, error: null }); const res = await api.getProducts(); set({ products: res.data.data, loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al obtener productos", loading: false }); }
+    try {
+      set({ loading: true, error: null });
+      const res = await api.getProducts();
+      set({ products: res.data.data, loading: false });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error al obtener productos",
+        loading: false,
+      });
+    }
   },
   createProduct: async (data) => {
-    try { set({ loading: true, error: null }); const res = await api.createProduct(data); set({ products: [res.data.data, ...get().products], loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al crear producto", loading: false }); throw error; }
+    try {
+      set({ loading: true, error: null });
+      const res = await api.createProduct(data);
+      set({ products: [res.data.data, ...get().products], loading: false });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error al crear producto",
+        loading: false,
+      });
+      throw error;
+    }
   },
   updateProduct: async (id, data) => {
-    try { set({ loading: true, error: null }); const res = await api.updateProduct(id, data); set({ products: get().products.map(p => p._id === id ? res.data.data : p), loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al actualizar producto", loading: false }); throw error; }
+    try {
+      set({ loading: true, error: null });
+      const res = await api.updateProduct(id, data);
+      set({
+        products: get().products.map((p) => (p._id === id ? res.data.data : p)),
+        loading: false,
+      });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error al actualizar producto",
+        loading: false,
+      });
+      throw error;
+    }
   },
   deleteProduct: async (id) => {
-    try { set({ loading: true, error: null }); await api.deleteProduct(id); set({ products: get().products.filter(p => p._id !== id), loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al eliminar producto", loading: false }); }
+    try {
+      set({ loading: true, error: null });
+      await api.deleteProduct(id);
+      set({
+        products: get().products.filter((p) => p._id !== id),
+        loading: false,
+      });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error al eliminar producto",
+        loading: false,
+      });
+    }
   },
 }));
 
 // ================= MENÚ STORE (Solo Lectura) =================
 export const useMenuStore = create((set) => ({
-  menuItems: [], loading: false, error: null,
+  menuItems: [],
+  loading: false,
+  error: null,
   getMenu: async () => {
-    try { set({ loading: true, error: null }); const res = await api.getMenu(); set({ menuItems: res.data.menu, loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al cargar menú", loading: false }); }
-  }
+    try {
+      set({ loading: true, error: null });
+      const res = await api.getMenu();
+      set({ menuItems: res.data.menu, loading: false });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error al cargar menú",
+        loading: false,
+      });
+    }
+  },
 }));
 
 // ================= CUPONES STORE =================
 export const useCouponStore = create((set, get) => ({
-  coupons: [], loading: false, error: null,
+  coupons: [],
+  loading: false,
+  error: null,
   getCoupons: async () => {
-    try { set({ loading: true, error: null }); const res = await api.getCoupons(); set({ coupons: res.data.data, loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al obtener cupones", loading: false }); }
+    try {
+      set({ loading: true, error: null });
+      const res = await api.getCoupons();
+      set({ coupons: res.data.data, loading: false });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error al obtener cupones",
+        loading: false,
+      });
+    }
   },
   createCoupon: async (data) => {
-    try { set({ loading: true, error: null }); const res = await api.createCoupon(data); set({ coupons: [res.data.data, ...get().coupons], loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al crear cupón", loading: false }); throw error; }
+    try {
+      set({ loading: true, error: null });
+      const res = await api.createCoupon(data);
+      set({ coupons: [res.data.data, ...get().coupons], loading: false });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error al crear cupón",
+        loading: false,
+      });
+      throw error;
+    }
   },
   updateCoupon: async (id, data) => {
-    try { set({ loading: true, error: null }); const res = await api.updateCoupon(id, data); set({ coupons: get().coupons.map(c => c._id === id ? res.data.data : c), loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al actualizar cupón", loading: false }); throw error; }
+    try {
+      set({ loading: true, error: null });
+      const res = await api.updateCoupon(id, data);
+      set({
+        coupons: get().coupons.map((c) => (c._id === id ? res.data.data : c)),
+        loading: false,
+      });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error al actualizar cupón",
+        loading: false,
+      });
+      throw error;
+    }
   },
   deleteCoupon: async (id) => {
-    try { set({ loading: true, error: null }); await api.deleteCoupon(id); set({ coupons: get().coupons.filter(c => c._id !== id), loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al eliminar cupón", loading: false }); }
+    try {
+      set({ loading: true, error: null });
+      await api.deleteCoupon(id);
+      set({
+        coupons: get().coupons.filter((c) => c._id !== id),
+        loading: false,
+      });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error al eliminar cupón",
+        loading: false,
+      });
+    }
   },
 }));
 
@@ -194,7 +327,10 @@ export const useTableStore = create((set, get) => ({
       const res = await api.getTables();
       set({ tables: res.data.tables || [], loading: false });
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error al obtener mesas", loading: false });
+      set({
+        error: error.response?.data?.message || "Error al obtener mesas",
+        loading: false,
+      });
     }
   },
 
@@ -204,7 +340,10 @@ export const useTableStore = create((set, get) => ({
       const res = await api.createTable(data);
       set({ tables: [res.data.table, ...get().tables], loading: false });
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error al crear mesa", loading: false });
+      set({
+        error: error.response?.data?.message || "Error al crear mesa",
+        loading: false,
+      });
       throw error;
     }
   },
@@ -214,11 +353,14 @@ export const useTableStore = create((set, get) => ({
       set({ loading: true, error: null });
       const res = await api.updateTable(id, data);
       set({
-        tables: get().tables.map(t => t._id === id ? res.data.updated : t),
-        loading: false
+        tables: get().tables.map((t) => (t._id === id ? res.data.updated : t)),
+        loading: false,
       });
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error al actualizar mesa", loading: false });
+      set({
+        error: error.response?.data?.message || "Error al actualizar mesa",
+        loading: false,
+      });
       throw error;
     }
   },
@@ -229,8 +371,8 @@ export const useTableStore = create((set, get) => ({
       await api.deleteTable(id);
       // Si la API responde 200, quitamos la mesa del estado local
       set({
-        tables: get().tables.filter(t => t._id !== id),
-        loading: false
+        tables: get().tables.filter((t) => t._id !== id),
+        loading: false,
       });
     } catch (error) {
       console.error("Error al eliminar:", error);
@@ -241,22 +383,62 @@ export const useTableStore = create((set, get) => ({
 
 // ================= USUARIOS STORE =================
 export const useUserStore = create((set, get) => ({
-  users: [], loading: false, error: null,
-  getUsers: async () => {
-    try { set({ loading: true, error: null }); const res = await api.getUsers(); set({ users: res.data.data, loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al obtener usuarios", loading: false }); }
+  users: [],
+  loading: false,
+  error: null,
+  getUsers: async (params) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.getUsers(params);
+      set({ users: res.data.data, loading: false });
+    } catch (error) {
+      set({
+        users: [],
+        error: error.response?.data?.message || "Error al obtener usuarios",
+        loading: false,
+      });
+    }
   },
   createUser: async (data) => {
-    try { set({ loading: true, error: null }); const res = await api.createUser(data); set({ users: [res.data.data, ...get().users], loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al crear usuario", loading: false }); throw error; }
+    try {
+      set({ loading: true, error: null });
+      const res = await api.createUser(data);
+      set({ users: [res.data.data, ...get().users], loading: false });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error al crear usuario",
+        loading: false,
+      });
+      throw error;
+    }
   },
   updateUser: async (id, data) => {
-    try { set({ loading: true, error: null }); const res = await api.updateUser(id, data); set({ users: get().users.map(u => u._id === id ? res.data.data : u), loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al actualizar usuario", loading: false }); throw error; }
+    try {
+      set({ loading: true, error: null });
+      const res = await api.updateUser(id, data);
+      set({
+        users: get().users.map((u) => (u._id === id ? res.data.data : u)),
+        loading: false,
+      });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error al actualizar usuario",
+        loading: false,
+      });
+      throw error;
+    }
   },
   deleteUser: async (id) => {
-    try { set({ loading: true, error: null }); await api.deleteUser(id); set({ users: get().users.filter(u => u._id !== id), loading: false }); }
-    catch (error) { set({ error: error.response?.data?.message || "Error al eliminar usuario", loading: false }); }
+    try {
+      set({ loading: true, error: null });
+      await api.deleteUser(id);
+      set({ users: get().users.filter((u) => u._id !== id), loading: false });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error al eliminar usuario",
+        loading: false,
+      });
+    }
   },
 }));
 
@@ -275,7 +457,7 @@ export const useBillingStore = create((set, get) => ({
     } catch (error) {
       set({
         error: error.response?.data?.message || "Error al obtener facturas",
-        loading: false
+        loading: false,
       });
     }
   },
@@ -288,7 +470,10 @@ export const useBillingStore = create((set, get) => ({
       set({ billings: [res.data.data, ...get().billings], loading: false });
       return res.data.data;
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error al crear factura", loading: false });
+      set({
+        error: error.response?.data?.message || "Error al crear factura",
+        loading: false,
+      });
       throw error;
     }
   },
@@ -299,9 +484,7 @@ export const useBillingStore = create((set, get) => ({
       const res = await api.payBilling(id);
       set({
         billings: get().billings.map((billing) =>
-          billing._id === id
-            ? res.data.data
-            : billing
+          billing._id === id ? res.data.data : billing,
         ),
         loading: false,
       });
@@ -309,16 +492,13 @@ export const useBillingStore = create((set, get) => ({
     } catch (error) {
       console.error(error);
       set({
-        error:
-          error.response?.data?.message ||
-          "Error al pagar factura",
+        error: error.response?.data?.message || "Error al pagar factura",
         loading: false,
       });
       throw error;
     }
   },
 }));
-
 
 // ================= RESERVATIONS STORE =================
 export const useReservationStore = create((set, get) => ({
@@ -333,7 +513,12 @@ export const useReservationStore = create((set, get) => ({
       // El controlador devuelve { success: true, reservations: [...] }
       set({ reservations: res.data.reservations, loading: false });
     } catch (error) {
-      set({ reservations: [], error: error.response?.data?.message || "Error al obtener reservaciones", loading: false });
+      set({
+        reservations: [],
+        error:
+          error.response?.data?.message || "Error al obtener reservaciones",
+        loading: false,
+      });
     }
   },
 
@@ -342,10 +527,16 @@ export const useReservationStore = create((set, get) => ({
       set({ loading: true, error: null });
       const res = await api.createReservation(data);
       // El controlador devuelve { success: true, data: {...} }
-      set({ reservations: [res.data.data, ...get().reservations], loading: false });
+      set({
+        reservations: [res.data.data, ...get().reservations],
+        loading: false,
+      });
       return res.data; // Útil para mostrar la mesa asignada en el componente
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error al crear reservación", loading: false });
+      set({
+        error: error.response?.data?.message || "Error al crear reservación",
+        loading: false,
+      });
       throw error;
     }
   },
@@ -357,12 +548,16 @@ export const useReservationStore = create((set, get) => ({
       // El controlador devuelve { success: true, updated: {...} }
       set({
         reservations: get().reservations.map((r) =>
-          r._id === id ? res.data.updated : r
+          r._id === id ? res.data.updated : r,
         ),
         loading: false,
       });
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error al actualizar reservación", loading: false });
+      set({
+        error:
+          error.response?.data?.message || "Error al actualizar reservación",
+        loading: false,
+      });
       throw error;
     }
   },
@@ -376,7 +571,12 @@ export const useReservationStore = create((set, get) => ({
       await get().getReservations(); // Recargamos para ver los cambios de estado aplicados
       set({ loading: false });
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error al cambiar estado de reservación", loading: false });
+      set({
+        error:
+          error.response?.data?.message ||
+          "Error al cambiar estado de reservación",
+        loading: false,
+      });
     }
   },
 }));
@@ -394,9 +594,11 @@ export const useInventoryStore = create((set, get) => ({
       // Tu controlador devuelve { success: true, items: [...] }
       set({ inventory: res.data.items, loading: false });
     } catch (error) {
-      set({ 
+      set({
         inventory: [],
-        error: error.response?.data?.message || "Error al obtener inventario", loading: false });
+        error: error.response?.data?.message || "Error al obtener inventario",
+        loading: false,
+      });
     }
   },
 
@@ -405,9 +607,15 @@ export const useInventoryStore = create((set, get) => ({
       set({ loading: true, error: null });
       const res = await api.createInventory(data);
       // Tu controlador devuelve { inventory: {...} }
-      set({ inventory: [res.data.inventory, ...get().inventory], loading: false });
+      set({
+        inventory: [res.data.inventory, ...get().inventory],
+        loading: false,
+      });
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error al crear insumo", loading: false });
+      set({
+        error: error.response?.data?.message || "Error al crear insumo",
+        loading: false,
+      });
       throw error;
     }
   },
@@ -416,17 +624,20 @@ export const useInventoryStore = create((set, get) => ({
     try {
       set({ loading: true, error: null });
       const res = await api.updateInventory(id, data);
-      const updatedItem = res.data.updatedItem;  
+      const updatedItem = res.data.updatedItem;
       // Tu controlador devuelve { updatedItem: {...} }
       set({
         inventory: get().inventory.map((item) =>
-          item._id === id ? res.data.updatedItem : item
+          item._id === id ? res.data.updatedItem : item,
         ),
         loading: false,
-       });
-       return true;
+      });
+      return true;
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error al actualizar insumo", loading: false });
+      set({
+        error: error.response?.data?.message || "Error al actualizar insumo",
+        loading: false,
+      });
       throw error;
     }
   },
@@ -438,12 +649,16 @@ export const useInventoryStore = create((set, get) => ({
       // Como es un soft delete (toggle status), actualizamos el objeto en el store
       set({
         inventory: get().inventory.map((item) =>
-          item._id === id ? res.data.updatedItem : item
+          item._id === id ? res.data.updatedItem : item,
         ),
         loading: false,
       });
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error al cambiar estado del insumo", loading: false });
+      set({
+        error:
+          error.response?.data?.message || "Error al cambiar estado del insumo",
+        loading: false,
+      });
     }
   },
 }));
@@ -461,7 +676,11 @@ export const useEventStore = create((set, get) => ({
       // El controlador de eventos devuelve { success: true, data: [...] }
       set({ events: res.data.data, loading: false });
     } catch (error) {
-      set({ events: [], error: error.response?.data?.message || "Error al obtener eventos", loading: false });
+      set({
+        events: [],
+        error: error.response?.data?.message || "Error al obtener eventos",
+        loading: false,
+      });
     }
   },
 
@@ -471,9 +690,12 @@ export const useEventStore = create((set, get) => ({
       const res = await api.createEvent(data);
       // El controlador devuelve { success: true, data: {...} }
       set({ events: [res.data.data, ...get().events], loading: false });
-      return res.data; 
+      return res.data;
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error al crear el evento", loading: false });
+      set({
+        error: error.response?.data?.message || "Error al crear el evento",
+        loading: false,
+      });
       throw error;
     }
   },
@@ -484,14 +706,15 @@ export const useEventStore = create((set, get) => ({
       const res = await api.updateEvent(id, data);
       // El controlador devuelve { success: true, data: {...} }
       set({
-        events: get().events.map((e) =>
-          e._id === id ? res.data.data : e
-        ),
+        events: get().events.map((e) => (e._id === id ? res.data.data : e)),
         loading: false,
       });
       return true;
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error al actualizar el evento", loading: false });
+      set({
+        error: error.response?.data?.message || "Error al actualizar el evento",
+        loading: false,
+      });
       throw error;
     }
   },
@@ -502,14 +725,17 @@ export const useEventStore = create((set, get) => ({
       const res = await api.changeEventStatus(id, status);
       // El controlador devuelve el evento con el nuevo estado en "data"
       set({
-        events: get().events.map((e) =>
-          e._id === id ? res.data.data : e
-        ),
+        events: get().events.map((e) => (e._id === id ? res.data.data : e)),
         loading: false,
       });
       return true;
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error al cambiar el estado del evento", loading: false });
+      set({
+        error:
+          error.response?.data?.message ||
+          "Error al cambiar el estado del evento",
+        loading: false,
+      });
       return false;
     }
   },
@@ -525,7 +751,12 @@ export const useEventStore = create((set, get) => ({
       });
       return true;
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error al eliminar el evento permanentemente", loading: false });
+      set({
+        error:
+          error.response?.data?.message ||
+          "Error al eliminar el evento permanentemente",
+        loading: false,
+      });
       return false;
     }
   },
@@ -541,13 +772,18 @@ export const useReviewStore = create((set, get) => ({
     try {
       set({ loading: true, error: null });
       // Si el branchId es "all" o viene vacío, traemos el global. Si no, filtramos por sucursal.
-      const res = (!branchId || branchId === "all") 
-        ? await api.getAllReviews() 
-        : await api.getBranchReviews(branchId);
-        
+      const res =
+        !branchId || branchId === "all"
+          ? await api.getAllReviews()
+          : await api.getBranchReviews(branchId);
+
       set({ reviews: res.data.data, loading: false });
     } catch (error) {
-      set({ reviews: [], error: error.response?.data?.message || "Error al obtener reseñas", loading: false });
+      set({
+        reviews: [],
+        error: error.response?.data?.message || "Error al obtener reseñas",
+        loading: false,
+      });
     }
   },
 
@@ -555,17 +791,20 @@ export const useReviewStore = create((set, get) => ({
     try {
       set({ loading: true, error: null });
       const res = await api.toggleReviewStatus(id);
-      
+
       // Actualizamos solo la reseña modificada en la lista actual
       set({
         reviews: get().reviews.map((r) =>
-          r._id === id ? { ...r, isDeleted: res.data.data.isDeleted } : r
+          r._id === id ? { ...r, isDeleted: res.data.data.isDeleted } : r,
         ),
         loading: false,
       });
       return true;
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error al moderar reseña", loading: false });
+      set({
+        error: error.response?.data?.message || "Error al moderar reseña",
+        loading: false,
+      });
       return false;
     }
   },
@@ -584,7 +823,11 @@ export const useOrderStore = create((set, get) => ({
       const res = await api.getOrders(params);
       set({ orders: res.data.data, loading: false });
     } catch (error) {
-      set({ orders: [], error: error.response?.data?.message || "Error al obtener órdenes", loading: false });
+      set({
+        orders: [],
+        error: error.response?.data?.message || "Error al obtener órdenes",
+        loading: false,
+      });
     }
   },
 
@@ -595,14 +838,19 @@ export const useOrderStore = create((set, get) => ({
       set({ currentOrderDetails: res.data.data, loading: false });
       return res.data.data;
     } catch (error) {
-      set({ currentOrderDetails: [], error: "Error al obtener detalles", loading: false });
+      set({
+        currentOrderDetails: [],
+        error: "Error al obtener detalles",
+        loading: false,
+      });
       return [];
     }
   },
 
-createFullOrder: async (orderData, cartItems) => {
+  createFullOrder: async (orderData, cartItems) => {
     try {
       set({ loading: true, error: null });
+
       // 1. Crear la orden (Cabecera)
       const orderRes = await api.createOrder(orderData);
       const newOrder = orderRes.data.data;
@@ -611,19 +859,36 @@ createFullOrder: async (orderData, cartItems) => {
       for (const item of cartItems) {
         await api.createOrderDetail({
           order: newOrder._id,
-          productoId: item.type === 'Individual' ? item.productId : null,
-          comboId: item.type === 'Combo' ? item.productId : null,
-          cantidad: item.quantity 
+          productoId: item.type === "Individual" ? item.productId : null,
+          comboId: item.type === "Combo" ? item.productId : null,
+          cantidad: item.quantity,
         });
       }
 
-      // 3. Recargar las órdenes para ver la nueva en la lista
-      // Usamos getOrders sin branchId obligatorio para que recargue todo
-      await get().getOrders(); 
+      // 3. ✅ NUEVO: Generar la factura automáticamente con estado GENERATED
+      //    Necesitamos recalcular el total porque el backend lo calcula en OrderDetail
+      //    Obtenemos la orden actualizada para tener el total correcto
+      const updatedOrderRes = await api.getOrderById(newOrder._id);
+      const updatedOrder =
+        updatedOrderRes.data.data?.order || updatedOrderRes.data.data;
+
+      await api.createBilling({
+        Order: newOrder._id,
+        BillPaymentMethod: "CASH", // Valor por defecto, se cambia al pagar
+        clientId: orderData.clientId || null,
+        newClientData: orderData.newClientData || null,
+        BillSerie: `FAC-${Date.now()}`,
+      });
+
+      await get().getOrders();
       set({ loading: false });
       return true;
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error al crear la orden completa", loading: false });
+      set({
+        error:
+          error.response?.data?.message || "Error al crear la orden completa",
+        loading: false,
+      });
       throw error;
     }
   },
@@ -633,15 +898,18 @@ createFullOrder: async (orderData, cartItems) => {
       set({ loading: true, error: null });
       const res = await api.changeOrderStatus(id, estado);
       set({
-        orders: get().orders.map((o) => o._id === id ? res.data.data : o),
+        orders: get().orders.map((o) => (o._id === id ? res.data.data : o)),
         loading: false,
       });
       return true;
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error al cambiar estado", loading: false });
+      set({
+        error: error.response?.data?.message || "Error al cambiar estado",
+        loading: false,
+      });
       return false;
     }
-  }
+  },
 }));
 
 // En src/features/users/store/adminStore.js
@@ -668,9 +936,9 @@ export const useComboStore = create((set, get) => ({
       set({ combos: [res.data.data, ...get().combos], loading: false });
       return true;
     } catch (err) {
-      set({ 
-        error: err.response?.data?.message || "Error al guardar el combo", 
-        loading: false 
+      set({
+        error: err.response?.data?.message || "Error al guardar el combo",
+        loading: false,
       });
       return false;
     }
@@ -682,15 +950,13 @@ export const useComboStore = create((set, get) => ({
       const res = await api.toggleComboStatus(id);
       // Actualizamos el estado local para reflejar si quedó ACTIVE o INACTIVE
       set({
-        combos: get().combos.map(c => c._id === id ? res.data.data : c),
-        loading: false
+        combos: get().combos.map((c) => (c._id === id ? res.data.data : c)),
+        loading: false,
       });
       return true;
     } catch (err) {
       set({ loading: false });
       return false;
     }
-  }
+  },
 }));
-
-

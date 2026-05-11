@@ -7,8 +7,8 @@ import { showSuccess, showError } from "../../../shared/utils/toast";
 export const ComboModal = ({ isOpen, onClose }) => {
   const [comboData, setComboData] = useState({ 
     ComboName: "", 
-    ComboPrice: "", 
-    ComboDescription: "" 
+    ComboDescription: "",
+    ComboDiscount: 0
   });
   const [comboList, setComboList] = useState([]);
   const [availableProducts, setAvailableProducts] = useState([]);
@@ -27,7 +27,9 @@ export const ComboModal = ({ isOpen, onClose }) => {
     const exists = comboList.find(item => item.productId === selectedProduct);
     
     if (exists) {
-      setComboList(comboList.map(i => i.productId === selectedProduct ? { ...i, cantidad: i.cantidad + 1 } : i));
+      setComboList(comboList.map(i => 
+        i.productId === selectedProduct ? { ...i, cantidad: i.cantidad + 1 } : i
+      ));
     } else {
       setComboList([...comboList, { productId: p._id, nombre: p.nombre, precio: p.precio, cantidad: 1 }]);
     }
@@ -39,17 +41,19 @@ export const ComboModal = ({ isOpen, onClose }) => {
     if (comboList.length === 0) return showError("El combo debe tener productos");
 
     const finalData = {
-        ...comboData,
-        ComboPrice: Number(comboData.ComboPrice),
-        ComboList: comboList.map(item => ({ productId: item.productId, cantidad: item.cantidad }))
+      ...comboData,
+      ComboDiscount: Number(comboData.ComboDiscount) || 0,
+      ComboList: comboList.map(item => ({ productId: item.productId, cantidad: item.cantidad }))
     };
     
     const success = await saveCombo(finalData);
     if (success) {
-        showSuccess("Combo creado con éxito");
-        setComboList([]);
-        setComboData({ ComboName: "", ComboPrice: "", ComboDescription: "" });
-        onClose();
+      showSuccess("Combo creado con éxito");
+      setComboList([]);
+      setComboData({ ComboName: "", ComboDescription: "", ComboDiscount: 0 });
+      onClose();
+    } else {
+      showError("Error al crear el combo");
     }
   };
 
@@ -78,31 +82,58 @@ export const ComboModal = ({ isOpen, onClose }) => {
               className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-kinal-orange h-20 resize-none" 
             />
             <input 
-              type="number" 
-              placeholder="Precio Final (Q)"
-              value={comboData.ComboPrice}
-              onChange={e => setComboData({...comboData, ComboPrice: e.target.value})}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-kinal-orange font-bold text-kinal-red" 
+              type="number"
+              min="0"
+              max="100"
+              placeholder="Descuento % (ej: 10)"
+              value={comboData.ComboDiscount}
+              onChange={e => setComboData({...comboData, ComboDiscount: e.target.value})}
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-kinal-orange" 
             />
           </div>
 
           <div className="flex gap-2">
-            <select value={selectedProduct} onChange={e => setSelectedProduct(e.target.value)} className="flex-1 px-4 py-3 rounded-xl border border-gray-200 outline-none">
-                <option value="">Selecciona producto...</option>
-                {availableProducts.map(p => <option key={p._id} value={p._id}>{p.nombre} (Q{p.precio})</option>)}
+            <select 
+              value={selectedProduct} 
+              onChange={e => setSelectedProduct(e.target.value)} 
+              className="flex-1 px-4 py-3 rounded-xl border border-gray-200 outline-none"
+            >
+              <option value="">Selecciona producto...</option>
+              {availableProducts.map(p => (
+                <option key={p._id} value={p._id}>{p.nombre} (Q{p.precio})</option>
+              ))}
             </select>
-            <button type="button" onClick={handleAddProduct} className="bg-kinal-orange text-white px-6 rounded-xl font-bold hover:bg-orange-600 transition-colors">Agregar</button>
+            <button 
+              type="button" 
+              onClick={handleAddProduct} 
+              className="bg-kinal-orange text-white px-6 rounded-xl font-bold hover:bg-orange-600 transition-colors"
+            >
+              Agregar
+            </button>
           </div>
 
           <ComboListTable 
             comboList={comboList} 
-            onQuantityChange={(id, qty) => setComboList(comboList.map(i => i.productId === id ? {...i, cantidad: parseInt(qty) || 1} : i))}
+            onQuantityChange={(id, qty) => setComboList(comboList.map(i => 
+              i.productId === id ? {...i, cantidad: parseInt(qty) || 1} : i
+            ))}
             onRemove={(id) => setComboList(comboList.filter(i => i.productId !== id))}
           />
 
           <div className="flex gap-3 pt-4">
-            <button type="button" onClick={onClose} className="flex-1 py-3 border border-gray-200 rounded-xl font-bold text-gray-500">Cancelar</button>
-            <button type="submit" className="flex-[2] bg-kinal-red text-white py-3 rounded-xl font-black uppercase tracking-widest shadow-lg hover:bg-red-700">Guardar Combo</button>
+            <button 
+              type="button" 
+              onClick={onClose} 
+              className="flex-1 py-3 border border-gray-200 rounded-xl font-bold text-gray-500"
+            >
+              Cancelar
+            </button>
+            <button 
+              type="submit" 
+              className="flex-[2] bg-kinal-red text-white py-3 rounded-xl font-black uppercase tracking-widest shadow-lg hover:bg-red-700"
+            >
+              Guardar Combo
+            </button>
           </div>
         </form>
       </div>

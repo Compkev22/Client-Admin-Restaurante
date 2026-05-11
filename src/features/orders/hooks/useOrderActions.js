@@ -50,6 +50,30 @@ export const useOrderActions = () => {
         return success;
     };
 
+    const addItemsToOrder = async (orderId, newItems) => {
+    if (newItems.length === 0) {
+        showError("No hay productos nuevos para agregar");
+        return false;
+    }
+    try {
+        for (const item of newItems) {
+            await api.createOrderDetail({
+                order: orderId,
+                productoId: item.type === 'Individual' ? item.productId : null,
+                comboId: item.type === 'Combo' ? item.productId : null,
+                cantidad: item.quantity
+            });
+        }
+        await api.syncBillingWithOrder(orderId);
+        await getOrders({});
+        showSuccess("Productos agregados a la orden");
+        return true;
+    } catch (error) {
+        showError("Error al agregar productos a la orden");
+        return false;
+    }
+};
+
     return {
         orders,
         currentOrderDetails,

@@ -1,21 +1,15 @@
 import { useEffect, useState } from "react";
 import { useBillingStore } from "../../../features/users/store/adminStore";
-import { useUserStore } from "../../users/store/adminStore"
+import { useUserStore } from "../../users/store/adminStore";
 // --- IMPORTACIÓN DE TUS ICONOS ---
 import CashIcon from "../../../assets/icons/Cash.svg";
 import CardIcon from "../../../assets/icons/CreditCard.svg";
 import NextIcon from "../../../assets/icons/Next.svg";
 
-export const PaymentWizardModal = ({
-  isOpen,
-  onClose,
-  orderData,
-}) => {
+export const PaymentWizardModal = ({ isOpen, onClose, orderData }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const { users, getUsers } = useUserStore();
-  const payBilling = useBillingStore(
-    (state) => state.payBilling
-  );
+  const payBilling = useBillingStore((state) => state.payBilling);
 
   useEffect(() => {
     if (isOpen) {
@@ -23,16 +17,16 @@ export const PaymentWizardModal = ({
     }
   }, [isOpen, getUsers]);
 
-  const filteredClients = users.filter(u =>
-    u.UserName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.UserSurname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.UserEmail?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredClients = users.filter(
+    (u) =>
+      u.UserName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.UserSurname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.UserEmail?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   // --- ESTADOS DEL WIZARD ---
   const [step, setStep] = useState(1);
-  const [paymentMethod, setPaymentMethod] =
-    useState("CASH");
+  const [paymentMethod, setPaymentMethod] = useState("CASH");
   const [loading, setLoading] = useState(false);
 
   // --- MOCK TEMPORAL DE CLIENTES ---
@@ -41,25 +35,24 @@ export const PaymentWizardModal = ({
       _id: "CF00000001",
       UserName: "Consumidor",
       UserSurname: "Final",
-      UserEmail: "cf@kfc.com.gt"
+      UserEmail: "cf@kfc.com.gt",
     },
     {
       _id: "U00000002",
       UserName: "Roberto",
       UserSurname: "Milian",
-      UserEmail: "roberto@kinal.edu.gt"
+      UserEmail: "roberto@kinal.edu.gt",
     },
     {
       _id: "U00000003",
       UserName: "Diego",
       UserSurname: "López",
-      UserEmail: "dlopez@gmail.com"
-    }
+      UserEmail: "dlopez@gmail.com",
+    },
   ];
 
   // --- ESTADOS CLIENTE ---
-  const [searchQuery, setSearchQuery] =
-    useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedClient, setSelectedClient] = useState(null);
   useEffect(() => {
     if (users.length > 0 && !selectedClient) {
@@ -67,49 +60,42 @@ export const PaymentWizardModal = ({
     }
   }, [users]);
 
-  const [isCreatingClient, setIsCreatingClient] =
-    useState(false);
+  const [isCreatingClient, setIsCreatingClient] = useState(false);
   const [newClient, setNewClient] = useState({
     UserName: "",
     UserSurname: "",
-    UserEmail: ""
+    UserEmail: "",
   });
 
   // --- EFECTIVO ---
-  const [cashReceived, setCashReceived] =
-    useState("");
+  const [cashReceived, setCashReceived] = useState("");
 
   // --- TARJETA ---
   const [cardData, setCardData] = useState({
     number: "",
     name: "",
     expiry: "",
-    cvv: ""
+    cvv: "",
   });
 
-  const [isCvvFocused, setIsCvvFocused] =
-    useState(false);
+  const [isCvvFocused, setIsCvvFocused] = useState(false);
 
   if (!isOpen || !orderData) return null;
 
   // --- FACTURA ---
-  const total = Number(orderData.BillTotal || 0);
-  const subtotal = Number(orderData.BillSubtotal || 0);
-  const iva = Number(orderData.BillIVA || 0);
-
+  const rawTotal = Number(orderData.total || orderData.BillTotal || 0);
+  const total = rawTotal;
+  const subtotal = rawTotal / 1.12;
+  const iva = rawTotal - subtotal;
   const change =
-    parseFloat(cashReceived) >= total
-      ? parseFloat(cashReceived) - total
-      : 0;
+    parseFloat(cashReceived) >= total ? parseFloat(cashReceived) - total : 0;
 
   // --- SIGUIENTE PASO ---
   const handleNextStep = (e) => {
     e.preventDefault();
 
     if (!selectedClient && !isCreatingClient) {
-      alert(
-        "Por favor selecciona o crea un cliente."
-      );
+      alert("Por favor selecciona o crea un cliente.");
       return;
     }
 
@@ -118,17 +104,12 @@ export const PaymentWizardModal = ({
 
   // --- BUSCADOR CLIENTE ---
   const handleSearchClient = (value) => {
-
     setSearchQuery(value);
 
     const found = mockUsers.find(
       (u) =>
-        u.UserName
-          .toLowerCase()
-          .includes(value.toLowerCase()) ||
-        u.UserEmail
-          .toLowerCase()
-          .includes(value.toLowerCase())
+        u.UserName.toLowerCase().includes(value.toLowerCase()) ||
+        u.UserEmail.toLowerCase().includes(value.toLowerCase()),
     );
 
     if (found) {
@@ -144,9 +125,7 @@ export const PaymentWizardModal = ({
     try {
       setLoading(true);
       await payBilling(orderData._id);
-      alert(
-        "Pago procesado correctamente"
-      );
+      alert("Pago procesado correctamente");
       setStep(1);
       setSearchQuery("");
       setCashReceived("");
@@ -154,10 +133,7 @@ export const PaymentWizardModal = ({
       onClose();
     } catch (error) {
       console.error(error);
-      alert(
-        error.response?.data?.message ||
-        "Error al procesar el pago"
-      );
+      alert(error.response?.data?.message || "Error al procesar el pago");
     } finally {
       setLoading(false);
     }
@@ -167,100 +143,83 @@ export const PaymentWizardModal = ({
   const handleCardChange = (e) => {
     const { name, value } = e.target;
     if (name === "number") {
-      const onlyNumbers =
-        value.replace(/\D/g, "");
-      const formattedNumber =
-        onlyNumbers.replace(
-          /(\d{4})(?=\d)/g,
-          "$1 "
-        );
+      const onlyNumbers = value.replace(/\D/g, "");
+      const formattedNumber = onlyNumbers.replace(/(\d{4})(?=\d)/g, "$1 ");
 
       if (formattedNumber.length <= 19) {
         setCardData({
           ...cardData,
-          [name]: formattedNumber
+          [name]: formattedNumber,
         });
       }
-
     } else if (name === "expiry") {
-      const onlyNumbers =
-        value.replace(/\D/g, "");
+      const onlyNumbers = value.replace(/\D/g, "");
       let formattedExpiry = onlyNumbers;
       if (onlyNumbers.length > 2) {
-        formattedExpiry =
-          `${onlyNumbers.slice(0, 2)}/${onlyNumbers.slice(2, 4)}`;
+        formattedExpiry = `${onlyNumbers.slice(0, 2)}/${onlyNumbers.slice(2, 4)}`;
       }
 
       setCardData({
         ...cardData,
-        [name]: formattedExpiry
+        [name]: formattedExpiry,
       });
-
     } else if (name === "cvv") {
-      const onlyNumbers =
-        value.replace(/\D/g, "");
+      const onlyNumbers = value.replace(/\D/g, "");
 
       if (onlyNumbers.length <= 3) {
         setCardData({
           ...cardData,
-          [name]: onlyNumbers
+          [name]: onlyNumbers,
         });
       }
-
     } else {
       setCardData({
         ...cardData,
-        [name]: value.toUpperCase()
+        [name]: value.toUpperCase(),
       });
-
     }
   };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn">
       <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-
         {/* HEADER */}
         <div className="bg-gray-50 px-8 py-6 border-b border-gray-100 flex justify-between items-center">
           <div>
             <h2 className="text-2xl font-black italic text-gray-800 uppercase">
-              Procesar{" "}
-              <span className="text-kinal-red">
-                Pago
-              </span>
+              Procesar <span className="text-kinal-red">Pago</span>
             </h2>
             <p className="text-sm font-bold text-gray-400">
-              Factura:{" "}
-              {orderData.BillSerie}
+              Factura: {orderData.BillSerie}
             </p>
           </div>
           <div className="flex items-center gap-2">
             <span
-              className={`w-8 h-8 flex items-center justify-center rounded-full font-black text-sm ${step === 1
-                ? "bg-kinal-red text-white"
-                : "bg-green-100 text-green-600"
-                }`}
+              className={`w-8 h-8 flex items-center justify-center rounded-full font-black text-sm ${
+                step === 1
+                  ? "bg-kinal-red text-white"
+                  : "bg-green-100 text-green-600"
+              }`}
             >
               1
             </span>
             <div
-              className={`w-8 h-1 rounded-full ${step === 2
-                ? "bg-kinal-red"
-                : "bg-gray-200"
-                }`}
+              className={`w-8 h-1 rounded-full ${
+                step === 2 ? "bg-kinal-red" : "bg-gray-200"
+              }`}
             />
             <span
-              className={`w-8 h-8 flex items-center justify-center rounded-full font-black text-sm ${step === 2
-                ? "bg-kinal-red text-white"
-                : "bg-gray-200 text-gray-400"
-                }`}
+              className={`w-8 h-8 flex items-center justify-center rounded-full font-black text-sm ${
+                step === 2
+                  ? "bg-kinal-red text-white"
+                  : "bg-gray-200 text-gray-400"
+              }`}
             >
               2
             </span>
           </div>
         </div>
         <div className="p-8 overflow-y-auto">
-
           {/* PASO 1 */}
           {step === 1 && (
             <form
@@ -278,12 +237,8 @@ export const PaymentWizardModal = ({
                   </p>
                 </div>
                 <div className="text-right text-xs font-bold text-gray-500">
-                  <p>
-                    Sub: Q {subtotal.toFixed(2)}
-                  </p>
-                  <p>
-                    IVA: Q {iva.toFixed(2)}
-                  </p>
+                  <p>Sub: Q {subtotal.toFixed(2)}</p>
+                  <p>IVA: Q {iva.toFixed(2)}</p>
                 </div>
               </div>
 
@@ -301,7 +256,9 @@ export const PaymentWizardModal = ({
                     }}
                     className="text-xs font-bold text-kinal-orange hover:underline"
                   >
-                    {isCreatingClient ? "← Volver a buscar" : "+ Crear Nuevo Cliente"}
+                    {isCreatingClient
+                      ? "← Volver a buscar"
+                      : "+ Crear Nuevo Cliente"}
                   </button>
                 </div>
 
@@ -317,17 +274,23 @@ export const PaymentWizardModal = ({
                     {/* DROPDOWN DE RESULTADOS */}
                     {searchTerm.length > 0 && !selectedClient && (
                       <div className="absolute z-[110] bg-white border rounded-xl w-full shadow-2xl max-h-48 overflow-y-auto mt-1">
-                        {filteredClients.map(client => (
+                        {filteredClients.map((client) => (
                           <div
                             key={client._id}
                             className="p-4 hover:bg-orange-50 cursor-pointer border-b border-gray-50 last:border-none"
                             onClick={() => {
                               setSelectedClient(client);
-                              setSearchTerm(`${client.UserName} ${client.UserSurname}`);
+                              setSearchTerm(
+                                `${client.UserName} ${client.UserSurname}`,
+                              );
                             }}
                           >
-                            <p className="font-bold text-gray-800">{client.UserName} {client.UserSurname}</p>
-                            <p className="text-xs text-gray-500">{client.UserEmail}</p>
+                            <p className="font-bold text-gray-800">
+                              {client.UserName} {client.UserSurname}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {client.UserEmail}
+                            </p>
                           </div>
                         ))}
                       </div>
@@ -335,9 +298,18 @@ export const PaymentWizardModal = ({
                     {selectedClient && (
                       <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-xl flex justify-between items-center">
                         <p className="text-sm font-bold text-green-700">
-                          Seleccionado: {selectedClient.UserName} {selectedClient.UserSurname}
+                          Seleccionado: {selectedClient.UserName}{" "}
+                          {selectedClient.UserSurname}
                         </p>
-                        <button onClick={() => { setSelectedClient(null); setSearchTerm(""); }} className="text-green-900 text-xs font-black">CAMBIAR</button>
+                        <button
+                          onClick={() => {
+                            setSelectedClient(null);
+                            setSearchTerm("");
+                          }}
+                          className="text-green-900 text-xs font-black"
+                        >
+                          CAMBIAR
+                        </button>
                       </div>
                     )}
                   </div>
@@ -351,8 +323,7 @@ export const PaymentWizardModal = ({
                       onChange={(e) =>
                         setNewClient({
                           ...newClient,
-                          UserName:
-                            e.target.value
+                          UserName: e.target.value,
                         })
                       }
                       className="px-4 py-2 rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-kinal-orange"
@@ -365,8 +336,7 @@ export const PaymentWizardModal = ({
                       onChange={(e) =>
                         setNewClient({
                           ...newClient,
-                          UserSurname:
-                            e.target.value
+                          UserSurname: e.target.value,
                         })
                       }
                       className="px-4 py-2 rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-kinal-orange"
@@ -379,8 +349,7 @@ export const PaymentWizardModal = ({
                       onChange={(e) =>
                         setNewClient({
                           ...newClient,
-                          UserEmail:
-                            e.target.value
+                          UserEmail: e.target.value,
                         })
                       }
                       className="col-span-2 px-4 py-2 rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-kinal-orange"
@@ -396,36 +365,26 @@ export const PaymentWizardModal = ({
                 <div className="grid grid-cols-2 gap-4">
                   <button
                     type="button"
-                    onClick={() =>
-                      setPaymentMethod("CASH")
-                    }
-                    className={`p-4 rounded-xl border-2 font-black uppercase transition-all flex items-center justify-center gap-2 ${paymentMethod === "CASH"
-                      ? "border-kinal-red bg-red-50 text-kinal-red"
-                      : "border-gray-100 text-gray-400"
-                      }`}
+                    onClick={() => setPaymentMethod("CASH")}
+                    className={`p-4 rounded-xl border-2 font-black uppercase transition-all flex items-center justify-center gap-2 ${
+                      paymentMethod === "CASH"
+                        ? "border-kinal-red bg-red-50 text-kinal-red"
+                        : "border-gray-100 text-gray-400"
+                    }`}
                   >
-                    <img
-                      src={CashIcon}
-                      alt="Cash"
-                      className="w-6 h-6"
-                    />
+                    <img src={CashIcon} alt="Cash" className="w-6 h-6" />
                     Efectivo
                   </button>
                   <button
                     type="button"
-                    onClick={() =>
-                      setPaymentMethod("CARD")
-                    }
-                    className={`p-4 rounded-xl border-2 font-black uppercase transition-all flex items-center justify-center gap-2 ${paymentMethod === "CARD"
-                      ? "border-kinal-red bg-red-50 text-kinal-red"
-                      : "border-gray-100 text-gray-400"
-                      }`}
+                    onClick={() => setPaymentMethod("CARD")}
+                    className={`p-4 rounded-xl border-2 font-black uppercase transition-all flex items-center justify-center gap-2 ${
+                      paymentMethod === "CARD"
+                        ? "border-kinal-red bg-red-50 text-kinal-red"
+                        : "border-gray-100 text-gray-400"
+                    }`}
                   >
-                    <img
-                      src={CardIcon}
-                      alt="Card"
-                      className="w-6 h-6"
-                    />
+                    <img src={CardIcon} alt="Card" className="w-6 h-6" />
                     Tarjeta
                   </button>
                 </div>
@@ -444,11 +403,7 @@ export const PaymentWizardModal = ({
                   className="flex items-center gap-2 bg-kinal-red text-white font-black px-8 py-3 rounded-xl shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest"
                 >
                   <span>Siguiente</span>
-                  <img
-                    src={NextIcon}
-                    alt="Next"
-                    className="w-5 h-5 invert"
-                  />
+                  <img src={NextIcon} alt="Next" className="w-5 h-5 invert" />
                 </button>
               </div>
             </form>
@@ -475,25 +430,25 @@ export const PaymentWizardModal = ({
                       step="0.01"
                       placeholder="0.00"
                       value={cashReceived}
-                      onChange={(e) =>
-                        setCashReceived(
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => setCashReceived(e.target.value)}
                       className="w-full px-6 py-4 text-2xl font-black text-center rounded-2xl border-2 border-green-200 focus:border-green-500 outline-none bg-green-50"
                     />
                   </div>
-                  <div className={`p-6 rounded-2xl border-2 ${change > 0
-                    ? "bg-green-100 border-green-300"
-                    : "bg-gray-50 border-gray-100"
-                    }`}>
+                  <div
+                    className={`p-6 rounded-2xl border-2 ${
+                      change > 0
+                        ? "bg-green-100 border-green-300"
+                        : "bg-gray-50 border-gray-100"
+                    }`}
+                  >
                     <p className="text-sm font-bold text-gray-500 uppercase mb-1">
                       Cambio
                     </p>
-                    <p className={`text-4xl font-black ${change > 0
-                      ? "text-green-600"
-                      : "text-gray-300"
-                      }`}>
+                    <p
+                      className={`text-4xl font-black ${
+                        change > 0 ? "text-green-600" : "text-gray-300"
+                      }`}
+                    >
                       Q {change.toFixed(2)}
                     </p>
                   </div>
@@ -531,12 +486,8 @@ export const PaymentWizardModal = ({
                       placeholder="CVV"
                       value={cardData.cvv}
                       onChange={handleCardChange}
-                      onFocus={() =>
-                        setIsCvvFocused(true)
-                      }
-                      onBlur={() =>
-                        setIsCvvFocused(false)
-                      }
+                      onFocus={() => setIsCvvFocused(true)}
+                      onBlur={() => setIsCvvFocused(false)}
                       className="px-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-kinal-red text-center font-mono"
                     />
                   </div>
@@ -557,20 +508,18 @@ export const PaymentWizardModal = ({
                   onClick={handleConfirmPayment}
                   disabled={
                     loading ||
-                    (
-                      paymentMethod === "CASH" &&
-                      parseFloat(cashReceived || 0) < total
-                    )
+                    (paymentMethod === "CASH" &&
+                      parseFloat(cashReceived || 0) < total)
                   }
-                  className={`flex-1 font-black px-8 py-4 rounded-xl shadow-lg transition-all uppercase tracking-widest ${loading
-                    ? "bg-gray-300 text-gray-500"
-                    : "bg-green-500 text-white hover:bg-green-600"
-                    }`}
+                  className={`flex-1 font-black px-8 py-4 rounded-xl shadow-lg transition-all uppercase tracking-widest ${
+                    loading
+                      ? "bg-gray-300 text-gray-500"
+                      : "bg-green-500 text-white hover:bg-green-600"
+                  }`}
                 >
                   {loading
                     ? "Procesando..."
-                    : `Confirmar Pago • Q ${total.toFixed(2)}`
-                  }
+                    : `Confirmar Pago • Q ${total.toFixed(2)}`}
                 </button>
               </div>
             </div>

@@ -97,6 +97,8 @@ export const getOrders = async (params) => await axiosAdmin.get("/orders", { par
 export const getOrderById = async (id) => await axiosAdmin.get(`/orders/${id}`);
 export const createOrder = async (data) => await axiosAdmin.post("/orders", data);
 export const changeOrderStatus = async (id, estado) => await axiosAdmin.patch(`/orders/${id}/status`, { estado });
+export const updateOrder = async (id, data) => await axiosAdmin.put(`/orders/${id}`, data);
+export const syncBillingWithOrder = async (orderId) => await axiosAdmin.patch(`/billings/sync/${orderId}`);
 
 // ================= ORDER DETAILS (DETALLE DE ÓRDENES) =================
 export const createOrderDetail = async (data) => await axiosAdmin.post("/orderDetails", data);
@@ -107,4 +109,8 @@ export const deleteOrderDetail = async (id) => await axiosAdmin.delete(`/orderDe
 export const getBranchOrderRequests = async (branchId) => await axiosAdmin.get(`/orderRequests/branch/${branchId}`);
 export const updateOrderRequestStatus = async (id, orderStatus) => await axiosAdmin.patch(`/orderRequests/${id}/status`, { orderStatus });
 
-
+// ================= COMBOS =================
+export const getCombos = async (params) => await axiosAdmin.get("/combos", { params });
+export const createCombo = async (data) => await axiosAdmin.post("/combos", data);
+export const updateCombo = async (id, data) => await axiosAdmin.put(`/combos/${id}`, data);
+export const toggleComboStatus = async (id) => await axiosAdmin.patch(`/combos/${id}/status`);

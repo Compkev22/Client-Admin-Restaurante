@@ -215,9 +215,11 @@ export const ProductModal = ({
 
     e.preventDefault();
 
+    const { ProductStatus, deletedAt, ...restOfData } = formData;
+
     await saveProduct(
       {
-        ...formData,
+        ...restOfData,
 
         ingredientes: ingredientList.map((item) => ({
           inventoryId: item.inventoryId,
