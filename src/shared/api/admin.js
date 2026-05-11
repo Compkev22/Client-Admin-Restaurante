@@ -84,3 +84,10 @@ export const deleteEventPermanently = async (id) => await axiosAdmin.delete(`/ev
 export const getAllReviews = async () => await axiosAdmin.get("/reviews");
 export const getBranchReviews = async (branchId) => await axiosAdmin.get(`/reviews/branch/${branchId}`);
 export const toggleReviewStatus = async (id) => await axiosAdmin.patch(`/reviews/${id}/status`);
+
+// ================= BILLING (FACTURACIÓN) =================
+// GET /billings acepta params como { page, limit, BillStatus, branchId }
+export const getBillings = async (params) => await axiosAdmin.get("/billings", { params });
+export const getBillingById = async (id) => await axiosAdmin.get(`/billings/${id}`);
+export const createBilling = async (data) => await axiosAdmin.post("/billings", data);
+export const payBilling = async (id) => await axiosAdmin.patch(`/billings/pay/${id}`);
