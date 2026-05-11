@@ -318,3 +318,30 @@ export const useBillingStore = create((set, get) => ({
     }
   },
 }));
+
+// ================= INVENTORY STORE =================
+export const useInventoryStore = create((set, get) => ({
+  inventory: [],
+  loading: false,
+  error: null,
+
+  getInventory: async () => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.getInventory();
+      console.log("INVENTORY RESPONSE:", res.data);
+      set({
+        inventory: res.data.items || [],
+        loading: false
+      });
+    } catch (error) {
+      console.log(error);
+      set({
+        error:
+          error.response?.data?.message ||
+          "Error al obtener inventario",
+        loading: false
+      });
+    }
+  }
+}));

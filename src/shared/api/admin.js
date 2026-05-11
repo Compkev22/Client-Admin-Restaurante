@@ -64,3 +64,9 @@ export const getBillings = async () => await axiosAdmin.get("/billings");
 export const getBillingById = async (id) => await axiosAdmin.get(`/billings/${id}`);
 export const createBilling = async (data) => await axiosAdmin.post("/billings", data);
 export const payBilling = async (id, data) => await axiosAdmin.patch(`/billings/pay/${id}`, data);
+
+// ================= INVENTORY =================
+export const getInventory = async (params) => await axiosAdmin.get("/inventory", { params });
+export const createInventory = async (data) => await axiosAdmin.post("/inventory", data);
+export const updateInventory = async (id, data) => await axiosAdmin.put(`/inventory/${id}`, data);
+export const deleteInventory = async (id) => await axiosAdmin.patch(`/inventory/${id}/status`);
