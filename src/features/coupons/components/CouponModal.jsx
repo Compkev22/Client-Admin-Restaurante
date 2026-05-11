@@ -1,3 +1,4 @@
+// features/coupons/components/CouponModal.jsx
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useSaveCoupon } from "../hook/useSaveCoupon.js";
@@ -5,39 +6,22 @@ import { useCouponStore } from "../../users/store/adminStore.js";
 import { Spinner } from "../../auth/components/Spinner.jsx";
 import { showSuccess, showError } from "../../../shared/utils/toast.js";
 import { showConfirmToast } from "../../auth/components/ConfirmModal.jsx";
+import { CouponFormFields } from "./CouponFormFields.jsx";
 
 export const CouponModal = ({ isOpen, onClose, coupon }) => {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isDirty },
-  } = useForm();
-
+  const { register, handleSubmit, reset, formState: { errors, isDirty } } = useForm();
   const { saveCoupon } = useSaveCoupon();
   const loading = useCouponStore((state) => state.loading);
 
-  // Cargar datos si es edición o limpiar si es nuevo
   useEffect(() => {
-    if (isOpen) {
-      if (coupon) {
-        // Formatear fecha para el input type="date" (YYYY-MM-DD)
-        const formattedDate = coupon.expirationDate ? new Date(coupon.expirationDate).toISOString().split('T')[0] : "";
-        
-        reset({
-          code: coupon.code,
-          discountPercentage: coupon.discountPercentage,
-          expirationDate: formattedDate,
-          usageLimit: coupon.usageLimit,
-        });
-      } else {
-        reset({
-          code: "",
-          discountPercentage: "",
-          expirationDate: "",
-          usageLimit: 10, // Valor por defecto según tu modelo
-        });
-      }
+    if (!isOpen) return;
+    if (coupon) {
+      const formattedDate = coupon.expirationDate
+        ? new Date(coupon.expirationDate).toISOString().split("T")[0]
+        : "";
+      reset({ code: coupon.code, discountPercentage: coupon.discountPercentage, expirationDate: formattedDate, usageLimit: coupon.usageLimit });
+    } else {
+      reset({ code: "", discountPercentage: "", expirationDate: "", usageLimit: 10 });
     }
   }, [isOpen, coupon, reset]);
 
@@ -46,21 +30,14 @@ export const CouponModal = ({ isOpen, onClose, coupon }) => {
       await saveCoupon(data, coupon?._id);
       showSuccess(coupon ? "Cupón actualizado" : "Cupón creado exitosamente");
       onClose();
-    } catch (error) {
+    } catch {
       showError("Error al procesar el cupón");
     }
   };
 
   const handleClose = () => {
     if (isDirty) {
-      showConfirmToast({
-        title: "Cerrar Editor",
-        message: "Tienes cambios sin guardar. ¿Deseas salir de todos modos?",
-        onConfirm: () => {
-          reset();
-          onClose();
-        }
-      });
+      showConfirmToast({ title: "Cerrar Editor", message: "Tienes cambios sin guardar. ¿Deseas salir de todos modos?", onConfirm: () => { reset(); onClose(); } });
     } else {
       reset();
       onClose();
@@ -77,75 +54,13 @@ export const CouponModal = ({ isOpen, onClose, coupon }) => {
             {coupon ? "Editar Cupón" : "Nuevo Cupón"}
           </h2>
         </div>
-
         <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-5">
-          <div className="grid grid-cols-1 gap-4">
-            {/* Código */}
-            <div className="flex flex-col">
-              <label className="text-xs font-black uppercase text-gray-400 mb-1">Código del Cupón</label>
-              <input
-                {...register("code", { 
-                    required: "El código es obligatorio", 
-                    maxLength: { value: 15, message: "Máximo 15 caracteres" } 
-                })}
-                placeholder="EJ: KINAL2026"
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-kinal-red outline-none transition-all font-bold uppercase"
-              />
-              {errors.code && <p className="text-red-500 text-[10px] mt-1 font-bold">{errors.code.message}</p>}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              {/* Descuento */}
-              <div className="flex flex-col">
-                <label className="text-xs font-black uppercase text-gray-400 mb-1">% Descuento</label>
-                <input
-                  type="number"
-                  {...register("discountPercentage", { 
-                      required: "Obligatorio", 
-                      min: { value: 1, message: "Min 1%" }, 
-                      max: { value: 100, message: "Max 100%" } 
-                  })}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-kinal-red outline-none font-bold"
-                />
-                {errors.discountPercentage && <p className="text-red-500 text-[10px] mt-1 font-bold">{errors.discountPercentage.message}</p>}
-              </div>
-
-              {/* Límite de Uso */}
-              <div className="flex flex-col">
-                <label className="text-xs font-black uppercase text-gray-400 mb-1">Límite de Uso</label>
-                <input
-                  type="number"
-                  {...register("usageLimit", { required: "Obligatorio", min: 1 })}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-kinal-red outline-none font-bold"
-                />
-              </div>
-            </div>
-
-            {/* Fecha de Expiración */}
-            <div className="flex flex-col">
-              <label className="text-xs font-black uppercase text-gray-400 mb-1">Fecha de Expiración</label>
-              <input
-                type="date"
-                {...register("expirationDate", { required: "La fecha es obligatoria" })}
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-kinal-red outline-none font-bold"
-              />
-              {errors.expirationDate && <p className="text-red-500 text-[10px] mt-1 font-bold">{errors.expirationDate.message}</p>}
-            </div>
-          </div>
-
+          <CouponFormFields register={register} errors={errors} />
           <div className="flex justify-end gap-3 pt-6">
-            <button
-              type="button"
-              onClick={handleClose}
-              className="px-6 py-3 bg-gray-100 rounded-2xl font-bold text-gray-500 hover:bg-gray-200 transition-all"
-            >
+            <button type="button" onClick={handleClose} className="px-6 py-3 bg-gray-100 rounded-2xl font-bold text-gray-500 hover:bg-gray-200 transition-all">
               CANCELAR
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-8 py-3 bg-kinal-red text-white rounded-2xl font-black shadow-lg shadow-red-200 hover:scale-105 transition-all disabled:opacity-50"
-            >
+            <button type="submit" disabled={loading} className="px-8 py-3 bg-kinal-red text-white rounded-2xl font-black shadow-lg shadow-red-200 hover:scale-105 transition-all disabled:opacity-50">
               {loading ? <Spinner small /> : coupon ? "ACTUALIZAR" : "CREAR CUPÓN"}
             </button>
           </div>

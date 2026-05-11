@@ -1,48 +1,76 @@
-export const InventoryModal = ({ isOpen, onClose }) => {
-    if (!isOpen) return null;
+// features/inventory/components/InventoryModal.jsx
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useSaveInventory } from "../hook/useSaveInventory.js";
+import { useInventoryStore, useBranchStore } from "../../users/store/adminStore.js";
+import { Spinner } from "../../auth/components/Spinner.jsx";
+import { showSuccess, showError } from "../../../shared/utils/toast.js";
+import { showConfirmToast } from "../../auth/components/ConfirmModal.jsx";
+import { InventoryFormFields } from "./InventoryFormFields.jsx";
 
-    return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
-            <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 mx-4">
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-black italic text-gray-800 uppercase">
-                        Nuevo <span className="text-kinal-red">Insumo</span>
-                    </h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 font-bold text-xl">×</button>
-                </div>
+export const InventoryModal = ({ isOpen, onClose, item }) => {
+  const { register, handleSubmit, reset, formState: { errors, isDirty } } = useForm();
+  const { saveInventory } = useSaveInventory();
+  const loading = useInventoryStore((state) => state.loading);
+  const { branches, getBranches } = useBranchStore();
 
-                <form className="space-y-4">
-                    <div className="flex flex-col gap-1">
-                        <label className="text-sm font-bold text-gray-700">Nombre del Insumo</label>
-                        <input type="text" name="name" placeholder="Ej: Aceite Vegetal" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none" />
-                    </div>
+  useEffect(() => {
+    if (!isOpen) return;
+    getBranches();
+    if (item) {
+      reset({
+        name: item.name,
+        description: item.description,
+        stock: item.stock,
+        unitCost: item.unitCost,
+        branchId: item.branchId?._id || item.branchId,
+      });
+    } else {
+      reset({ name: "", description: "", stock: 0, unitCost: 0, branchId: "" });
+    }
+  }, [isOpen, item, reset, getBranches]);
 
-                    <div className="flex flex-col gap-1">
-                        <label className="text-sm font-bold text-gray-700">Descripción</label>
-                        <textarea name="description" placeholder="Detalles del insumo..." rows="2" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none resize-none" />
-                    </div>
+  const onSubmit = async (data) => {
+    try {
+      await saveInventory(data, item?._id);
+      showSuccess(item ? "Insumo actualizado" : "Insumo creado exitosamente");
+      onClose();
+    } catch {
+      showError("Error al procesar el insumo");
+    }
+  };
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="flex flex-col gap-1">
-                            <label className="text-sm font-bold text-gray-700">Stock</label>
-                            <input type="number" name="stock" placeholder="0" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none" />
-                        </div>
-                        <div className="flex flex-col gap-1">
-                            <label className="text-sm font-bold text-gray-700">Costo Unitario (Q)</label>
-                            <input type="number" step="0.01" name="unitCost" placeholder="0.00" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none" />
-                        </div>
-                    </div>
+  const handleClose = () => {
+    if (isDirty) {
+      showConfirmToast({ title: "Cerrar Editor", message: "Tienes cambios sin guardar. ¿Deseas salir de todos modos?", onConfirm: () => { reset(); onClose(); } });
+    } else {
+      reset();
+      onClose();
+    }
+  };
 
-                    <div className="pt-4 flex gap-3">
-                        <button type="button" onClick={onClose} className="flex-1 px-4 py-3 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-colors">
-                            Cancelar
-                        </button>
-                        <button type="submit" className="flex-1 bg-kinal-red text-white font-black py-3 rounded-xl shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest">
-                            Guardar Insumo
-                        </button>
-                    </div>
-                </form>
-            </div>
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 px-3 animate-fadeIn">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden">
+        <div className="p-6 text-white bg-kinal-red">
+          <h2 className="text-xl font-black uppercase italic">
+            {item ? "Editar Insumo" : "Nuevo Insumo"}
+          </h2>
         </div>
-    );
+        <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-5">
+          <InventoryFormFields register={register} errors={errors} branches={branches} />
+          <div className="flex justify-end gap-3 pt-4">
+            <button type="button" onClick={handleClose} className="px-6 py-3 bg-gray-100 rounded-2xl font-bold text-gray-500 hover:bg-gray-200 transition-all">
+              CANCELAR
+            </button>
+            <button type="submit" disabled={loading} className="px-8 py-3 bg-kinal-red text-white rounded-2xl font-black shadow-lg shadow-red-200 hover:scale-105 transition-all disabled:opacity-50">
+              {loading ? <Spinner small /> : item ? "ACTUALIZAR" : "GUARDAR INSUMO"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 };

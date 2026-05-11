@@ -259,3 +259,129 @@ export const useUserStore = create((set, get) => ({
     catch (error) { set({ error: error.response?.data?.message || "Error al eliminar usuario", loading: false }); }
   },
 }));
+
+// ================= RESERVATIONS STORE =================
+export const useReservationStore = create((set, get) => ({
+  reservations: [],
+  loading: false,
+  error: null,
+
+  getReservations: async (params) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.getReservations(params);
+      // El controlador devuelve { success: true, reservations: [...] }
+      set({ reservations: res.data.reservations, loading: false });
+    } catch (error) {
+      set({ reservations: [], error: error.response?.data?.message || "Error al obtener reservaciones", loading: false });
+    }
+  },
+
+  createReservation: async (data) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.createReservation(data);
+      // El controlador devuelve { success: true, data: {...} }
+      set({ reservations: [res.data.data, ...get().reservations], loading: false });
+      return res.data; // Útil para mostrar la mesa asignada en el componente
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al crear reservación", loading: false });
+      throw error;
+    }
+  },
+
+  updateReservation: async (id, data) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.updateReservation(id, data);
+      // El controlador devuelve { success: true, updated: {...} }
+      set({
+        reservations: get().reservations.map((r) =>
+          r._id === id ? res.data.updated : r
+        ),
+        loading: false,
+      });
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al actualizar reservación", loading: false });
+      throw error;
+    }
+  },
+
+  deleteReservation: async (id) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.deleteReservation(id);
+      // El controlador hace un toggle y devuelve el objeto modificado o mensaje
+      // Para mantener sincronía con tu controlador que cambia statusRes y status:
+      await get().getReservations(); // Recargamos para ver los cambios de estado aplicados
+      set({ loading: false });
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al cambiar estado de reservación", loading: false });
+    }
+  },
+}));
+
+// ================= INVENTORY STORE =================
+export const useInventoryStore = create((set, get) => ({
+  inventory: [],
+  loading: false,
+  error: null,
+
+  getInventory: async (params) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.getInventory(params);
+      // Tu controlador devuelve { success: true, items: [...] }
+      set({ inventory: res.data.items, loading: false });
+    } catch (error) {
+      set({ 
+        inventory: [],
+        error: error.response?.data?.message || "Error al obtener inventario", loading: false });
+    }
+  },
+
+  createInventory: async (data) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.createInventory(data);
+      // Tu controlador devuelve { inventory: {...} }
+      set({ inventory: [res.data.inventory, ...get().inventory], loading: false });
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al crear insumo", loading: false });
+      throw error;
+    }
+  },
+
+  updateInventory: async (id, data) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.updateInventory(id, data);
+      // Tu controlador devuelve { updatedItem: {...} }
+      set({
+        inventory: get().inventory.map((item) =>
+          item._id === id ? res.data.updatedItem : item
+        ),
+        loading: false,
+       });
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al actualizar insumo", loading: false });
+      throw error;
+    }
+  },
+
+  deleteInventory: async (id) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.deleteInventory(id);
+      // Como es un soft delete (toggle status), actualizamos el objeto en el store
+      set({
+        inventory: get().inventory.map((item) =>
+          item._id === id ? res.data.updatedItem : item
+        ),
+        loading: false,
+      });
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al cambiar estado del insumo", loading: false });
+    }
+  },
+}));
