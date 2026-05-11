@@ -6,7 +6,7 @@ export const TableFormFields = ({ register, errors, branches }) => {
         {/* Sucursal */}
         <div className="flex flex-col gap-1 col-span-2">
           <label className="text-sm font-bold text-gray-700">Sucursal</label>
-          <select {...register("branch", { required: true })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none bg-white font-medium">
+          <select {...register("branchId", { required: true })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none bg-white font-medium">
             <option value="">Selecciona la sucursal...</option>
             {branches.map(b => <option key={b._id} value={b._id}>{b.name}</option>)}
           </select>

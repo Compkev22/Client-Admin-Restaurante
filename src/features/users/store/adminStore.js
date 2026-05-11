@@ -17,7 +17,7 @@ export const useAdditionalServicesStore = create((set, get) => ({
         loading: false,
       });
     } catch (error) {
-      console.log("ERROR GET:", error); // 👈 importante para debug
+      console.log("ERROR GET:", error); 
       set({
         error:
           error.response?.data?.message ||
@@ -356,6 +356,7 @@ export const useInventoryStore = create((set, get) => ({
     try {
       set({ loading: true, error: null });
       const res = await api.updateInventory(id, data);
+      const updatedItem = res.data.updatedItem;  
       // Tu controlador devuelve { updatedItem: {...} }
       set({
         inventory: get().inventory.map((item) =>
@@ -363,6 +364,7 @@ export const useInventoryStore = create((set, get) => ({
         ),
         loading: false,
        });
+       return true;
     } catch (error) {
       set({ error: error.response?.data?.message || "Error al actualizar insumo", loading: false });
       throw error;
@@ -385,3 +387,128 @@ export const useInventoryStore = create((set, get) => ({
     }
   },
 }));
+
+// ================= EVENTS STORE =================
+export const useEventStore = create((set, get) => ({
+  events: [],
+  loading: false,
+  error: null,
+
+  getEvents: async (params) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.getEvents(params);
+      // El controlador de eventos devuelve { success: true, data: [...] }
+      set({ events: res.data.data, loading: false });
+    } catch (error) {
+      set({ events: [], error: error.response?.data?.message || "Error al obtener eventos", loading: false });
+    }
+  },
+
+  createEvent: async (data) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.createEvent(data);
+      // El controlador devuelve { success: true, data: {...} }
+      set({ events: [res.data.data, ...get().events], loading: false });
+      return res.data; 
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al crear el evento", loading: false });
+      throw error;
+    }
+  },
+
+  updateEvent: async (id, data) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.updateEvent(id, data);
+      // El controlador devuelve { success: true, data: {...} }
+      set({
+        events: get().events.map((e) =>
+          e._id === id ? res.data.data : e
+        ),
+        loading: false,
+      });
+      return true;
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al actualizar el evento", loading: false });
+      throw error;
+    }
+  },
+
+  changeEventStatus: async (id, status) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.changeEventStatus(id, status);
+      // El controlador devuelve el evento con el nuevo estado en "data"
+      set({
+        events: get().events.map((e) =>
+          e._id === id ? res.data.data : e
+        ),
+        loading: false,
+      });
+      return true;
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al cambiar el estado del evento", loading: false });
+      return false;
+    }
+  },
+
+  deleteEventPermanently: async (id) => {
+    try {
+      set({ loading: true, error: null });
+      await api.deleteEventPermanently(id);
+      // Filtramos el evento borrado para sacarlo de la lista
+      set({
+        events: get().events.filter((e) => e._id !== id),
+        loading: false,
+      });
+      return true;
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al eliminar el evento permanentemente", loading: false });
+      return false;
+    }
+  },
+}));
+
+// ================= REVIEWS STORE =================
+export const useReviewStore = create((set, get) => ({
+  reviews: [],
+  loading: false,
+  error: null,
+
+  getReviews: async (branchId) => {
+    try {
+      set({ loading: true, error: null });
+      // Si el branchId es "all" o viene vacío, traemos el global. Si no, filtramos por sucursal.
+      const res = (!branchId || branchId === "all") 
+        ? await api.getAllReviews() 
+        : await api.getBranchReviews(branchId);
+        
+      set({ reviews: res.data.data, loading: false });
+    } catch (error) {
+      set({ reviews: [], error: error.response?.data?.message || "Error al obtener reseñas", loading: false });
+    }
+  },
+
+  deleteReview: async (id) => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.toggleReviewStatus(id);
+      
+      // Actualizamos solo la reseña modificada en la lista actual
+      set({
+        reviews: get().reviews.map((r) =>
+          r._id === id ? { ...r, isDeleted: res.data.data.isDeleted } : r
+        ),
+        loading: false,
+      });
+      return true;
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al moderar reseña", loading: false });
+      return false;
+    }
+  },
+}));
+
+

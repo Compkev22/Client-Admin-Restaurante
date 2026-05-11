@@ -70,3 +70,17 @@ export const getInventory = async (params) => await axiosAdmin.get("/inventory",
 export const createInventory = async (data) => await axiosAdmin.post("/inventory", data);
 export const updateInventory = async (id, data) => await axiosAdmin.put(`/inventory/${id}`, data);
 export const deleteInventory = async (id) => await axiosAdmin.patch(`/inventory/${id}/status`);
+
+// ================= EVENTS (EVENTOS) =================
+export const getEvents = async (params) => await axiosAdmin.get("/events", { params });
+export const getEventById = async (id) => await axiosAdmin.get(`/events/${id}`);
+export const createEvent = async (data) => await axiosAdmin.post("/events", data);
+export const updateEvent = async (id, data) => await axiosAdmin.put(`/events/${id}`, data);
+export const changeEventStatus = async (id, status) => await axiosAdmin.patch(`/events/${id}/status`, { status });
+export const toggleEventAttendance = async (id, action) => await axiosAdmin.patch(`/events/${id}/attendance`, { action });
+export const deleteEventPermanently = async (id) => await axiosAdmin.delete(`/events/${id}`);
+
+// ================= REVIEWS (RESEÑAS) =================
+export const getAllReviews = async () => await axiosAdmin.get("/reviews");
+export const getBranchReviews = async (branchId) => await axiosAdmin.get(`/reviews/branch/${branchId}`);
+export const toggleReviewStatus = async (id) => await axiosAdmin.patch(`/reviews/${id}/status`);
