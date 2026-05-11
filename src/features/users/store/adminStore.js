@@ -644,4 +644,53 @@ createFullOrder: async (orderData, cartItems) => {
   }
 }));
 
+// En src/features/users/store/adminStore.js
+
+export const useComboStore = create((set, get) => ({
+  combos: [],
+  loading: false,
+  error: null,
+
+  getCombos: async () => {
+    try {
+      set({ loading: true });
+      const res = await api.getCombos();
+      set({ combos: res.data.data, loading: false });
+    } catch (err) {
+      set({ error: "Error al cargar combos", loading: false });
+    }
+  },
+
+  saveCombo: async (formData) => {
+    try {
+      set({ loading: true });
+      const res = await api.createCombo(formData);
+      set({ combos: [res.data.data, ...get().combos], loading: false });
+      return true;
+    } catch (err) {
+      set({ 
+        error: err.response?.data?.message || "Error al guardar el combo", 
+        loading: false 
+      });
+      return false;
+    }
+  },
+
+  deleteCombo: async (id) => {
+    try {
+      set({ loading: true });
+      const res = await api.toggleComboStatus(id);
+      // Actualizamos el estado local para reflejar si quedó ACTIVE o INACTIVE
+      set({
+        combos: get().combos.map(c => c._id === id ? res.data.data : c),
+        loading: false
+      });
+      return true;
+    } catch (err) {
+      set({ loading: false });
+      return false;
+    }
+  }
+}));
+
 
