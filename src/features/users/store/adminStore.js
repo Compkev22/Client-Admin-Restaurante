@@ -478,10 +478,11 @@ export const useBillingStore = create((set, get) => ({
     }
   },
 
-  payBilling: async (id) => {
+payBilling: async (id, payload = {}) => { // <-- Agrega payload = {}
     try {
       set({ loading: true, error: null });
-      const res = await api.payBilling(id);
+      // Envía el payload a la API
+      const res = await api.payBilling(id, payload); 
       set({
         billings: get().billings.map((billing) =>
           billing._id === id ? res.data.data : billing,
@@ -823,11 +824,7 @@ export const useOrderStore = create((set, get) => ({
       const res = await api.getOrders(params);
       set({ orders: res.data.data, loading: false });
     } catch (error) {
-      set({
-        orders: [],
-        error: error.response?.data?.message || "Error al obtener órdenes",
-        loading: false,
-      });
+      set({ orders: [], error: error.response?.data?.message, loading: false });
     }
   },
 
@@ -838,57 +835,68 @@ export const useOrderStore = create((set, get) => ({
       set({ currentOrderDetails: res.data.data, loading: false });
       return res.data.data;
     } catch (error) {
-      set({
-        currentOrderDetails: [],
-        error: "Error al obtener detalles",
-        loading: false,
-      });
+      set({ currentOrderDetails: [], error: "Error al obtener detalles", loading: false });
       return [];
     }
   },
 
+  // 1. CREACIÓN DE ORDEN NUEVA Y FACTURA AUTOMÁTICA
   createFullOrder: async (orderData, cartItems) => {
     try {
       set({ loading: true, error: null });
 
-      // 1. Crear la orden (Cabecera)
       const orderRes = await api.createOrder(orderData);
       const newOrder = orderRes.data.data;
 
-      // 2. Insertar cada producto del carrito como OrderDetail
       for (const item of cartItems) {
+        const isCombo = item.type && item.type.toString().toLowerCase().includes("combo");
+        
         await api.createOrderDetail({
           order: newOrder._id,
-          productoId: item.type === "Individual" ? item.productId : null,
-          comboId: item.type === "Combo" ? item.productId : null,
+          productoId: isCombo ? null : item.productId,
+          comboId: isCombo ? item.productId : null,
           cantidad: item.quantity,
         });
       }
 
-      // 3. ✅ NUEVO: Generar la factura automáticamente con estado GENERATED
-      //    Necesitamos recalcular el total porque el backend lo calcula en OrderDetail
-      //    Obtenemos la orden actualizada para tener el total correcto
-      const updatedOrderRes = await api.getOrderById(newOrder._id);
-      const updatedOrder =
-        updatedOrderRes.data.data?.order || updatedOrderRes.data.data;
-
       await api.createBilling({
         Order: newOrder._id,
-        BillPaymentMethod: "CASH", // Valor por defecto, se cambia al pagar
+        BillPaymentMethod: "CASH", 
         clientId: orderData.clientId || null,
         newClientData: orderData.newClientData || null,
-        BillSerie: `FAC-${Date.now()}`,
       });
 
       await get().getOrders();
       set({ loading: false });
       return true;
     } catch (error) {
-      set({
-        error:
-          error.response?.data?.message || "Error al crear la orden completa",
-        loading: false,
-      });
+      set({ error: error.response?.data?.message || "Error al crear la orden", loading: false });
+      throw error;
+    }
+  },
+
+  addItemsToExistingOrder: async (orderId, cartItems) => {
+    try {
+      set({ loading: true, error: null });
+
+      // Agregamos los nuevos productos
+      for (const item of cartItems) {
+        const isCombo = item.type && item.type.toString().toLowerCase().includes("combo");
+        await api.createOrderDetail({
+          order: orderId,
+          productoId: isCombo ? null : item.productId,
+          comboId: isCombo ? item.productId : null,
+          cantidad: item.quantity,
+        });
+      }
+
+      await api.syncBillingWithOrder(orderId);
+
+      await get().getOrders();
+      set({ loading: false });
+      return true;
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Error al agregar productos", loading: false });
       throw error;
     }
   },
@@ -903,16 +911,13 @@ export const useOrderStore = create((set, get) => ({
       });
       return true;
     } catch (error) {
-      set({
-        error: error.response?.data?.message || "Error al cambiar estado",
-        loading: false,
-      });
+      set({ error: "Error al cambiar estado", loading: false });
       return false;
     }
   },
 }));
 
-// En src/features/users/store/adminStore.js
+
 
 export const useComboStore = create((set, get) => ({
   combos: [],
@@ -931,16 +936,32 @@ export const useComboStore = create((set, get) => ({
 
   saveCombo: async (formData) => {
     try {
-      set({ loading: true });
-      const res = await api.createCombo(formData);
-      set({ combos: [res.data.data, ...get().combos], loading: false });
+      await api.createCombo(formData);
+      await get().getCombos();
       return true;
-    } catch (err) {
-      set({
-        error: err.response?.data?.message || "Error al guardar el combo",
-        loading: false,
-      });
+    } catch (error) {
+      console.error(error);
       return false;
+    }
+  },
+
+  updateCombo: async (id, formData) => {
+    try {
+      await api.updateCombo(id, formData);
+      await get().getCombos();
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  },
+
+  changeComboStatus: async (id) => {
+    try {
+      await api.changeComboStatus(id);
+      await get().getCombos();
+    } catch (error) {
+      console.error(error);
     }
   },
 
@@ -948,7 +969,6 @@ export const useComboStore = create((set, get) => ({
     try {
       set({ loading: true });
       const res = await api.toggleComboStatus(id);
-      // Actualizamos el estado local para reflejar si quedó ACTIVE o INACTIVE
       set({
         combos: get().combos.map((c) => (c._id === id ? res.data.data : c)),
         loading: false,

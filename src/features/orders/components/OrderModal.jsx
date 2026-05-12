@@ -2,67 +2,64 @@ import { useState, useEffect } from "react";
 import { OrderFormFields } from "./OrderFormFields";
 import { OrderCart } from "./OrderCart";
 import { getMenu } from "../../../shared/api/admin";
-import { useOrderActions } from "../hooks/useOrderActions";
 import {
+  useOrderStore,
   useTableStore,
   useBranchStore,
   useUserStore,
 } from "../../users/store/adminStore";
 import { useAuthStore } from "../../auth/store/authStore";
-import { showError } from "../../../shared/utils/toast";
+import { showError, showSuccess } from "../../../shared/utils/toast";
 
+// RECIBIMOS orderToEdit
 export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
   const isEditMode = !!orderToEdit;
-  // --- ESTADOS ---
   const [orderType, setOrderType] = useState("TAKEAWAY");
   const [orderList, setOrderList] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState("");
   const [menuProducts, setMenuProducts] = useState([]);
   const [mesaId, setMesaId] = useState("");
   const [selectedBranchId, setSelectedBranchId] = useState("");
-  const [selectedEmpleadoId, setSelectedEmpleadoId] = useState(""); // Nuevo estado para el empleado
+  const [selectedEmpleadoId, setSelectedEmpleadoId] = useState("");
 
-  // --- STORES Y HOOKS ---
-  const { saveOrder } = useOrderActions();
+  const { createFullOrder, addItemsToExistingOrder } = useOrderStore();
   const { tables, getTables } = useTableStore();
   const { branches, getBranches } = useBranchStore();
-  const { users, getUsers } = useUserStore(); // Usamos el store de usuarios para los empleados
+  const { users, getUsers } = useUserStore();
   const { user } = useAuthStore();
 
-  // --- CARGA INICIAL ---
- useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       getMenu().then((res) => setMenuProducts(res.data.menu || []));
       getTables();
       getBranches();
       getUsers();
 
-      if (isEditMode) {
-        // Modo edición: cargar datos de la orden existente
-        setOrderType(orderToEdit.orderType);
+      setOrderList([]); // El carrito empieza vacío, solo agregaremos lo nuevo
+
+      if (orderToEdit) {
+        // Modo Edición: Precargar datos y bloquearlos
         setSelectedBranchId(orderToEdit.branchId?._id || orderToEdit.branchId);
-        setSelectedEmpleadoId(orderToEdit.empleadoId?._id || orderToEdit.empleadoId || "");
+        setSelectedEmpleadoId(
+          orderToEdit.empleadoId?._id || orderToEdit.empleadoId,
+        );
+        setOrderType(orderToEdit.orderType);
         setMesaId(orderToEdit.mesaId?._id || orderToEdit.mesaId || "");
-        // Los items existentes se cargan vía fetchOrderDetails
-        setOrderList([]); // Empezamos limpio; los items del carrito son los NUEVOS a agregar
       } else {
-        setOrderList([]);
+        // Modo Nueva Orden
         setMesaId("");
         const userBranch = user?.branchId || user?.branch?._id || "";
         setSelectedBranchId(userBranch);
         setSelectedEmpleadoId(user?._id || "");
       }
     }
-  }, [isOpen, orderToEdit]);
+  }, [isOpen, orderToEdit, user]);
 
-  // --- FILTRO DINÁMICO DE EMPLEADOS ---
-  // Se actualiza cada vez que el admin cambia la sucursal seleccionada
   const filteredEmployees = users.filter(
     (u) =>
       u.branchId === selectedBranchId || u.branch?._id === selectedBranchId,
   );
 
-  // --- LÓGICA DEL CARRITO ---
   const handleAddProduct = () => {
     if (!selectedProduct) return;
     const exists = orderList.find((item) => item.productId === selectedProduct);
@@ -81,9 +78,9 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
         ...orderList,
         {
           productId: selectedProduct,
-          type: p.type,
-          name: p.name,
-          price: p.price,
+          type: p.type || p.categoria || "Individual", // Fallback seguro
+          name: p.name || p.nombre,
+          price: p.price || p.precio,
           quantity: 1,
         },
       ]);
@@ -98,25 +95,32 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
     0,
   );
 
-  // --- ENVÍO ---
- const handleSubmit = async () => {
+  const handleSubmit = async () => {
     if (!selectedBranchId) return showError("Debes seleccionar una sucursal.");
-    if (orderList.length === 0) return showError("Agrega al menos un producto.");
+    if (!selectedEmpleadoId) return showError("Debes seleccionar un empleado.");
+    if (orderList.length === 0) return showError("Debes agregar productos.");
 
-    if (isEditMode) {
-      // Modo edición: solo agregar nuevos items a la orden existente
-      const success = await addItemsToOrder(orderToEdit._id, orderList);
-      if (success) onClose();
-    } else {
-      // Modo creación: flujo normal
-      const orderData = {
-        branchId: selectedBranchId,
-        orderType,
-        mesaId: orderType === "DINE_IN" ? mesaId : null,
-        empleadoId: selectedEmpleadoId,
-      };
-      const success = await saveOrder(orderData, orderList);
-      if (success) onClose();
+    try {
+      if (orderToEdit) {
+        await addItemsToExistingOrder(orderToEdit._id, orderList);
+        showSuccess("Productos agregados y factura actualizada");
+      } else {
+        const finalEmpleadoId =
+          selectedEmpleadoId.length < 24
+            ? user?._id || user?.uid
+            : selectedEmpleadoId;
+        const orderData = {
+          branchId: selectedBranchId,
+          orderType: orderType,
+          mesaId: orderType === "DINE_IN" ? mesaId : null,
+          empleadoId: finalEmpleadoId,
+        };
+        await createFullOrder(orderData, orderList);
+        showSuccess("Orden creada y facturada automáticamente");
+      }
+      onClose();
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -127,8 +131,9 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
       <div className="bg-white w-full max-w-3xl rounded-3xl shadow-2xl p-8 mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-black italic text-gray-800 uppercase">
-      {isEditMode ? "Editar" : "Nueva"} <span className="text-kinal-red">Orden</span>
-    </h2>
+            {isEditMode ? "Editar" : "Nueva"}{" "}
+            <span className="text-kinal-red">Orden</span>
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 font-bold text-2xl"
@@ -138,8 +143,9 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
         </div>
 
         <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-          {/* SELECTORES DE SUCURSAL Y EMPLEADO */}
+          {/* SELECTORES */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-orange-50 p-5 rounded-2xl border border-orange-100">
+            {/* SUCURSAL */}
             <div className="space-y-1">
               <label className="text-xs font-black text-kinal-orange uppercase tracking-widest">
                 Sucursal
@@ -148,11 +154,12 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
                 value={selectedBranchId}
                 onChange={(e) => {
                   setSelectedBranchId(e.target.value);
-                  setSelectedEmpleadoId(""); // Limpiamos el empleado al cambiar de sucursal
+                  setSelectedEmpleadoId("");
                 }}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-white font-bold text-gray-700"
+                disabled={!!orderToEdit}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-white font-bold text-gray-700 disabled:bg-gray-100"
               >
-                <option value="">-- Seleccionar Local --</option>
+                <option value="">-- Seleccionar --</option>
                 {branches?.map((b) => (
                   <option key={b._id} value={b._id}>
                     {b.name}
@@ -161,27 +168,23 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
               </select>
             </div>
 
+            {/* EMPLEADO */}
             <div className="space-y-1">
               <label className="text-xs font-black text-kinal-orange uppercase tracking-widest">
-                Empleado Responsable
+                Empleado
               </label>
               <select
                 value={selectedEmpleadoId}
                 onChange={(e) => setSelectedEmpleadoId(e.target.value)}
-                disabled={!selectedBranchId}
+                disabled={!selectedBranchId || !!orderToEdit}
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-white font-bold text-gray-700 disabled:bg-gray-100"
               >
-                <option value="">-- Seleccionar Empleado --</option>
-                {filteredEmployees.map((emp) => {
-                  // Intentamos obtener el ID real de cualquier forma posible
-                  const realId = emp._id || emp.uid || emp.id;
-
-                  return (
-                    <option key={realId} value={realId}>
-                      {emp.UserName} {emp.UserSurname}
-                    </option>
-                  );
-                })}
+                <option value="">-- Seleccionar --</option>
+                {filteredEmployees.map((emp) => (
+                  <option key={emp._id || emp.uid} value={emp._id || emp.uid}>
+                    {emp.UserName} {emp.UserSurname}
+                  </option>
+                ))}
               </select>
             </div>
           </div>

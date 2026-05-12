@@ -29,27 +29,7 @@ export const PaymentWizardModal = ({ isOpen, onClose, orderData }) => {
   const [paymentMethod, setPaymentMethod] = useState("CASH");
   const [loading, setLoading] = useState(false);
 
-  // --- MOCK TEMPORAL DE CLIENTES ---
-  const mockUsers = [
-    {
-      _id: "CF00000001",
-      UserName: "Consumidor",
-      UserSurname: "Final",
-      UserEmail: "cf@kfc.com.gt",
-    },
-    {
-      _id: "U00000002",
-      UserName: "Roberto",
-      UserSurname: "Milian",
-      UserEmail: "roberto@kinal.edu.gt",
-    },
-    {
-      _id: "U00000003",
-      UserName: "Diego",
-      UserSurname: "López",
-      UserEmail: "dlopez@gmail.com",
-    },
-  ];
+
 
   // --- ESTADOS CLIENTE ---
   const [searchQuery, setSearchQuery] = useState("");
@@ -124,8 +104,18 @@ export const PaymentWizardModal = ({ isOpen, onClose, orderData }) => {
   const handleConfirmPayment = async () => {
     try {
       setLoading(true);
-      await payBilling(orderData._id);
-      alert("Pago procesado correctamente");
+
+      const payload = {};
+
+      if (isCreatingClient) {
+        payload.newClientData = newClient; // Datos del formulario (Nombres, Correo...)
+      } else if (selectedClient) {
+        payload.clientId = selectedClient._id || selectedClient.uid; // ID del usuario existente
+      }
+
+      await payBilling(orderData._id, payload);
+
+      alert("Pago procesado y factura actualizada correctamente");
       setStep(1);
       setSearchQuery("");
       setCashReceived("");
@@ -195,25 +185,22 @@ export const PaymentWizardModal = ({ isOpen, onClose, orderData }) => {
           </div>
           <div className="flex items-center gap-2">
             <span
-              className={`w-8 h-8 flex items-center justify-center rounded-full font-black text-sm ${
-                step === 1
+              className={`w-8 h-8 flex items-center justify-center rounded-full font-black text-sm ${step === 1
                   ? "bg-kinal-red text-white"
                   : "bg-green-100 text-green-600"
-              }`}
+                }`}
             >
               1
             </span>
             <div
-              className={`w-8 h-1 rounded-full ${
-                step === 2 ? "bg-kinal-red" : "bg-gray-200"
-              }`}
+              className={`w-8 h-1 rounded-full ${step === 2 ? "bg-kinal-red" : "bg-gray-200"
+                }`}
             />
             <span
-              className={`w-8 h-8 flex items-center justify-center rounded-full font-black text-sm ${
-                step === 2
+              className={`w-8 h-8 flex items-center justify-center rounded-full font-black text-sm ${step === 2
                   ? "bg-kinal-red text-white"
                   : "bg-gray-200 text-gray-400"
-              }`}
+                }`}
             >
               2
             </span>
@@ -366,11 +353,10 @@ export const PaymentWizardModal = ({ isOpen, onClose, orderData }) => {
                   <button
                     type="button"
                     onClick={() => setPaymentMethod("CASH")}
-                    className={`p-4 rounded-xl border-2 font-black uppercase transition-all flex items-center justify-center gap-2 ${
-                      paymentMethod === "CASH"
+                    className={`p-4 rounded-xl border-2 font-black uppercase transition-all flex items-center justify-center gap-2 ${paymentMethod === "CASH"
                         ? "border-kinal-red bg-red-50 text-kinal-red"
                         : "border-gray-100 text-gray-400"
-                    }`}
+                      }`}
                   >
                     <img src={CashIcon} alt="Cash" className="w-6 h-6" />
                     Efectivo
@@ -378,11 +364,10 @@ export const PaymentWizardModal = ({ isOpen, onClose, orderData }) => {
                   <button
                     type="button"
                     onClick={() => setPaymentMethod("CARD")}
-                    className={`p-4 rounded-xl border-2 font-black uppercase transition-all flex items-center justify-center gap-2 ${
-                      paymentMethod === "CARD"
+                    className={`p-4 rounded-xl border-2 font-black uppercase transition-all flex items-center justify-center gap-2 ${paymentMethod === "CARD"
                         ? "border-kinal-red bg-red-50 text-kinal-red"
                         : "border-gray-100 text-gray-400"
-                    }`}
+                      }`}
                   >
                     <img src={CardIcon} alt="Card" className="w-6 h-6" />
                     Tarjeta
@@ -435,19 +420,17 @@ export const PaymentWizardModal = ({ isOpen, onClose, orderData }) => {
                     />
                   </div>
                   <div
-                    className={`p-6 rounded-2xl border-2 ${
-                      change > 0
+                    className={`p-6 rounded-2xl border-2 ${change > 0
                         ? "bg-green-100 border-green-300"
                         : "bg-gray-50 border-gray-100"
-                    }`}
+                      }`}
                   >
                     <p className="text-sm font-bold text-gray-500 uppercase mb-1">
                       Cambio
                     </p>
                     <p
-                      className={`text-4xl font-black ${
-                        change > 0 ? "text-green-600" : "text-gray-300"
-                      }`}
+                      className={`text-4xl font-black ${change > 0 ? "text-green-600" : "text-gray-300"
+                        }`}
                     >
                       Q {change.toFixed(2)}
                     </p>
@@ -511,11 +494,10 @@ export const PaymentWizardModal = ({ isOpen, onClose, orderData }) => {
                     (paymentMethod === "CASH" &&
                       parseFloat(cashReceived || 0) < total)
                   }
-                  className={`flex-1 font-black px-8 py-4 rounded-xl shadow-lg transition-all uppercase tracking-widest ${
-                    loading
+                  className={`flex-1 font-black px-8 py-4 rounded-xl shadow-lg transition-all uppercase tracking-widest ${loading
                       ? "bg-gray-300 text-gray-500"
                       : "bg-green-500 text-white hover:bg-green-600"
-                  }`}
+                    }`}
                 >
                   {loading
                     ? "Procesando..."

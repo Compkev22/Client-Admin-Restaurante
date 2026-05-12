@@ -90,8 +90,7 @@ export const toggleReviewStatus = async (id) => await axiosAdmin.patch(`/reviews
 export const getBillings = async (params) => await axiosAdmin.get("/billings", { params });
 export const getBillingById = async (id) => await axiosAdmin.get(`/billings/${id}`);
 export const createBilling = async (data) => await axiosAdmin.post("/billings", data);
-export const payBilling = async (id) => await axiosAdmin.patch(`/billings/pay/${id}`);
-
+export const payBilling = async (id, data) => await axiosAdmin.patch(`/billings/pay/${id}`, data);
 // ================= ORDERS (ÓRDENES) =================
 export const getOrders = async (params) => await axiosAdmin.get("/orders", { params });
 export const getOrderById = async (id) => await axiosAdmin.get(`/orders/${id}`);
@@ -111,6 +110,7 @@ export const updateOrderRequestStatus = async (id, orderStatus) => await axiosAd
 
 // ================= COMBOS =================
 export const getCombos = async (params) => await axiosAdmin.get("/combos", { params });
-export const createCombo = async (data) => await axiosAdmin.post("/combos", data);
-export const updateCombo = async (id, data) => await axiosAdmin.put(`/combos/${id}`, data);
+export const createCombo = (formData) => axiosAdmin.post("/combos", formData, { headers: { "Content-Type": "multipart/form-data" },});
+export const updateCombo = (id, formData) => axiosAdmin.put(`/combos/${id}`, formData, { headers: { "Content-Type": "multipart/form-data" },});
+export const changeComboStatus = (id) => axiosAdmin.patch(`/combos/${id}/status`);
 export const toggleComboStatus = async (id) => await axiosAdmin.patch(`/combos/${id}/status`);

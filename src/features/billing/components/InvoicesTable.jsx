@@ -13,12 +13,14 @@ export const InvoicesTable = () => {
   }, [getBillings]);
 
   const handleOpenPaymentModal = (invoice) => {
-    setSelectedInvoice({
-      _id: invoice._id,
-      total: invoice.BillTotal,
-    });
+    setSelectedInvoice(invoice);
     setIsPaymentModalOpen(true);
-  }
+  };
+
+  const handleViewDetails = (invoice) => {
+    console.log("Viendo detalles de la factura ya pagada:", invoice);
+    alert(`Viendo detalles de la factura ${invoice.BillSerie}`);
+  };
 
   if (loading && billings.length === 0) {
     return (
@@ -49,35 +51,49 @@ export const InvoicesTable = () => {
           {billings.map((inv) => (
             <tr key={inv._id} className="hover:bg-orange-50/50 transition-colors border-b border-gray-50 group">
               <td className="py-4 px-2 font-bold text-gray-700">{inv.BillSerie}</td>
-              {/* Nota: Asumiendo que el backend hace .populate('client') */}
               <td className="py-4 px-2 text-gray-600">
                 {inv.client?.UserName ? `${inv.client.UserName} ${inv.client.UserSurname}` : "Consumidor Final"}
               </td>
               <td className="py-4 px-2 font-black text-gray-800">Q {inv.BillTotal?.toFixed(2)}</td>
               <td className="py-4 px-2">
-                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${inv.BillStatus === 'PAYED' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-700'
-                  }`}>
+                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
+                  inv.BillStatus === 'PAYED' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-700'
+                }`}>
                   {inv.BillStatus === 'PAYED' ? 'Pagada' : 'Pendiente'}
                 </span>
               </td>
               <td className="py-4 px-2">
-                <button
-                  onClick={() => handleOpenPaymentModal(inv)}
-                  className="text-kinal-red font-bold text-sm hover:underline"
-                >
-                  Ver Detalles
-                </button>
+                
+                {inv.BillStatus === 'PAYED' ? (
+                  <button
+                    onClick={() => handleViewDetails(inv)}
+                    className="text-gray-400 font-bold text-sm hover:text-gray-600 underline"
+                  >
+                    Ver Detalles
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleOpenPaymentModal(inv)}
+                    className="bg-kinal-red text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-red-700 shadow-sm"
+                  >
+                    Cobrar Factura
+                  </button>
+                )}
+
               </td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      <PaymentWizardModal
-        isOpen={isPaymentModalOpen}
-        onClose={() => setIsPaymentModalOpen(false)}
-        orderData={selectedInvoice}
-      />
+      {/* Modal de Pago */}
+      {isPaymentModalOpen && (
+        <PaymentWizardModal
+          isOpen={isPaymentModalOpen}
+          onClose={() => setIsPaymentModalOpen(false)}
+          orderData={selectedInvoice}
+        />
+      )}
     </div>
   );
 };
