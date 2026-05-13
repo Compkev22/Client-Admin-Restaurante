@@ -478,11 +478,11 @@ export const useBillingStore = create((set, get) => ({
     }
   },
 
-payBilling: async (id, payload = {}) => { // <-- Agrega payload = {}
+  payBilling: async (id, payload = {}) => { // <-- Agrega payload = {}
     try {
       set({ loading: true, error: null });
       // Envía el payload a la API
-      const res = await api.payBilling(id, payload); 
+      const res = await api.payBilling(id, payload);
       set({
         billings: get().billings.map((billing) =>
           billing._id === id ? res.data.data : billing,
@@ -850,7 +850,7 @@ export const useOrderStore = create((set, get) => ({
 
       for (const item of cartItems) {
         const isCombo = item.type && item.type.toString().toLowerCase().includes("combo");
-        
+
         await api.createOrderDetail({
           order: newOrder._id,
           productoId: isCombo ? null : item.productId,
@@ -861,7 +861,7 @@ export const useOrderStore = create((set, get) => ({
 
       await api.createBilling({
         Order: newOrder._id,
-        BillPaymentMethod: "CASH", 
+        BillPaymentMethod: "CASH",
         clientId: orderData.clientId || null,
         newClientData: orderData.newClientData || null,
       });
@@ -878,8 +878,6 @@ export const useOrderStore = create((set, get) => ({
   addItemsToExistingOrder: async (orderId, cartItems) => {
     try {
       set({ loading: true, error: null });
-
-      // Agregamos los nuevos productos
       for (const item of cartItems) {
         const isCombo = item.type && item.type.toString().toLowerCase().includes("combo");
         await api.createOrderDetail({
@@ -891,12 +889,12 @@ export const useOrderStore = create((set, get) => ({
       }
 
       await api.syncBillingWithOrder(orderId);
-
+ 
       await get().getOrders();
       set({ loading: false });
       return true;
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error al agregar productos", loading: false });
+      set({ error: error.response?.data?.message, loading: false });
       throw error;
     }
   },

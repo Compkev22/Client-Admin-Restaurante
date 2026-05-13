@@ -33,32 +33,35 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
       getMenu().then((res) => setMenuProducts(res.data.menu || []));
       getTables();
       getBranches();
-      getUsers();
 
-      setOrderList([]); // El carrito empieza vacío, solo agregaremos lo nuevo
+      getUsers().then(() => {
+        setOrderList([]);
 
-      if (orderToEdit) {
-        // Modo Edición: Precargar datos y bloquearlos
-        setSelectedBranchId(orderToEdit.branchId?._id || orderToEdit.branchId);
-        setSelectedEmpleadoId(
-          orderToEdit.empleadoId?._id || orderToEdit.empleadoId,
-        );
-        setOrderType(orderToEdit.orderType);
-        setMesaId(orderToEdit.mesaId?._id || orderToEdit.mesaId || "");
-      } else {
-        // Modo Nueva Orden
-        setMesaId("");
-        const userBranch = user?.branchId || user?.branch?._id || "";
-        setSelectedBranchId(userBranch);
-        setSelectedEmpleadoId(user?._id || "");
-      }
+        if (orderToEdit) {
+          const bId = orderToEdit.branchId?._id || orderToEdit.branchId || "";
+          const eId = orderToEdit.empleadoId?._id || orderToEdit.empleadoId || "";
+
+          setSelectedBranchId(bId);
+          setTimeout(() => {
+            setSelectedEmpleadoId(eId);
+          }, 50);
+
+          setOrderType(orderToEdit.orderType || "TAKEAWAY");
+          setMesaId(orderToEdit.mesaId?._id || orderToEdit.mesaId || "");
+        } else {
+          setMesaId("");
+          setOrderType("TAKEAWAY");
+          setSelectedBranchId(user?.branchId || user?.branch?._id || "");
+          setSelectedEmpleadoId(user?._id || user?.uid || "");
+        }
+      });
     }
   }, [isOpen, orderToEdit, user]);
 
-  const filteredEmployees = users.filter(
-    (u) =>
-      u.branchId === selectedBranchId || u.branch?._id === selectedBranchId,
-  );
+  const filteredEmployees = users.filter((u) => {
+    const uBranchId = u.branchId?._id || u.branchId || u.branch?._id || "";
+    return uBranchId.toString() === selectedBranchId.toString();
+  });
 
   const handleAddProduct = () => {
     if (!selectedProduct) return;
@@ -176,11 +179,11 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
               <select
                 value={selectedEmpleadoId}
                 onChange={(e) => setSelectedEmpleadoId(e.target.value)}
-                disabled={!selectedBranchId || !!orderToEdit}
+                disabled={isEditMode}
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-white font-bold text-gray-700 disabled:bg-gray-100"
               >
                 <option value="">-- Seleccionar --</option>
-                {filteredEmployees.map((emp) => (
+                {(isEditMode ? users : filteredEmployees).map((emp) => (
                   <option key={emp._id || emp.uid} value={emp._id || emp.uid}>
                     {emp.UserName} {emp.UserSurname}
                   </option>

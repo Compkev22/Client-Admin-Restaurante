@@ -50,7 +50,7 @@ export const getStatusColor = (status) => {
   }
 };
 
-export const OrderCard = ({ order, onPay, onDetail }) => {
+export const OrderCard = ({ order, onPay, onDetail, onEdit }) => {
   const typeStyle = getOrderTypeStyle(order.orderType);
   const isPayable = order.estado === "Pendiente" || order.estado === "Listo";
   const isEditable =
