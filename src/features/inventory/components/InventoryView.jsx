@@ -31,7 +31,7 @@ export const InventoryPage = () => {
   };
 
   return (
-    <div className="space-y-8 animate-fadeIn p-4">
+    <div className="space-y-6 md:space-y-8 animate-fadeIn p-2 md:p-4">
       <InventoryHeader onCreateClick={handleCreate} />
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
         <InventoryTable

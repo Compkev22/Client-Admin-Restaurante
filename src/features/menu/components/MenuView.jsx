@@ -1,10 +1,10 @@
-// MenuView.jsx
+// features/menu/components/MenuView.jsx
 import { useEffect, useState } from "react";
-import { ProductModal } from "./ProductModal";
-import { useProductStore } from "../../../features/users/store/adminStore";
-import { MenuHeader } from "./MenuHeader";
-import { MenuFilters } from "./MenuFilters";
-import { MenuProductCard } from "./MenuProductCard";
+import { ProductModal } from "./ProductModal.jsx";
+import { useProductStore } from "../../../features/users/store/adminStore.js";
+import { MenuHeader } from "./MenuHeader.jsx";
+import { MenuFilters } from "./MenuFilters.jsx";
+import { MenuProductCard } from "./MenuProductCard.jsx";
 
 export const MenuPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,7 +34,7 @@ export const MenuPage = () => {
       : products.filter((p) => p.categoria === activeCategory);
 
   return (
-    <div className="space-y-8 animate-fadeIn">
+    <div className="space-y-6 md:space-y-8 animate-fadeIn p-2 md:p-4">
       <MenuHeader
         onNewProduct={() => {
           setSelectedProduct(null);
@@ -49,17 +49,25 @@ export const MenuPage = () => {
       />
 
       {loading && (
-        <p className="text-center font-bold text-gray-500">Cargando productos...</p>
+        <p className="text-center font-bold text-gray-500 py-4">Cargando productos...</p>
       )}
 
       {error && (
-        <div className="bg-red-100 border border-red-300 text-red-600 p-4 rounded-xl">
+        <div className="bg-red-100 border border-red-300 text-red-600 p-4 rounded-xl text-sm">
           {error}
         </div>
       )}
 
-      {!loading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {!loading && filteredProducts.length === 0 && (
+        <div className="text-center py-12 md:py-16 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+          <p className="text-gray-400 font-black uppercase tracking-widest text-sm md:text-base">
+            No hay productos en esta categoría
+          </p>
+        </div>
+      )}
+
+      {!loading && filteredProducts.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
           {filteredProducts.map((product) => (
             <MenuProductCard
               key={product._id}
@@ -71,14 +79,6 @@ export const MenuPage = () => {
               onDelete={() => handleDelete(product._id)}
             />
           ))}
-        </div>
-      )}
-
-      {!loading && filteredProducts.length === 0 && (
-        <div className="text-center py-16 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
-          <p className="text-gray-400 font-black uppercase tracking-widest">
-            No hay productos en esta categoría
-          </p>
         </div>
       )}
 

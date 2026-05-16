@@ -48,23 +48,55 @@ export const ReservationModal = ({ isOpen, onClose, item }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl p-8 mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-black italic text-gray-800 uppercase">
-            {item ? "Editar" : "Nueva"} <span className="text-kinal-red">Reservación</span>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fadeIn p-4">
+      <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[92vh]">
+
+        {/* Cabecera fija */}
+        <div className="flex justify-between items-center px-6 md:px-8 pt-6 md:pt-8 pb-4 shrink-0 border-b border-gray-100">
+          <h2 className="text-xl md:text-2xl font-black italic text-gray-800 uppercase">
+            {item ? "Editar" : "Nueva"}{" "}
+            <span className="text-kinal-red">Reservación</span>
           </h2>
-          <button onClick={handleClose} className="text-gray-400 hover:text-gray-600 font-bold text-xl">×</button>
+          <button
+            onClick={handleClose}
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 font-bold text-xl transition-colors"
+            aria-label="Cerrar modal"
+          >
+            ×
+          </button>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <ReservationFormFields register={register} errors={errors} branches={branches} users={users} isEditing={!!item} />
-          <div className="pt-4 flex gap-3 border-t border-gray-100 mt-6">
-            <button type="button" onClick={handleClose} className="flex-1 px-4 py-3 bg-gray-100 rounded-xl font-bold text-gray-500">CANCELAR</button>
-            <button type="submit" disabled={loading} className="flex-[2] bg-kinal-red text-white font-black py-3 px-8 rounded-xl shadow-lg hover:scale-[1.02] transition-all uppercase">
-              {loading ? <Spinner small /> : item ? "ACTUALIZAR" : "GUARDAR RESERVACIÓN"}
-            </button>
-          </div>
-        </form>
+
+        {/* Cuerpo con scroll */}
+        <div className="overflow-y-auto flex-1 px-6 md:px-8 py-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" id="reservation-form">
+            <ReservationFormFields
+              register={register}
+              errors={errors}
+              branches={branches}
+              users={users}
+              isEditing={!!item}
+            />
+          </form>
+        </div>
+
+        {/* Footer fijo */}
+        <div className="shrink-0 px-6 md:px-8 pb-6 md:pb-8 pt-4 border-t border-gray-100 flex flex-col sm:flex-row gap-3">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="flex-1 px-4 py-3 bg-gray-100 rounded-xl font-bold text-gray-500 hover:bg-gray-200 transition-colors uppercase"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            form="reservation-form"
+            disabled={loading}
+            className="flex-[2] bg-kinal-red text-white font-black py-3 px-8 rounded-xl shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest flex justify-center items-center"
+          >
+            {loading ? <Spinner small /> : item ? "Actualizar" : "Guardar Reservación"}
+          </button>
+        </div>
       </div>
     </div>
   );

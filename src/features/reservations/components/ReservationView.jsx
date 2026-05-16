@@ -20,7 +20,9 @@ export const ReservationPage = () => {
   useEffect(() => { if (error) showError(error); }, [error]);
 
   const safeReservations = reservations || [];
-  const filtered = activeTab === "Todas" ? safeReservations : safeReservations.filter(r => r.status === activeTab);
+  const filtered = activeTab === "Todas"
+    ? safeReservations
+    : safeReservations.filter((r) => r.status === activeTab);
 
   const handleEdit = (res) => { setSelectedItem(res); setIsModalOpen(true); };
   const handleCreate = () => { setSelectedItem(null); setIsModalOpen(true); };
@@ -34,7 +36,7 @@ export const ReservationPage = () => {
   };
 
   return (
-    <div className="space-y-8 animate-fadeIn p-4">
+    <div className="space-y-6 md:space-y-8 animate-fadeIn p-2 md:p-4">
       <ReservationHeader onCreateClick={handleCreate} />
       <ReservationTabs activeTab={activeTab} onTabChange={setActiveTab} />
       <ReservationGrid

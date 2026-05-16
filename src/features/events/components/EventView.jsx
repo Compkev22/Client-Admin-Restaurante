@@ -1,10 +1,11 @@
+// features/events/components/EventView.jsx
 import { useState, useEffect, useCallback } from "react";
-import { EventModal } from "./EventModal";
-import { EventGrid } from "./EventGrid";
-import { EventHeader } from "./EventHeader";
-import { useSaveEvent } from "../hooks/useSaveEvent";
-import { axiosAdmin } from "../../../shared/api/api";
-import { showConfirmToast } from "../../auth/components/ConfirmModal";
+import { EventModal } from "./EventModal.jsx";
+import { EventGrid } from "./EventGrid.jsx";
+import { EventHeader } from "./EventHeader.jsx";
+import { useSaveEvent } from "../hooks/useSaveEvent.js";
+import { axiosAdmin } from "../../../shared/api/api.js";
+import { showConfirmToast } from "../../auth/components/ConfirmModal.jsx";
 
 export const EventPage = () => {
   const [events, setEvents] = useState([]);
@@ -13,28 +14,49 @@ export const EventPage = () => {
   const { cancelEvent, deleteEventPermanently } = useSaveEvent();
 
   const fetchEvents = useCallback(async () => {
-    const res = await axiosAdmin.get('/events');
+    const res = await axiosAdmin.get("/events");
     setEvents(res.data.data || []);
   }, []);
 
-  useEffect(() => { fetchEvents(); }, [fetchEvents]);
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
 
   const handleAction = (event) => {
-    const isCancel = event.status !== 'Cancelado';
+    const isCancel = event.status !== "Cancelado";
     showConfirmToast({
       title: isCancel ? "Cancelar Evento" : "Eliminar Permanente",
       onConfirm: async () => {
-        const ok = isCancel ? await cancelEvent(event._id, event) : await deleteEventPermanently(event._id);
+        const ok = isCancel
+          ? await cancelEvent(event._id, event)
+          : await deleteEventPermanently(event._id);
         if (ok) fetchEvents();
-      }
+      },
     });
   };
 
   return (
-    <div className="space-y-8 animate-fadeIn p-6">
-      <EventHeader onCreateClick={() => { setSelectedEvent(null); setIsModalOpen(true); }} />
-      <EventGrid events={events} onEdit={(e) => { setSelectedEvent(e); setIsModalOpen(true); }} onAction={handleAction} />
-      <EventModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} eventToEdit={selectedEvent} onRefresh={fetchEvents} />
+    <div className="space-y-6 md:space-y-8 animate-fadeIn p-2 md:p-4">
+      <EventHeader
+        onCreateClick={() => {
+          setSelectedEvent(null);
+          setIsModalOpen(true);
+        }}
+      />
+      <EventGrid
+        events={events}
+        onEdit={(e) => {
+          setSelectedEvent(e);
+          setIsModalOpen(true);
+        }}
+        onAction={handleAction}
+      />
+      <EventModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        eventToEdit={selectedEvent}
+        onRefresh={fetchEvents}
+      />
     </div>
   );
 };

@@ -1,12 +1,13 @@
+// BillingModal.jsx
 import { useState, useEffect } from "react";
 import {
   useBillingStore,
   useUserStore,
   useBranchStore,
   useOrderStore,
-} from "../../users/store/adminStore";
-import { Spinner } from "../../auth/components/Spinner";
-import { BillingFormFields } from "./BillingFormFields";
+} from "../../users/store/adminStore.js";
+import { Spinner } from "../../auth/components/Spinner.jsx";
+import { BillingFormFields } from "./BillingFormFields.jsx";
 
 export const BillingModal = ({ isOpen, onClose, orderData }) => {
   const createBilling = useBillingStore((state) => state.createBilling);
@@ -73,42 +74,55 @@ export const BillingModal = ({ isOpen, onClose, orderData }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-8 mx-4">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-black italic text-gray-800 uppercase">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn p-4">
+      <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl flex flex-col max-h-[92vh]">
+
+        {/* Encabezado fijo */}
+        <div className="flex justify-between items-center px-6 md:px-8 pt-6 md:pt-8 pb-4 shrink-0">
+          <h2 className="text-xl md:text-2xl font-black italic text-gray-800 uppercase">
             Generar <span className="text-kinal-red">Factura</span>
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 font-bold text-xl">×</button>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 font-bold text-xl transition-colors"
+            aria-label="Cerrar modal"
+          >
+            ×
+          </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <BillingFormFields
-            formData={formData}
-            handleChange={handleChange}
-            users={users}
-            branches={branches}
-            orders={orders}
-          />
+        {/* Cuerpo con scroll */}
+        <div className="overflow-y-auto px-6 md:px-8 pb-6 md:pb-8 flex-1">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <BillingFormFields
+                formData={formData}
+                handleChange={handleChange}
+                users={users}
+                branches={branches}
+                orders={orders}
+              />
+            </div>
 
-          <div className="col-span-2 pt-4 flex gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={loading}
-              className="flex-1 px-4 py-3 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 bg-kinal-red text-white font-black py-3 rounded-xl shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest flex justify-center items-center"
-            >
-              {loading ? <Spinner size="sm" /> : "Crear Factura"}
-            </button>
-          </div>
-        </form>
+            <div className="pt-4 flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={loading}
+                className="flex-1 px-4 py-3 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 bg-kinal-red text-white font-black py-3 rounded-xl shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest flex justify-center items-center"
+              >
+                {loading ? <Spinner size="sm" /> : "Crear Factura"}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

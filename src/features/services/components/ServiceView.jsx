@@ -10,7 +10,8 @@ import { ServiceCard } from "./ServiceCard.jsx";
 import { ServiceModal } from "./ServiceModal.jsx";
 
 export const ServicePage = () => {
-  const { additionalServices, loading, error, getAdditionalServices, changeAdditionalServiceStatus } = useAdditionalServicesStore();
+  const { additionalServices, loading, error, getAdditionalServices, changeAdditionalServiceStatus } =
+    useAdditionalServicesStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
   const [activeTab, setActiveTab] = useState("Todos");
@@ -43,20 +44,28 @@ export const ServicePage = () => {
   if (loading && additionalServices.length === 0) return <Spinner />;
 
   return (
-    <div className="space-y-8 animate-fadeIn">
+    <div className="space-y-6 md:space-y-8 animate-fadeIn p-2 md:p-4">
       <ServiceHeader onCreateClick={handleOpenCreate} />
       <ServiceTabs activeTab={activeTab} onTabChange={setActiveTab} />
+
       {filtered.length === 0 && (
         <div className="bg-white rounded-3xl p-10 text-center border border-gray-100 shadow-sm">
           <h3 className="text-xl font-black text-gray-700">No hay servicios para mostrar</h3>
           <p className="text-gray-400 font-medium mt-1">Crea un nuevo servicio adicional para verlo aquí.</p>
         </div>
       )}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
         {filtered.map((service) => (
-          <ServiceCard key={service._id} service={service} onEdit={handleOpenEdit} onChangeStatus={handleChangeStatus} />
+          <ServiceCard
+            key={service._id}
+            service={service}
+            onEdit={handleOpenEdit}
+            onChangeStatus={handleChangeStatus}
+          />
         ))}
       </div>
+
       <ServiceModal isOpen={isModalOpen} onClose={handleCloseModal} serviceData={selectedService} />
     </div>
   );

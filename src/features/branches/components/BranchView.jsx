@@ -1,10 +1,10 @@
 // features/branches/components/BranchView.jsx
 import { useEffect, useState } from "react";
-import { useBranchStore } from "../../users/store/adminStore";
-import { showError } from "../../../shared/utils/toast";
-import { BranchHeader } from "./BranchHeader";
-import { BranchGrid } from "./BranchGrid";
-import { BranchModal } from "./BranchModal";
+import { useBranchStore } from "../../users/store/adminStore.js";
+import { showError } from "../../../shared/utils/toast.js";
+import { BranchHeader } from "./BranchHeader.jsx";
+import { BranchGrid } from "./BranchGrid.jsx";
+import { BranchModal } from "./BranchModal.jsx";
 
 export const BranchPage = () => {
   const { branches, loading, error, getBranches } = useBranchStore();
@@ -32,7 +32,7 @@ export const BranchPage = () => {
   };
 
   return (
-    <div className="space-y-8 animate-fadeIn p-4">
+    <div className="space-y-6 md:space-y-8 animate-fadeIn p-2 md:p-4">
       <BranchHeader onCreateClick={handleCreate} />
       <BranchGrid
         branches={branchesList}

@@ -9,7 +9,7 @@ export const BillingFormFields = ({ formData, handleChange, users, branches, ord
         value={formData.client}
         onChange={handleChange}
         required
-        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none bg-white"
+        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none bg-white text-sm"
       >
         <option value="">Seleccionar cliente</option>
         {users
@@ -30,7 +30,7 @@ export const BillingFormFields = ({ formData, handleChange, users, branches, ord
         value={formData.branchId}
         onChange={handleChange}
         required
-        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none bg-white"
+        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none bg-white text-sm"
       >
         <option value="">Seleccionar sucursal</option>
         {branches?.map((branch) => (
@@ -41,15 +41,15 @@ export const BillingFormFields = ({ formData, handleChange, users, branches, ord
       </select>
     </div>
 
-    {/* ORDEN */}
-    <div className="col-span-2 flex flex-col gap-1">
+    {/* ORDEN — ancho completo en sm+ */}
+    <div className="sm:col-span-2 flex flex-col gap-1">
       <label className="text-sm font-bold text-gray-700">Orden</label>
       <select
         name="orderId"
         value={formData.orderId}
         onChange={handleChange}
         required
-        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none bg-white"
+        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none bg-white text-sm"
       >
         <option value="">Seleccionar orden</option>
         {orders?.map((order) => (
@@ -62,14 +62,14 @@ export const BillingFormFields = ({ formData, handleChange, users, branches, ord
 
     {/* SERIE */}
     <div className="flex flex-col gap-1">
-      <label className="text-sm font-bold text-gray-700">Serie (BillSerie)</label>
+      <label className="text-sm font-bold text-gray-700">Serie</label>
       <input
         type="text"
         name="BillSerie"
         value={formData.BillSerie}
         onChange={handleChange}
         placeholder="Ej: A-001"
-        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none"
+        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none text-sm"
       />
     </div>
 
@@ -80,7 +80,7 @@ export const BillingFormFields = ({ formData, handleChange, users, branches, ord
         name="BillPaymentMethod"
         value={formData.BillPaymentMethod}
         onChange={handleChange}
-        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none bg-white"
+        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none bg-white text-sm"
       >
         <option value="CASH">Efectivo (CASH)</option>
         <option value="CARD">Tarjeta (CARD)</option>
@@ -97,7 +97,7 @@ export const BillingFormFields = ({ formData, handleChange, users, branches, ord
         value={formData.BillSubtotal}
         onChange={handleChange}
         placeholder="0.00"
-        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none"
+        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none text-sm"
       />
     </div>
 
@@ -111,18 +111,18 @@ export const BillingFormFields = ({ formData, handleChange, users, branches, ord
         value={formData.BillIVA}
         onChange={handleChange}
         placeholder="0.00"
-        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none"
+        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none text-sm"
       />
     </div>
 
-    {/* ESTADO */}
-    <div className="col-span-2 flex flex-col gap-1">
+    {/* ESTADO — ancho completo en sm+ */}
+    <div className="sm:col-span-2 flex flex-col gap-1">
       <label className="text-sm font-bold text-gray-700">Estado de Factura</label>
       <select
         name="BillStatus"
         value={formData.BillStatus}
         onChange={handleChange}
-        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none bg-white"
+        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none bg-white text-sm"
       >
         <option value="GENERATED">Generada (GENERATED)</option>
         <option value="PAYED">Pagada (PAYED)</option>

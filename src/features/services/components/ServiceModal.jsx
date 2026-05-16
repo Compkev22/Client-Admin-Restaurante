@@ -51,7 +51,7 @@ export const ServiceModal = ({ isOpen, onClose, serviceData = null }) => {
       if (!ok) { showError("Error al guardar el servicio"); return; }
       showSuccess(serviceData ? "Servicio actualizado correctamente" : "Servicio creado correctamente");
       handleClose();
-    } catch (error) {
+    } catch {
       showError("Error al guardar el servicio");
     }
   };
@@ -59,27 +59,58 @@ export const ServiceModal = ({ isOpen, onClose, serviceData = null }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fadeIn px-4">
-      <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden flex flex-col">
-        <div className="bg-gray-50 px-8 py-6 border-b border-gray-100 flex justify-between items-center">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fadeIn p-4">
+      <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl flex flex-col max-h-[92vh]">
+
+        {/* Cabecera fija */}
+        <div className="bg-gray-50 px-6 md:px-8 py-5 md:py-6 border-b border-gray-100 flex justify-between items-center shrink-0 rounded-t-3xl">
           <div>
-            <h2 className="text-2xl font-black italic text-gray-800 uppercase">
-              {serviceData ? "Editar" : "Nuevo"} <span className="text-kinal-red">Servicio</span>
+            <h2 className="text-xl md:text-2xl font-black italic text-gray-800 uppercase">
+              {serviceData ? "Editar" : "Nuevo"}{" "}
+              <span className="text-kinal-red">Servicio</span>
             </h2>
-            <p className="text-sm font-bold text-gray-400">Agrega valor extra a las reservaciones.</p>
+            <p className="text-xs md:text-sm font-bold text-gray-400">
+              Agrega valor extra a las reservaciones.
+            </p>
           </div>
-          <button type="button" onClick={handleClose} className="text-gray-400 hover:text-gray-600 font-bold text-2xl transition-colors">×</button>
+          <button
+            type="button"
+            onClick={handleClose}
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 text-gray-400 hover:text-gray-600 font-bold text-xl transition-colors"
+            aria-label="Cerrar modal"
+          >
+            ×
+          </button>
         </div>
-        <form className="p-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+
+        {/* Cuerpo con scroll */}
+        <form
+          className="overflow-y-auto flex-1 px-6 md:px-8 py-6 space-y-5"
+          onSubmit={handleSubmit(onSubmit)}
+          id="service-form"
+        >
           <ServiceImagePreview preview={preview} register={register} />
           <ServiceFormFields register={register} errors={errors} />
-          <div className="pt-4 flex flex-col-reverse sm:flex-row items-center gap-3 mt-2 border-t border-gray-50">
-            <button type="button" onClick={handleClose} className="flex-1 px-4 py-3 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-colors">Cancelar</button>
-            <button type="submit" disabled={loading} className="flex-1 sm:flex-2 flex justify-center items-center bg-kinal-red text-white font-black py-3 px-8 rounded-xl shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest disabled:opacity-60">
-              {loading ? <Spinner small /> : serviceData ? "Actualizar Servicio" : "Guardar Servicio"}
-            </button>
-          </div>
         </form>
+
+        {/* Footer fijo */}
+        <div className="shrink-0 px-6 md:px-8 pb-6 md:pb-8 pt-4 border-t border-gray-100 flex flex-col sm:flex-row gap-3">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="flex-1 px-4 py-3 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            form="service-form"
+            disabled={loading}
+            className="flex-1 sm:flex-[2] flex justify-center items-center bg-kinal-red text-white font-black py-3 px-8 rounded-xl shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest disabled:opacity-60"
+          >
+            {loading ? <Spinner small /> : serviceData ? "Actualizar Servicio" : "Guardar Servicio"}
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -18,7 +18,7 @@ export const TablePage = () => {
   useEffect(() => { if (error) showError(error); }, [error]);
 
   const safeTables = Array.isArray(tables) ? tables : [];
-  const filtered = safeTables.filter(t => activeTab === "Todas" || t.availability === activeTab);
+  const filtered = safeTables.filter((t) => activeTab === "Todas" || t.availability === activeTab);
 
   const handleEdit = (table) => { setSelectedTable(table); setIsModalOpen(true); };
   const handleCreate = () => { setSelectedTable(null); setIsModalOpen(true); };
@@ -32,7 +32,7 @@ export const TablePage = () => {
   };
 
   return (
-    <div className="space-y-8 animate-fadeIn p-4">
+    <div className="space-y-6 md:space-y-8 animate-fadeIn p-2 md:p-4">
       <TableHeader onCreateClick={handleCreate} />
       <TableTabs activeTab={activeTab} onTabChange={setActiveTab} />
       <TableGrid

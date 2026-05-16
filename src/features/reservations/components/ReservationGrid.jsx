@@ -23,14 +23,16 @@ export const ReservationGrid = ({ reservations, allReservations, branches, users
 
   if (reservations.length === 0) {
     return (
-      <div className="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 mt-6">
-        <p className="text-gray-400 font-bold uppercase italic">No se encontraron reservaciones en esta categoría</p>
+      <div className="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+        <p className="text-gray-400 font-bold uppercase italic">
+          No se encontraron reservaciones en esta categoría
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
       {reservations.map((res) => (
         <ReservationCard
           key={res._id}

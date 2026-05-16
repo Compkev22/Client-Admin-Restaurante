@@ -1,11 +1,12 @@
+// features/orders/components/OrderView.jsx
 import { useState, useEffect } from "react";
-import { OrderHeader } from "./OrderHeader";
-import { OrderTabs } from "./OrderTabs";
-import { OrderGrid } from "./OrderGrid";
-import { OrderModal } from "./OrderModal";
-import { OrderDetailModal } from "./OrderDetailModal";
-import { PaymentWizardModal } from "../../billing/components/PaymentModal";
-import { useOrderActions } from "../hooks/useOrderActions";
+import { OrderHeader } from "./OrderHeader.jsx";
+import { OrderTabs } from "./OrderTabs.jsx";
+import { OrderGrid } from "./OrderGrid.jsx";
+import { OrderModal } from "./OrderModal.jsx";
+import { OrderDetailModal } from "./OrderDetailModal.jsx";
+import { PaymentWizardModal } from "../../billing/components/PaymentModal.jsx";
+import { useOrderActions } from "../hooks/useOrderActions.js";
 
 export const OrderPage = () => {
   const [activeTab, setActiveTab] = useState("Todos");
@@ -16,10 +17,8 @@ export const OrderPage = () => {
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
   const [orderToEdit, setOrderToEdit] = useState(null);
 
-  // 1. Extraemos las órdenes reales y la función para recargarlas
   const { orders, fetchOrders } = useOrderActions();
 
-  // 2. Cargamos las órdenes al abrir la página
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
@@ -32,20 +31,16 @@ export const OrderPage = () => {
     "Entregado",
     "Cancelado",
   ];
-  // 3. Filtramos la data real
+
   const filteredOrders =
     activeTab === "Todos"
       ? orders
       : orders.filter((o) => o.estado === activeTab);
 
   return (
-    <div className="space-y-8 animate-fadeIn p-6">
+    <div className="space-y-6 md:space-y-8 animate-fadeIn p-2 md:p-4">
       <OrderHeader onNewOrder={() => setIsModalOpen(true)} />
-      <OrderTabs
-        tabs={tabs}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-      />
+      <OrderTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
       <OrderGrid
         orders={filteredOrders}
         onPay={(order) => {
@@ -61,7 +56,6 @@ export const OrderPage = () => {
           setIsModalOpen(true);
         }}
       />
-      {/* Pasamos fetchOrders para que la lista se actualice al cerrar los modales */}
       <OrderModal
         isOpen={isModalOpen}
         onClose={() => {
@@ -70,7 +64,7 @@ export const OrderPage = () => {
           fetchOrders();
         }}
         orderToEdit={orderToEdit}
-      />{" "}
+      />
       <PaymentWizardModal
         isOpen={isPaymentOpen}
         onClose={() => {
