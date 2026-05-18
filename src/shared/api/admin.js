@@ -114,3 +114,10 @@ export const createCombo = (formData) => axiosAdmin.post("/combos", formData, { 
 export const updateCombo = (id, formData) => axiosAdmin.put(`/combos/${id}`, formData, { headers: { "Content-Type": "multipart/form-data" },});
 export const changeComboStatus = (id) => axiosAdmin.patch(`/combos/${id}/status`);
 export const toggleComboStatus = async (id) => await axiosAdmin.patch(`/combos/${id}/status`);
+
+// ================= DASHBOARD =================
+export const getDashboardSummary = async () => await axiosAdmin.get('/dashboard/summary');
+export const getDashboardRecentOrders = async (limit = 5) =>
+    await axiosAdmin.get('/dashboard/recent-orders', { params: { limit } });
+export const getDashboardUpcomingReservations = async () =>
+    await axiosAdmin.get('/dashboard/upcoming-reservations');
