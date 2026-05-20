@@ -1,12 +1,14 @@
 // InvoicesTable.jsx
 import { useEffect, useState } from "react";
 import { PaymentWizardModal } from "./PaymentModal.jsx";
+import { OrderDetailModal } from "../../orders/components/OrderDetailModal.jsx"
 import { useBillingStore } from "../../users/store/adminStore.js";
 import { Spinner } from "../../auth/components/Spinner.jsx";
 
 export const InvoicesTable = () => {
   const { billings, loading, error, getBillings } = useBillingStore();
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isOrderDetailModalOpen, setIsOrderDetailModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
 
   useEffect(() => {
@@ -18,6 +20,10 @@ export const InvoicesTable = () => {
     setIsPaymentModalOpen(true);
   };
 
+    const handleOpenOrderDetailModal = (invoice) => {
+    setSelectedInvoice(invoice);
+    setIsOrderDetailModalOpen(true);
+  };
   const handleViewDetails = (invoice) => {
     console.log("Viendo detalles de la factura ya pagada:", invoice);
     alert(`Viendo detalles de la factura ${invoice.BillSerie}`);
@@ -81,7 +87,7 @@ export const InvoicesTable = () => {
                 <td className="py-3 px-3">
                   {inv.BillStatus === "PAYED" ? (
                     <button
-                      onClick={() => handleViewDetails(inv)}
+                      onClick={() => handleOpenOrderDetailModal(inv)}
                       className="text-gray-400 font-bold text-sm hover:text-gray-600 underline"
                     >
                       Ver Detalles
@@ -100,6 +106,14 @@ export const InvoicesTable = () => {
           </tbody>
         </table>
       </div>
+
+      {isOrderDetailModalOpen && (
+        <OrderDetailModal
+          isOpen={isOrderDetailModalOpen}
+          onClose={() => setIsOrderDetailModalOpen(false)}
+          orderData={selectedInvoice}
+        />
+      )}
 
       {isPaymentModalOpen && (
         <PaymentWizardModal

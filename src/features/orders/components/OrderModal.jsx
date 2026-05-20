@@ -145,7 +145,6 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
                 <select
                   value={selectedEmpleadoId}
                   onChange={(e) => setSelectedEmpleadoId(e.target.value)}
-                  disabled={isEditMode}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-white font-bold text-gray-700 disabled:bg-gray-100"
                 >
                   <option value="">-- Seleccionar --</option>
