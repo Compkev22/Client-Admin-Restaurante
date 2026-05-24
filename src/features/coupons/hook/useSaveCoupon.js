@@ -6,16 +6,21 @@ export const useSaveCoupon = () => {
 
     const saveCoupon = async (data, couponId = null) => {
         const couponPayload = {
-            code: data.code,
+            code: data.code.trim().toUpperCase(),
             discountPercentage: Number(data.discountPercentage),
             expirationDate: data.expirationDate,
-            usageLimit: Number(data.usageLimit)
+            usageLimit: Number(data.usageLimit),
         };
 
-        if (couponId) {
-            await updateCoupon(couponId, couponPayload);
-        } else {
-            await createCoupon(couponPayload);
+        try {
+            if (couponId) {
+                await updateCoupon(couponId, couponPayload);
+            } else {
+                await createCoupon(couponPayload);
+            }
+        } catch (err) {
+            // Re-lanzar el error para que el Modal pueda mostrar el mensaje real
+            throw err;
         }
     };
 

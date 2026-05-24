@@ -80,12 +80,29 @@ export const ComboModal = ({ isOpen, onClose, comboData = null }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (comboList.length === 0) return showError("El combo debe tener productos");
+
+    const name = formData.ComboName.trim();
+    const desc = formData.ComboDescription.trim();
+
+    if (!name || name.length < 3) {
+      return showError("El nombre debe tener al menos 3 caracteres");
+    }
+    if (!desc || desc.length < 5) {
+      return showError("La descripción debe tener al menos 5 caracteres");
+    }
+    if (comboList.length === 0) {
+      return showError("El combo debe tener al menos un producto");
+    }
+
+    const discount = Number(formData.ComboDiscount) || 0;
+    if (discount < 0 || discount > 100) {
+      return showError("El descuento debe estar entre 0 y 100");
+    }
 
     const payload = new FormData();
-    payload.append("ComboName", formData.ComboName);
-    payload.append("ComboDescription", formData.ComboDescription);
-    payload.append("ComboDiscount", Number(formData.ComboDiscount) || 0);
+    payload.append("ComboName", name);
+    payload.append("ComboDescription", desc);
+    payload.append("ComboDiscount", discount);
     payload.append(
       "ComboList",
       JSON.stringify(
@@ -97,15 +114,23 @@ export const ComboModal = ({ isOpen, onClose, comboData = null }) => {
     );
     if (imageFile) payload.append("image", imageFile);
 
-    const success = comboData
-      ? await updateCombo(comboData._id, payload)
-      : await saveCombo(payload);
+    try {
+      const result = comboData
+        ? await updateCombo(comboData._id, payload)
+        : await saveCombo(payload);
 
-    if (success) {
-      showSuccess(comboData ? "Combo actualizado con éxito" : "Combo creado con éxito");
-      onClose();
-    } else {
-      showError("Error al guardar el combo");
+      if (result) {
+        showSuccess(comboData ? "Combo actualizado con éxito" : "Combo creado con éxito");
+        onClose();
+      } else {
+        showError("Error al guardar el combo");
+      }
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Error al guardar el combo";
+      showError(msg);
     }
   };
 
@@ -143,6 +168,8 @@ export const ComboModal = ({ isOpen, onClose, comboData = null }) => {
                 value={formData.ComboName}
                 onChange={(e) => setFormData({ ...formData, ComboName: e.target.value })}
                 required
+                minLength={3}
+                maxLength={100}
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-kinal-orange text-sm"
               />
               <textarea
@@ -150,6 +177,8 @@ export const ComboModal = ({ isOpen, onClose, comboData = null }) => {
                 value={formData.ComboDescription}
                 onChange={(e) => setFormData({ ...formData, ComboDescription: e.target.value })}
                 required
+                minLength={5}
+                maxLength={300}
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-kinal-orange h-20 resize-none text-sm"
               />
               <div className="flex flex-col gap-1">
@@ -162,13 +191,17 @@ export const ComboModal = ({ isOpen, onClose, comboData = null }) => {
                   max="100"
                   placeholder="Ej: 10"
                   value={formData.ComboDiscount}
+                  onInput={(e) => {
+                    if (e.target.value < 0) e.target.value = 0;
+                    if (e.target.value > 100) e.target.value = 100;
+                  }}
                   onChange={(e) => setFormData({ ...formData, ComboDiscount: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-kinal-orange text-sm"
                 />
               </div>
             </div>
 
-            {/* Agregar producto — columna en móvil, fila en sm+ */}
+            {/* Agregar producto */}
             <div className="flex flex-col sm:flex-row gap-2">
               <select
                 value={selectedProduct}

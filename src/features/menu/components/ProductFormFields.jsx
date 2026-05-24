@@ -2,7 +2,7 @@
 export const ProductFormFields = ({ formData, setFormData, preview }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 md:p-5 rounded-2xl border border-gray-100">
 
-    {/* Preview de imagen — centrada, ancho completo */}
+    {/* Preview de imagen */}
     <div className="sm:col-span-2 flex justify-center">
       <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden shadow-inner shrink-0">
         {preview ? (
@@ -13,14 +13,17 @@ export const ProductFormFields = ({ formData, setFormData, preview }) => (
       </div>
     </div>
 
-    {/* Nombre — ancho completo */}
+    {/* Nombre */}
     <div className="sm:col-span-2 flex flex-col gap-1">
       <label className="text-sm font-bold text-gray-700">Nombre</label>
       <input
         type="text"
         value={formData.nombre}
         onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+        onBlur={(e) => setFormData({ ...formData, nombre: e.target.value.trim() })}
         placeholder="Ej: Hamburguesa Clásica"
+        minLength={2}
+        maxLength={100}
         className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white outline-none text-sm"
         required
       />
@@ -28,10 +31,12 @@ export const ProductFormFields = ({ formData, setFormData, preview }) => (
 
     {/* Precio */}
     <div className="flex flex-col gap-1">
-      <label className="text-sm font-bold text-gray-700">Precio</label>
+      <label className="text-sm font-bold text-gray-700">Precio (Q)</label>
       <input
         type="number"
         step="0.01"
+        min="0.01"
+        max="9999.99"
         value={formData.precio}
         onChange={(e) => setFormData({ ...formData, precio: e.target.value })}
         placeholder="0.00"
@@ -47,7 +52,10 @@ export const ProductFormFields = ({ formData, setFormData, preview }) => (
         type="text"
         value={formData.categoria}
         onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
+        onBlur={(e) => setFormData({ ...formData, categoria: e.target.value.trim() })}
         placeholder="Ej: Hamburguesas"
+        minLength={2}
+        maxLength={50}
         className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white outline-none text-sm"
         required
       />
@@ -80,7 +88,7 @@ export const ProductFormFields = ({ formData, setFormData, preview }) => (
       </select>
     </div>
 
-    {/* Input imagen — ancho completo */}
+    {/* Input imagen */}
     <div className="sm:col-span-2 flex flex-col gap-1">
       <label className="text-sm font-bold text-gray-700">Imagen</label>
       <input

@@ -4,6 +4,7 @@ import iconDelete from "../../../assets/icons/Delete.svg";
 import { useBranchStore, useInventoryStore } from "../../users/store/adminStore.js";
 import { useSaveProduct } from "../hooks/useSaveProduct.js";
 import { ProductFormFields } from "./ProductFormFields.jsx";
+import { showSuccess, showError } from "../../../shared/utils/toast.js";
 
 export const ProductModal = ({ isOpen, onClose, productData = null }) => {
   const { branches, getBranches } = useBranchStore();
@@ -31,30 +32,26 @@ export const ProductModal = ({ isOpen, onClose, productData = null }) => {
     }
     if (productData && isOpen) {
       setFormData({
-        nombre: productData.nombre || "",
-        categoria: productData.categoria || "",
-        precio: productData.precio || "",
-        estado: productData.estado || "Disponible",
+        nombre:        productData.nombre        || "",
+        categoria:     productData.categoria     || "",
+        precio:        productData.precio        || "",
+        estado:        productData.estado        || "Disponible",
         ProductStatus: productData.ProductStatus || "ACTIVE",
-        imagen: null,
-        Branches: productData.Branches?.map((b) => b.BranchId?._id || b.BranchId) || [],
+        imagen:        null,
+        Branches:      productData.Branches?.map((b) => b.BranchId?._id || b.BranchId) || [],
       });
       setIngredientList(
         productData.ingredientes?.map((item) => ({
-          inventoryId: item.inventoryId?._id || item.inventoryId,
-          nombre: item.inventoryId?.name || "Ingrediente",
+          inventoryId:   item.inventoryId?._id || item.inventoryId,
+          nombre:        item.inventoryId?.name || "Ingrediente",
           cantidadUsada: item.cantidadUsada || 1,
         })) || []
       );
     } else if (isOpen) {
       setFormData({
-        nombre: "",
-        categoria: "",
-        precio: "",
-        estado: "Disponible",
-        ProductStatus: "ACTIVE",
-        imagen: null,
-        Branches: [],
+        nombre: "", categoria: "", precio: "",
+        estado: "Disponible", ProductStatus: "ACTIVE",
+        imagen: null, Branches: [],
       });
       setIngredientList([]);
     }
@@ -108,19 +105,43 @@ export const ProductModal = ({ isOpen, onClose, productData = null }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { ProductStatus, deletedAt, ...restOfData } = formData;
-    await saveProduct(
-      {
-        ...restOfData,
-        ingredientes: ingredientList.map((i) => ({
-          inventoryId: i.inventoryId,
-          cantidadUsada: i.cantidadUsada,
-        })),
-        Branches: formData.Branches.map((id) => ({ BranchId: id })),
-      },
-      productData?._id
-    );
-    onClose();
+
+    // Validaciones frontend antes de enviar
+    if (!formData.nombre?.trim() || formData.nombre.trim().length < 2) {
+      return showError("El nombre del producto debe tener al menos 2 caracteres.");
+    }
+    if (!formData.categoria?.trim() || formData.categoria.trim().length < 2) {
+      return showError("La categoría debe tener al menos 2 caracteres.");
+    }
+    if (!formData.precio || Number(formData.precio) <= 0) {
+      return showError("El precio debe ser mayor a Q0.00.");
+    }
+    if (formData.Branches.length === 0) {
+      return showError("Debes seleccionar al menos una sucursal.");
+    }
+
+    try {
+      const { ProductStatus, deletedAt, ...restOfData } = formData;
+      await saveProduct(
+        {
+          ...restOfData,
+          nombre:    formData.nombre.trim(),
+          categoria: formData.categoria.trim(),
+          ingredientes: ingredientList.map((i) => ({
+            inventoryId:   i.inventoryId,
+            cantidadUsada: i.cantidadUsada,
+          })),
+          Branches: formData.Branches.map((id) => ({ BranchId: id })),
+        },
+        productData?._id
+      );
+      showSuccess(productData ? "Producto actualizado correctamente" : "Producto creado correctamente");
+      onClose();
+    } catch (error) {
+      showError(
+        error?.response?.data?.message || "Error al guardar el producto. Revisa los datos."
+      );
+    }
   };
 
   return (
@@ -146,12 +167,7 @@ export const ProductModal = ({ isOpen, onClose, productData = null }) => {
         <div className="overflow-y-auto px-6 md:px-8 py-6 md:py-8 flex-1">
           <form onSubmit={handleSubmit} className="space-y-6">
 
-            {/* Campos básicos */}
-            <ProductFormFields
-              formData={formData}
-              setFormData={setFormData}
-              preview={preview}
-            />
+            <ProductFormFields formData={formData} setFormData={setFormData} preview={preview} />
 
             {/* SUCURSALES */}
             <div>
@@ -187,7 +203,6 @@ export const ProductModal = ({ isOpen, onClose, productData = null }) => {
                 </span>
               </div>
 
-              {/* Selector + botón: columna en móvil, fila en sm+ */}
               <div className="flex flex-col sm:flex-row gap-2 mb-4">
                 <select
                   value={selectedIngredient}
@@ -210,7 +225,6 @@ export const ProductModal = ({ isOpen, onClose, productData = null }) => {
                 </button>
               </div>
 
-              {/* Tabla de ingredientes con scroll horizontal en móvil */}
               <div className="bg-white rounded-xl border border-gray-200 overflow-hidden min-h-[100px]">
                 {ingredientList.length > 0 ? (
                   <div className="overflow-x-auto">
@@ -230,12 +244,13 @@ export const ProductModal = ({ isOpen, onClose, productData = null }) => {
                               <input
                                 type="number"
                                 min="1"
+                                max="9999"
                                 value={item.cantidadUsada}
                                 onChange={(e) =>
                                   setIngredientList(
                                     ingredientList.map((i) =>
                                       i.inventoryId === item.inventoryId
-                                        ? { ...i, cantidadUsada: parseInt(e.target.value) || 1 }
+                                        ? { ...i, cantidadUsada: Math.max(1, parseInt(e.target.value) || 1) }
                                         : i
                                     )
                                   )
@@ -248,19 +263,13 @@ export const ProductModal = ({ isOpen, onClose, productData = null }) => {
                                 type="button"
                                 onClick={() =>
                                   setIngredientList(
-                                    ingredientList.filter(
-                                      (i) => i.inventoryId !== item.inventoryId
-                                    )
+                                    ingredientList.filter((i) => i.inventoryId !== item.inventoryId)
                                   )
                                 }
                                 className="p-1 hover:bg-red-100 rounded-lg transition-colors"
                                 aria-label="Eliminar ingrediente"
                               >
-                                <img
-                                  src={iconDelete}
-                                  alt="Delete"
-                                  className="w-5 h-5 opacity-70 hover:opacity-100"
-                                />
+                                <img src={iconDelete} alt="Delete" className="w-5 h-5 opacity-70 hover:opacity-100" />
                               </button>
                             </td>
                           </tr>
@@ -289,8 +298,7 @@ export const ProductModal = ({ isOpen, onClose, productData = null }) => {
               </button>
               <button
                 type="submit"
-                disabled={ingredientList.length === 0}
-                className="flex-1 bg-kinal-red text-white font-black py-3 rounded-xl shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="flex-1 bg-kinal-red text-white font-black py-3 rounded-xl shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest"
               >
                 Guardar Producto
               </button>

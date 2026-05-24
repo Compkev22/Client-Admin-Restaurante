@@ -1,5 +1,7 @@
 // features/coupons/components/CouponFormFields.jsx
 export const CouponFormFields = ({ register, errors }) => {
+  const today = new Date().toISOString().split("T")[0];
+
   return (
     <div className="grid grid-cols-1 gap-4">
 
@@ -20,6 +22,7 @@ export const CouponFormFields = ({ register, errors }) => {
             (e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))
           }
           placeholder="EJ: KINAL2026"
+          maxLength={15}
           className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-kinal-red outline-none transition-all font-bold uppercase text-sm"
         />
         {errors.code && (
@@ -27,12 +30,18 @@ export const CouponFormFields = ({ register, errors }) => {
         )}
       </div>
 
-      {/* Descuento + Límite — 1 col en móvil, 2 en sm+ */}
+      {/* Descuento + Límite */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col">
           <label className="text-xs font-black uppercase text-gray-400 mb-1">% Descuento</label>
           <input
             type="number"
+            min="1"
+            max="100"
+            onInput={(e) => {
+              if (e.target.value < 1) e.target.value = 1;
+              if (e.target.value > 100) e.target.value = 100;
+            }}
             {...register("discountPercentage", {
               required: "El descuento es obligatorio",
               min: { value: 1, message: "Mínimo 1%" },
@@ -52,9 +61,15 @@ export const CouponFormFields = ({ register, errors }) => {
           </label>
           <input
             type="number"
+            min="1"
+            max="10000"
+            onInput={(e) => {
+              if (e.target.value < 1) e.target.value = 1;
+            }}
             {...register("usageLimit", {
               required: "El límite de uso es obligatorio",
               min: { value: 1, message: "Mínimo 1" },
+              max: { value: 10000, message: "Máximo 10,000" },
             })}
             className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-kinal-red outline-none font-bold text-sm"
           />
@@ -73,7 +88,12 @@ export const CouponFormFields = ({ register, errors }) => {
         </label>
         <input
           type="date"
-          {...register("expirationDate", { required: "La fecha es obligatoria" })}
+          min={today}
+          {...register("expirationDate", {
+            required: "La fecha es obligatoria",
+            validate: (value) =>
+              new Date(value) >= new Date(today) || "La fecha debe ser hoy o futura",
+          })}
           className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-kinal-red outline-none font-bold text-sm"
         />
         {errors.expirationDate && (

@@ -1,8 +1,5 @@
 // features/branches/components/BranchFormFields.jsx
 export const BranchFormFields = ({ register, errors }) => {
-  /*
-    Clases reutilizables para mantener consistencia y reducir repetición.
-  */
   const inputClass =
     "w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none text-sm transition-colors";
   const inputErrorClass =
@@ -11,17 +8,17 @@ export const BranchFormFields = ({ register, errors }) => {
   const errorClass = "text-red-500 text-[10px] font-bold mt-0.5";
 
   return (
-    /*
-      Grid de 1 columna en móvil (320-640px), 2 columnas desde sm (640px+).
-      Cada campo de ancho completo usa sm:col-span-2.
-    */
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
 
       {/* Nombre */}
       <div className="flex flex-col gap-1">
         <label className={labelClass}>Nombre</label>
         <input
-          {...register("name", { required: "Requerido" })}
+          {...register("name", {
+            required: "Requerido",
+            minLength: { value: 3, message: "Mínimo 3 caracteres" },
+            validate: (v) => v.trim().length >= 3 || "No puede ser solo espacios",
+          })}
           className={errors.name ? inputErrorClass : inputClass}
           placeholder="Ej: Sucursal Central"
         />
@@ -33,20 +30,27 @@ export const BranchFormFields = ({ register, errors }) => {
         <label className={labelClass}>Email</label>
         <input
           type="email"
-          {...register("Email", { required: "El correo es obligatorio" })}
+          {...register("Email", {
+            required: "El correo es obligatorio",
+            pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Correo inválido" },
+          })}
           className={errors.Email ? inputErrorClass : inputClass}
           placeholder="sucursal@ejemplo.com"
         />
         {errors.Email && <p className={errorClass}>{errors.Email.message}</p>}
       </div>
 
-      {/* Dirección — ocupa las 2 columnas en sm+ */}
+      {/* Dirección */}
       <div className="sm:col-span-2 flex flex-col gap-1">
         <label className={labelClass}>Dirección</label>
         <input
-          {...register("address", { required: "Requerido" })}
+          {...register("address", {
+            required: "Requerido",
+            minLength: { value: 5, message: "Mínimo 5 caracteres" },
+            validate: (v) => v.trim().length >= 5 || "No puede ser solo espacios",
+          })}
           className={errors.address ? inputErrorClass : inputClass}
-          placeholder="Ej: 6a Avenida 0-60"
+          placeholder="Ej: 6a Avenida 0-60, Zona 1"
         />
         {errors.address && <p className={errorClass}>{errors.address.message}</p>}
       </div>
@@ -71,7 +75,10 @@ export const BranchFormFields = ({ register, errors }) => {
       <div className="flex flex-col gap-1">
         <label className={labelClass}>Ciudad</label>
         <input
-          {...register("city", { required: "Requerido" })}
+          {...register("city", {
+            required: "Requerido",
+            minLength: { value: 2, message: "Mínimo 2 caracteres" },
+          })}
           className={errors.city ? inputErrorClass : inputClass}
           placeholder="Ej: Guatemala"
         />
@@ -92,22 +99,26 @@ export const BranchFormFields = ({ register, errors }) => {
         </select>
       </div>
 
-      {/* Teléfono */}
+      {/* Teléfono — type="tel" + bloqueo de no-numéricos + maxLength 8 */}
       <div className="flex flex-col gap-1">
-        <label className={labelClass}>Teléfono</label>
+        <label className={labelClass}>
+          Teléfono <span className="text-gray-400 font-normal text-xs">(8 dígitos)</span>
+        </label>
         <input
-          type="number"
+          type="tel"
           {...register("phone", {
             required: "Requerido",
-            pattern: { value: /^[0-9]{8}$/, message: "Número de teléfono inválido (8 dígitos)" },
+            pattern: { value: /^\d{8}$/, message: "Exactamente 8 dígitos numéricos" },
           })}
+          maxLength={8}
+          onInput={(e) => { e.target.value = e.target.value.replace(/\D/g, "").slice(0, 8); }}
           className={errors.phone ? inputErrorClass : inputClass}
           placeholder="Ej: 22345678"
         />
         {errors.phone && <p className={errorClass}>{errors.phone.message}</p>}
       </div>
 
-      {/* Horario: Apertura y Cierre en la misma fila siempre */}
+      {/* Horario */}
       <div className="flex flex-col gap-1">
         <label className={labelClass}>Hora de apertura</label>
         <input

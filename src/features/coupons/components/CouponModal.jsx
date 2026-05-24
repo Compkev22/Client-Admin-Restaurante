@@ -40,8 +40,12 @@ export const CouponModal = ({ isOpen, onClose, coupon }) => {
       await saveCoupon(data, coupon?._id);
       showSuccess(coupon ? "Cupón actualizado" : "Cupón creado exitosamente");
       onClose();
-    } catch {
-      showError("Error al procesar el cupón");
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Error al procesar el cupón";
+      showError(msg);
     }
   };
 
@@ -67,7 +71,6 @@ export const CouponModal = ({ isOpen, onClose, coupon }) => {
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-4">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg flex flex-col max-h-[92vh]">
 
-        {/* Cabecera fija con banda de color */}
         <div className="px-6 md:px-8 py-5 md:py-6 bg-kinal-red rounded-t-3xl flex justify-between items-center shrink-0">
           <h2 className="text-lg md:text-xl font-black uppercase italic text-white">
             {coupon ? "Editar Cupón" : "Nuevo Cupón"}
@@ -81,7 +84,6 @@ export const CouponModal = ({ isOpen, onClose, coupon }) => {
           </button>
         </div>
 
-        {/* Cuerpo con scroll */}
         <div className="overflow-y-auto px-6 md:px-8 py-6 md:py-8 flex-1">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <CouponFormFields register={register} errors={errors} />

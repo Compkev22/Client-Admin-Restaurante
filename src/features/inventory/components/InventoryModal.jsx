@@ -31,7 +31,7 @@ export const InventoryModal = ({ isOpen, onClose, item }) => {
         branchId: item.branchId?._id || item.branchId,
       });
     } else {
-      reset({ name: "", description: "", stock: 0, unitCost: 0, branchId: "" });
+      reset({ name: "", description: "", stock: 0, unitCost: "", branchId: "" });
     }
   }, [isOpen, item, reset, getBranches]);
 
@@ -40,8 +40,12 @@ export const InventoryModal = ({ isOpen, onClose, item }) => {
       await saveInventory(data, item?._id);
       showSuccess(item ? "Insumo actualizado" : "Insumo creado exitosamente");
       onClose();
-    } catch {
-      showError("Error al procesar el insumo");
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Error al procesar el insumo";
+      showError(msg);
     }
   };
 
@@ -64,7 +68,6 @@ export const InventoryModal = ({ isOpen, onClose, item }) => {
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-4 animate-fadeIn">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg flex flex-col max-h-[92vh]">
 
-        {/* Cabecera fija con banda de color */}
         <div className="px-6 md:px-8 py-5 md:py-6 bg-kinal-red rounded-t-3xl flex justify-between items-center shrink-0">
           <h2 className="text-lg md:text-xl font-black uppercase italic text-white">
             {item ? "Editar Insumo" : "Nuevo Insumo"}
@@ -78,7 +81,6 @@ export const InventoryModal = ({ isOpen, onClose, item }) => {
           </button>
         </div>
 
-        {/* Cuerpo con scroll */}
         <div className="overflow-y-auto px-6 md:px-8 py-6 md:py-8 flex-1">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <InventoryFormFields register={register} errors={errors} branches={branches} />

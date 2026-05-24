@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { useSaveUser } from "../hooks/useSaveUser.js";
 import { useBranchStore } from "../../users/store/adminStore.js";
 import { UserFormFields } from "./UserFormFields.jsx";
+import { showSuccess, showError } from "../../../shared/utils/toast.js";
 
 export const UserModal = ({ isOpen, onClose, userData = null }) => {
   const [selectedRole, setSelectedRole] = useState(userData?.role || "CLIENT");
@@ -26,9 +27,13 @@ export const UserModal = ({ isOpen, onClose, userData = null }) => {
   const onSubmit = async (data) => {
     try {
       await saveUser(data, userData?.uid || userData?._id);
+      showSuccess(userData ? "Usuario actualizado correctamente" : "Usuario creado correctamente");
       onClose();
     } catch (error) {
-      console.error(error);
+      showError(
+        error?.response?.data?.message ||
+          "Error al guardar el usuario. Revisa los datos e intenta de nuevo."
+      );
     }
   };
 
@@ -56,6 +61,7 @@ export const UserModal = ({ isOpen, onClose, userData = null }) => {
           <form onSubmit={handleSubmit(onSubmit)} id="user-form">
             <UserFormFields
               register={register}
+              errors={errors}
               userData={userData}
               selectedRole={selectedRole}
               setSelectedRole={setSelectedRole}
