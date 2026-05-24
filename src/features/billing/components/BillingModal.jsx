@@ -8,6 +8,7 @@ import {
 } from "../../users/store/adminStore.js";
 import { Spinner } from "../../auth/components/Spinner.jsx";
 import { BillingFormFields } from "./BillingFormFields.jsx";
+import { showError, showSuccess } from "../../../shared/utils/toast.js";
 
 export const BillingModal = ({ isOpen, onClose, orderData }) => {
   const createBilling = useBillingStore((state) => state.createBilling);
@@ -64,10 +65,10 @@ export const BillingModal = ({ isOpen, onClose, orderData }) => {
         clientId: formData.client,
       };
       await createBilling(payload);
-      alert("Factura generada con éxito");
+      showSuccess("Factura generada con éxito");
       onClose();
     } catch (error) {
-      alert(error.response?.data?.message || "Error al generar factura");
+      showError(error.response?.data?.message || "Error al generar factura");
     } finally {
       setLoading(false);
     }

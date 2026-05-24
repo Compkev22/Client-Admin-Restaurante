@@ -1,7 +1,7 @@
 // InvoicesTable.jsx
 import { useEffect, useState } from "react";
 import { PaymentWizardModal } from "./PaymentModal.jsx";
-import { OrderDetailModal } from "../../orders/components/OrderDetailModal.jsx"
+import { OrderDetailModal } from "../../orders/components/OrderDetailModal.jsx";
 import { useBillingStore } from "../../users/store/adminStore.js";
 import { Spinner } from "../../auth/components/Spinner.jsx";
 
@@ -20,13 +20,11 @@ export const InvoicesTable = () => {
     setIsPaymentModalOpen(true);
   };
 
-    const handleOpenOrderDetailModal = (invoice) => {
-    setSelectedInvoice(invoice);
+  const handleOpenOrderDetailModal = (invoice) => {
+    // Le pasamos invoice.Order (el objeto Order populado) al modal de detalle,
+    // ya que OrderDetailModal espera un objeto de tipo Order, no un Billing.
+    setSelectedInvoice(invoice.Order);
     setIsOrderDetailModalOpen(true);
-  };
-  const handleViewDetails = (invoice) => {
-    console.log("Viendo detalles de la factura ya pagada:", invoice);
-    alert(`Viendo detalles de la factura ${invoice.BillSerie}`);
   };
 
   if (loading && billings.length === 0) {
@@ -88,7 +86,8 @@ export const InvoicesTable = () => {
                   {inv.BillStatus === "PAYED" ? (
                     <button
                       onClick={() => handleOpenOrderDetailModal(inv)}
-                      className="text-gray-400 font-bold text-sm hover:text-gray-600 underline"
+                      disabled={!inv.Order}
+                      className="text-gray-400 font-bold text-sm hover:text-gray-600 underline disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       Ver Detalles
                     </button>
@@ -107,10 +106,13 @@ export const InvoicesTable = () => {
         </table>
       </div>
 
-      {isOrderDetailModalOpen && (
+      {isOrderDetailModalOpen && selectedInvoice && (
         <OrderDetailModal
           isOpen={isOrderDetailModalOpen}
-          onClose={() => setIsOrderDetailModalOpen(false)}
+          onClose={() => {
+            setIsOrderDetailModalOpen(false);
+            setSelectedInvoice(null);
+          }}
           orderData={selectedInvoice}
         />
       )}

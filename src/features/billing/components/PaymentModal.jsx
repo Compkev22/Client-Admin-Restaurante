@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useBillingStore } from "../../../features/users/store/adminStore.js";
 import { useUserStore } from "../../users/store/adminStore.js";
+import { showError, showSuccess } from "../../../shared/utils/toast.js";
 import CashIcon from "../../../assets/icons/Cash.svg";
 import CardIcon from "../../../assets/icons/CreditCard.svg";
 import NextIcon from "../../../assets/icons/Next.svg";
@@ -58,7 +59,7 @@ export const PaymentWizardModal = ({ isOpen, onClose, orderData }) => {
   const handleNextStep = (e) => {
     e.preventDefault();
     if (!selectedClient && !isCreatingClient) {
-      alert("Por favor selecciona o crea un cliente.");
+      showError("Por favor selecciona o crea un cliente.");
       return;
     }
     setStep(2);
@@ -74,7 +75,7 @@ export const PaymentWizardModal = ({ isOpen, onClose, orderData }) => {
         payload.clientId = selectedClient._id || selectedClient.uid;
       }
       await payBilling(orderData._id, payload);
-      alert("Pago procesado y factura actualizada correctamente");
+      showSuccess("Pago procesado y factura actualizada correctamente");
       setStep(1);
       setSearchTerm("");
       setCashReceived("");
@@ -82,7 +83,7 @@ export const PaymentWizardModal = ({ isOpen, onClose, orderData }) => {
       onClose();
     } catch (error) {
       console.error(error);
-      alert(error.response?.data?.message || "Error al procesar el pago");
+      showError(error.response?.data?.message || "Error al procesar el pago");
     } finally {
       setLoading(false);
     }
@@ -93,309 +94,247 @@ export const PaymentWizardModal = ({ isOpen, onClose, orderData }) => {
     if (name === "number") {
       const onlyNumbers = value.replace(/\D/g, "");
       const formattedNumber = onlyNumbers.replace(/(\d{4})(?=\d)/g, "$1 ");
-      if (formattedNumber.length <= 19) setCardData({ ...cardData, [name]: formattedNumber });
-    } else if (name === "expiry") {
-      const onlyNumbers = value.replace(/\D/g, "");
-      let formattedExpiry = onlyNumbers;
-      if (onlyNumbers.length > 2) formattedExpiry = `${onlyNumbers.slice(0, 2)}/${onlyNumbers.slice(2, 4)}`;
-      setCardData({ ...cardData, [name]: formattedExpiry });
-    } else if (name === "cvv") {
-      const onlyNumbers = value.replace(/\D/g, "");
-      if (onlyNumbers.length <= 3) setCardData({ ...cardData, [name]: onlyNumbers });
+      setCardData((prev) => ({ ...prev, number: formattedNumber }));
     } else {
-      setCardData({ ...cardData, [name]: value.toUpperCase() });
+      setCardData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
+  // ─── RENDER ────────────────────────────────────────────────────────────────
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md animate-fadeIn p-4">
-      <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fadeIn p-4">
+      <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl flex flex-col max-h-[92vh]">
 
-        {/* HEADER fijo */}
-        <div className="bg-gray-50 px-6 md:px-8 py-5 md:py-6 border-b border-gray-100 flex justify-between items-center shrink-0">
+        {/* Cabecera */}
+        <div className="bg-gray-800 px-6 md:px-8 py-5 md:py-6 flex justify-between items-center text-white shrink-0 rounded-t-3xl">
           <div>
-            <h2 className="text-xl md:text-2xl font-black italic text-gray-800 uppercase">
-              Procesar <span className="text-kinal-red">Pago</span>
+            <h2 className="text-xl md:text-2xl font-black italic uppercase tracking-wider">
+              {step === 1 ? "Seleccionar" : "Método de"}{" "}
+              <span className="text-kinal-red">{step === 1 ? "Cliente" : "Pago"}</span>
             </h2>
-            <p className="text-xs md:text-sm font-bold text-gray-400">
-              Factura: {orderData.BillSerie}
+            <p className="text-gray-400 font-mono text-xs md:text-sm mt-1">
+              Paso {step} de 2 • Total: Q {total.toFixed(2)}
             </p>
           </div>
-          {/* Indicador de pasos */}
-          <div className="flex items-center gap-2">
-            <span
-              className={`w-8 h-8 flex items-center justify-center rounded-full font-black text-sm ${
-                step === 1 ? "bg-kinal-red text-white" : "bg-green-100 text-green-600"
-              }`}
-            >
-              1
-            </span>
-            <div className={`w-8 h-1 rounded-full ${step === 2 ? "bg-kinal-red" : "bg-gray-200"}`} />
-            <span
-              className={`w-8 h-8 flex items-center justify-center rounded-full font-black text-sm ${
-                step === 2 ? "bg-kinal-red text-white" : "bg-gray-200 text-gray-400"
-              }`}
-            >
-              2
-            </span>
-          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-gray-400 hover:text-white font-bold text-xl transition-colors"
+            aria-label="Cerrar"
+          >
+            ×
+          </button>
         </div>
 
-        {/* CUERPO con scroll */}
-        <div className="p-6 md:p-8 overflow-y-auto flex-1">
-
-          {/* PASO 1 */}
+        {/* Cuerpo con scroll */}
+        <div className="overflow-y-auto flex-1 px-6 md:px-8 py-6">
           {step === 1 && (
-            <form onSubmit={handleNextStep} className="space-y-5 animate-fadeIn">
-
-              {/* Total */}
-              <div className="bg-orange-50 rounded-2xl p-5 border border-orange-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <div>
-                  <h3 className="text-xs font-black text-kinal-orange uppercase tracking-widest mb-1">
-                    Total a Pagar
-                  </h3>
-                  <p className="text-3xl font-black text-kinal-red leading-none">
-                    Q {total.toFixed(2)}
-                  </p>
-                </div>
-                <div className="text-left sm:text-right text-xs font-bold text-gray-500">
-                  <p>Sub: Q {subtotal.toFixed(2)}</p>
-                  <p>IVA: Q {iva.toFixed(2)}</p>
-                </div>
+            <form onSubmit={handleNextStep} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-xs font-black text-kinal-orange uppercase tracking-widest">
+                  Buscar Cliente
+                </label>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Nombre, apellido o correo..."
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none font-bold text-gray-700"
+                />
               </div>
 
-              {/* Cliente */}
-              <div className="relative bg-white border border-gray-200 p-5 rounded-2xl shadow-sm space-y-4">
-                <div className="flex justify-between items-end">
-                  <h3 className="text-sm font-black text-gray-800 uppercase tracking-widest">
-                    Datos de Facturación
-                  </h3>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsCreatingClient(!isCreatingClient);
-                      setSelectedClient(isCreatingClient ? users[0] : null);
-                    }}
-                    className="text-xs font-bold text-kinal-orange hover:underline shrink-0 ml-2"
-                  >
-                    {isCreatingClient ? "← Volver a buscar" : "+ Nuevo Cliente"}
-                  </button>
+              {!isCreatingClient && (
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {filteredClients.map((u) => (
+                    <button
+                      key={u._id || u.uid}
+                      type="button"
+                      onClick={() => setSelectedClient(u)}
+                      className={`w-full text-left px-4 py-3 rounded-xl border-2 font-bold text-sm transition-colors ${
+                        selectedClient?._id === u._id
+                          ? "border-kinal-red bg-red-50 text-kinal-red"
+                          : "border-gray-100 hover:border-gray-300 text-gray-700"
+                      }`}
+                    >
+                      {u.UserName} {u.UserSurname}
+                      <span className="text-xs font-normal text-gray-400 ml-2">{u.UserEmail}</span>
+                    </button>
+                  ))}
                 </div>
+              )}
 
-                {!isCreatingClient ? (
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="Buscar por nombre o correo..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none bg-gray-50 text-sm"
-                    />
-                    {searchTerm.length > 0 && !selectedClient && (
-                      <div className="absolute z-[110] bg-white border rounded-xl w-full shadow-2xl max-h-48 overflow-y-auto mt-1">
-                        {filteredClients.map((client) => (
-                          <div
-                            key={client._id}
-                            className="p-4 hover:bg-orange-50 cursor-pointer border-b border-gray-50 last:border-none"
-                            onClick={() => {
-                              setSelectedClient(client);
-                              setSearchTerm(`${client.UserName} ${client.UserSurname}`);
-                            }}
-                          >
-                            <p className="font-bold text-gray-800 text-sm">
-                              {client.UserName} {client.UserSurname}
-                            </p>
-                            <p className="text-xs text-gray-500">{client.UserEmail}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    {selectedClient && (
-                      <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-xl flex justify-between items-center">
-                        <p className="text-sm font-bold text-green-700">
-                          Seleccionado: {selectedClient.UserName} {selectedClient.UserSurname}
-                        </p>
-                        <button
-                          onClick={() => { setSelectedClient(null); setSearchTerm(""); }}
-                          className="text-green-900 text-xs font-black shrink-0 ml-2"
-                        >
-                          CAMBIAR
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-fadeIn bg-orange-50 p-4 rounded-xl border border-orange-100">
-                    <input
-                      type="text"
-                      placeholder="Nombres"
-                      required
-                      value={newClient.UserName}
-                      onChange={(e) => setNewClient({ ...newClient, UserName: e.target.value })}
-                      className="px-4 py-2.5 rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-kinal-orange text-sm"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Apellidos"
-                      required
-                      value={newClient.UserSurname}
-                      onChange={(e) => setNewClient({ ...newClient, UserSurname: e.target.value })}
-                      className="px-4 py-2.5 rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-kinal-orange text-sm"
-                    />
-                    <input
-                      type="email"
-                      placeholder="Correo"
-                      required
-                      value={newClient.UserEmail}
-                      onChange={(e) => setNewClient({ ...newClient, UserEmail: e.target.value })}
-                      className="sm:col-span-2 px-4 py-2.5 rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-kinal-orange text-sm"
-                    />
-                  </div>
-                )}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsCreatingClient((prev) => !prev);
+                    setSelectedClient(null);
+                  }}
+                  className="text-xs font-black text-kinal-orange underline"
+                >
+                  {isCreatingClient ? "← Seleccionar cliente existente" : "+ Crear nuevo cliente"}
+                </button>
               </div>
 
-              {/* Método de pago */}
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-bold text-gray-700">Método de Pago</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod("CASH")}
-                    className={`p-4 rounded-xl border-2 font-black uppercase transition-all flex items-center justify-center gap-2 text-sm ${
-                      paymentMethod === "CASH"
-                        ? "border-kinal-red bg-red-50 text-kinal-red"
-                        : "border-gray-100 text-gray-400"
-                    }`}
-                  >
-                    <img src={CashIcon} alt="Cash" className="w-5 h-5 shrink-0" />
-                    Efectivo
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod("CARD")}
-                    className={`p-4 rounded-xl border-2 font-black uppercase transition-all flex items-center justify-center gap-2 text-sm ${
-                      paymentMethod === "CARD"
-                        ? "border-kinal-red bg-red-50 text-kinal-red"
-                        : "border-gray-100 text-gray-400"
-                    }`}
-                  >
-                    <img src={CardIcon} alt="Card" className="w-5 h-5 shrink-0" />
-                    Tarjeta
-                  </button>
+              {isCreatingClient && (
+                <div className="space-y-3 bg-orange-50 p-4 rounded-2xl border border-orange-100">
+                  {["UserName", "UserSurname", "UserEmail"].map((field) => (
+                    <input
+                      key={field}
+                      type={field === "UserEmail" ? "email" : "text"}
+                      placeholder={field === "UserName" ? "Nombre" : field === "UserSurname" ? "Apellido" : "Correo"}
+                      value={newClient[field]}
+                      onChange={(e) => setNewClient((prev) => ({ ...prev, [field]: e.target.value }))}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none font-bold text-gray-700"
+                    />
+                  ))}
                 </div>
-              </div>
+              )}
 
-              {/* Botones */}
-              <div className="pt-2 flex flex-col sm:flex-row gap-3">
+              <div className="pt-4 flex gap-3">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 px-6 py-3 text-gray-500 font-bold hover:bg-gray-50 rounded-xl transition-colors border border-gray-200"
+                  className="flex-1 px-4 py-3 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 flex items-center justify-center gap-2 bg-kinal-red text-white font-black px-8 py-3 rounded-xl shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest"
+                  className="flex-1 bg-kinal-red text-white font-black py-3 rounded-xl shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest flex items-center justify-center gap-2"
                 >
-                  <span>Siguiente</span>
-                  <img src={NextIcon} alt="Next" className="w-5 h-5 invert shrink-0" />
+                  Siguiente
+                  <img src={NextIcon} alt="Siguiente" className="w-4 h-4" />
                 </button>
               </div>
             </form>
           )}
 
-          {/* PASO 2 */}
           {step === 2 && (
-            <div className="space-y-5 animate-fadeIn">
-              {paymentMethod === "CASH" ? (
-                <div className="space-y-5 text-center">
-                  <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
-                    <p className="text-sm font-bold text-gray-500 uppercase">Monto a Cobrar</p>
-                    <p className="text-4xl font-black text-gray-800">Q {total.toFixed(2)}</p>
-                  </div>
-                  <div className="flex flex-col gap-2 max-w-sm mx-auto text-left">
-                    <label className="text-sm font-bold text-gray-700">Efectivo Recibido</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="0.00"
-                      value={cashReceived}
-                      onChange={(e) => setCashReceived(e.target.value)}
-                      className="w-full px-6 py-4 text-2xl font-black text-center rounded-2xl border-2 border-green-200 focus:border-green-500 outline-none bg-green-50"
-                    />
-                  </div>
-                  <div
-                    className={`p-5 rounded-2xl border-2 ${
-                      change > 0 ? "bg-green-100 border-green-300" : "bg-gray-50 border-gray-100"
-                    }`}
-                  >
-                    <p className="text-sm font-bold text-gray-500 uppercase mb-1">Cambio</p>
-                    <p className={`text-4xl font-black ${change > 0 ? "text-green-600" : "text-gray-300"}`}>
-                      Q {change.toFixed(2)}
-                    </p>
-                  </div>
+            <div className="space-y-6">
+              {/* Método de pago */}
+              <div className="space-y-2">
+                <p className="text-xs font-black text-kinal-orange uppercase tracking-widest">
+                  Método de Pago
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { value: "CASH", label: "Efectivo", icon: CashIcon },
+                    { value: "CARD", label: "Tarjeta", icon: CardIcon },
+                  ].map(({ value, label, icon }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setPaymentMethod(value)}
+                      className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 font-black text-sm transition-colors ${
+                        paymentMethod === value
+                          ? "border-kinal-red bg-red-50 text-kinal-red"
+                          : "border-gray-100 hover:border-gray-300 text-gray-500"
+                      }`}
+                    >
+                      <img src={icon} alt={label} className="w-8 h-8" />
+                      {label}
+                    </button>
+                  ))}
                 </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              </div>
+
+              {/* Efectivo */}
+              {paymentMethod === "CASH" && (
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-kinal-orange uppercase tracking-widest">
+                    Efectivo Recibido
+                  </label>
+                  <input
+                    type="number"
+                    value={cashReceived}
+                    onChange={(e) => setCashReceived(e.target.value)}
+                    placeholder="0.00"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none font-bold text-gray-700"
+                  />
+                  {parseFloat(cashReceived) >= total && (
+                    <p className="text-sm font-black text-green-600 mt-1">
+                      Cambio: Q {change.toFixed(2)}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Tarjeta */}
+              {paymentMethod === "CARD" && (
+                <div className="space-y-3 bg-gray-50 p-4 rounded-2xl border border-gray-100">
                   <input
                     type="text"
                     name="number"
-                    placeholder="Número de Tarjeta"
+                    maxLength={19}
                     value={cardData.number}
                     onChange={handleCardChange}
-                    className="sm:col-span-2 px-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-kinal-red font-mono text-sm"
+                    placeholder="0000 0000 0000 0000"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none font-bold text-gray-700 tracking-widest"
                   />
                   <input
                     type="text"
                     name="name"
-                    placeholder="Nombre en Tarjeta"
                     value={cardData.name}
                     onChange={handleCardChange}
-                    className="sm:col-span-2 px-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-kinal-red uppercase text-sm"
+                    placeholder="Nombre en la tarjeta"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none font-bold text-gray-700"
                   />
-                  <input
-                    type="text"
-                    name="expiry"
-                    placeholder="MM/YY"
-                    value={cardData.expiry}
-                    onChange={handleCardChange}
-                    className="px-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-kinal-red text-center text-sm"
-                  />
-                  <input
-                    type="password"
-                    name="cvv"
-                    placeholder="CVV"
-                    value={cardData.cvv}
-                    onChange={handleCardChange}
-                    onFocus={() => setIsCvvFocused(true)}
-                    onBlur={() => setIsCvvFocused(false)}
-                    className="px-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-kinal-red text-center font-mono text-sm"
-                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      name="expiry"
+                      maxLength={5}
+                      value={cardData.expiry}
+                      onChange={handleCardChange}
+                      placeholder="MM/AA"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none font-bold text-gray-700"
+                    />
+                    <input
+                      type={isCvvFocused ? "text" : "password"}
+                      name="cvv"
+                      maxLength={4}
+                      value={cardData.cvv}
+                      onChange={handleCardChange}
+                      onFocus={() => setIsCvvFocused(true)}
+                      onBlur={() => setIsCvvFocused(false)}
+                      placeholder="CVV"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none font-bold text-gray-700"
+                    />
+                  </div>
                 </div>
               )}
 
-              {/* Botones paso 2 */}
-              <div className="pt-4 flex flex-col sm:flex-row gap-3 border-t border-gray-100 mt-6">
+              {/* Resumen */}
+              <div className="bg-gray-50 rounded-2xl p-4 space-y-2 border border-gray-100">
+                <div className="flex justify-between text-sm font-bold text-gray-500">
+                  <span>Subtotal</span>
+                  <span>Q {subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm font-bold text-gray-500">
+                  <span>IVA (12%)</span>
+                  <span>Q {iva.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-lg font-black text-gray-800 border-t border-gray-200 pt-2 mt-1">
+                  <span>Total</span>
+                  <span className="text-kinal-red">Q {total.toFixed(2)}</span>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="flex-1 px-6 py-4 text-gray-500 font-bold hover:bg-gray-50 rounded-xl transition-colors border border-gray-200"
+                  className="flex-1 px-4 py-3 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-colors"
                 >
-                  Volver
+                  Atrás
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmPayment}
-                  disabled={
-                    loading ||
-                    (paymentMethod === "CASH" && parseFloat(cashReceived || 0) < total)
-                  }
-                  className={`flex-1 font-black px-8 py-4 rounded-xl shadow-lg transition-all uppercase tracking-widest ${
-                    loading ? "bg-gray-300 text-gray-500" : "bg-green-500 text-white hover:bg-green-600"
-                  }`}
+                  disabled={loading}
+                  className="flex-1 bg-kinal-red text-white font-black py-3 rounded-xl shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest flex items-center justify-center"
                 >
-                  {loading ? "Procesando..." : `Confirmar Pago • Q ${total.toFixed(2)}`}
+                  {loading ? "Procesando..." : "Confirmar Pago"}
                 </button>
               </div>
             </div>
