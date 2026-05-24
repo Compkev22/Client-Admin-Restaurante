@@ -28,29 +28,39 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
   const { users, getUsers } = useUserStore();
   const { user } = useAuthStore();
 
+  // Efecto principal: carga de datos al abrir el modal
   useEffect(() => {
-    if (isOpen) {
-      getMenu().then((res) => setMenuProducts(res.data.menu || []));
-      getTables();
-      getBranches();
-      getUsers().then(() => {
-        setOrderList([]);
-        if (orderToEdit) {
-          const bId = orderToEdit.branchId?._id || orderToEdit.branchId || "";
-          const eId = orderToEdit.empleadoId?._id || orderToEdit.empleadoId || "";
-          setSelectedBranchId(bId);
-          setTimeout(() => setSelectedEmpleadoId(eId), 50);
-          setOrderType(orderToEdit.orderType || "TAKEAWAY");
-          setMesaId(orderToEdit.mesaId?._id || orderToEdit.mesaId || "");
-        } else {
-          setMesaId("");
-          setOrderType("TAKEAWAY");
-          setSelectedBranchId(user?.branchId || user?.branch?._id || "");
-          setSelectedEmpleadoId(user?._id || user?.uid || "");
-        }
-      });
+    if (!isOpen) return;
+
+    getMenu().then((res) => setMenuProducts(res.data.menu || []));
+    getTables();
+    getBranches();
+    getUsers();
+    setOrderList([]);
+
+    if (!isEditMode) {
+      setMesaId("");
+      setOrderType("TAKEAWAY");
+      setSelectedBranchId(user?.branchId || user?.branch?._id || "");
+      setSelectedEmpleadoId(user?._id || user?.uid || "");
+    } else {
+      const bId = orderToEdit.branchId?._id || orderToEdit.branchId || "";
+      setSelectedBranchId(bId);
+      setOrderType(orderToEdit.orderType || "TAKEAWAY");
+      setMesaId(orderToEdit.mesaId?._id || orderToEdit.mesaId || "");
+      // El empleado se setea en el efecto secundario de abajo,
+      // una vez que el store de users ya esté poblado.
     }
-  }, [isOpen, orderToEdit, user]);
+  }, [isOpen, orderToEdit]);
+
+  // Efecto secundario: en modo edición, espera a que users esté
+  // disponible en el store para pre-seleccionar el empleado correcto.
+  useEffect(() => {
+    if (!isOpen || !isEditMode || users.length === 0) return;
+
+    const eId = orderToEdit.empleadoId?._id || orderToEdit.empleadoId || "";
+    if (eId) setSelectedEmpleadoId(eId);
+  }, [isOpen, isEditMode, users, orderToEdit]);
 
   const filteredEmployees = users.filter((u) => {
     const uBranchId = u.branchId?._id || u.branchId || u.branch?._id || "";
@@ -61,17 +71,25 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
     if (!selectedProduct) return;
     const exists = orderList.find((item) => item.productId === selectedProduct);
     if (exists) {
-      setOrderList(orderList.map((item) =>
-        item.productId === selectedProduct
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      ));
+      setOrderList(
+        orderList.map((item) =>
+          item.productId === selectedProduct
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        )
+      );
     } else {
       const p = menuProducts.find((p) => p._id === selectedProduct);
       if (!p) return;
       setOrderList([
         ...orderList,
-        { productId: selectedProduct, type: p.type || p.categoria || "Individual", name: p.name || p.nombre, price: p.price || p.precio, quantity: 1 },
+        {
+          productId: selectedProduct,
+          type: p.type || p.categoria || "Individual",
+          name: p.name || p.nombre,
+          price: p.price || p.precio,
+          quantity: 1,
+        },
       ]);
     }
     setSelectedProduct("");
@@ -80,25 +98,48 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
   const handleRemoveProduct = (id) =>
     setOrderList(orderList.filter((item) => item.productId !== id));
 
-  const totalOrder = orderList.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const totalOrder = orderList.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
 
   const handleSubmit = async () => {
     if (!selectedBranchId) return showError("Debes seleccionar una sucursal.");
-    if (!selectedEmpleadoId) return showError("Debes seleccionar un empleado.");
-    if (orderList.length === 0) return showError("Debes agregar productos.");
+
+    // En modo edición el empleado ya viene de la orden original,
+    // solo validamos que exista si estamos creando una orden nueva.
+    if (!isEditMode && !selectedEmpleadoId) {
+      return showError("Debes seleccionar un empleado.");
+    }
+
+    if (orderList.length === 0) return showError("Debes agregar al menos un producto.");
+
     try {
-      if (orderToEdit) {
+      if (isEditMode) {
         await addItemsToExistingOrder(orderToEdit._id, orderList);
-        showSuccess("Productos agregados y factura actualizada");
+        showSuccess(
+          `${orderList.length} producto(s) agregado(s) y factura actualizada correctamente.`
+        );
       } else {
-        const finalEmpleadoId = selectedEmpleadoId.length < 24 ? user?._id || user?.uid : selectedEmpleadoId;
-        const orderData = { branchId: selectedBranchId, orderType, mesaId: orderType === "DINE_IN" ? mesaId : null, empleadoId: finalEmpleadoId };
+        const finalEmpleadoId =
+          selectedEmpleadoId.length < 24
+            ? user?._id || user?.uid
+            : selectedEmpleadoId;
+        const orderData = {
+          branchId: selectedBranchId,
+          orderType,
+          mesaId: orderType === "DINE_IN" ? mesaId : null,
+          empleadoId: finalEmpleadoId,
+        };
         await createFullOrder(orderData, orderList);
-        showSuccess("Orden creada y facturada automáticamente");
+        showSuccess("Orden creada y facturada automáticamente.");
       }
       onClose();
     } catch (error) {
-      console.log(error);
+      showError(
+        error?.response?.data?.message ||
+          "Ocurrió un error. Revisa los datos e intenta de nuevo."
+      );
     }
   };
 
@@ -110,10 +151,19 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
 
         {/* Cabecera fija */}
         <div className="flex justify-between items-center px-6 md:px-8 pt-6 md:pt-8 pb-4 shrink-0 border-b border-gray-100">
-          <h2 className="text-xl md:text-2xl font-black italic text-gray-800 uppercase">
-            {isEditMode ? "Editar" : "Nueva"}{" "}
-            <span className="text-kinal-red">Orden</span>
-          </h2>
+          <div>
+            <h2 className="text-xl md:text-2xl font-black italic text-gray-800 uppercase">
+              {isEditMode ? "Agregar a" : "Nueva"}{" "}
+              <span className="text-kinal-red">Orden</span>
+            </h2>
+            {isEditMode && (
+              <p className="text-xs font-bold text-gray-400 mt-1">
+                ORD-{orderToEdit._id.slice(-4).toUpperCase()} •{" "}
+                <span className="text-kinal-orange">{orderToEdit.estado}</span>
+                {" "}• Total actual: Q {(orderToEdit.total || 0).toFixed(2)}
+              </p>
+            )}
+          </div>
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 font-bold text-xl transition-colors"
@@ -123,29 +173,54 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
           </button>
         </div>
 
+        {/* Banner informativo en modo edición */}
+        {isEditMode && (
+          <div className="mx-6 md:mx-8 mt-4 bg-orange-50 border border-orange-200 rounded-2xl px-4 py-3 flex items-start gap-3 shrink-0">
+            <span className="text-kinal-orange text-lg leading-none mt-0.5">ℹ</span>
+            <p className="text-xs font-bold text-orange-700 leading-relaxed">
+              Estás agregando productos a una orden existente. Los nuevos items
+              se sumarán al total y la factura vinculada se actualizará automáticamente.
+              <br />
+              <span className="font-black">No puedes modificar la sucursal, el tipo de orden ni la mesa.</span>
+            </p>
+          </div>
+        )}
+
         {/* Cuerpo con scroll */}
         <div className="overflow-y-auto flex-1 px-6 md:px-8 py-6">
           <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
             {/* Sucursal y Empleado */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-orange-50 p-4 md:p-5 rounded-2xl border border-orange-100">
               <div className="space-y-1">
-                <label className="text-xs font-black text-kinal-orange uppercase tracking-widest">Sucursal</label>
+                <label className="text-xs font-black text-kinal-orange uppercase tracking-widest">
+                  Sucursal
+                </label>
                 <select
                   value={selectedBranchId}
-                  onChange={(e) => { setSelectedBranchId(e.target.value); setSelectedEmpleadoId(""); }}
-                  disabled={!!orderToEdit}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-white font-bold text-gray-700 disabled:bg-gray-100"
+                  onChange={(e) => {
+                    setSelectedBranchId(e.target.value);
+                    setSelectedEmpleadoId("");
+                  }}
+                  disabled={isEditMode}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-white font-bold text-gray-700 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 >
                   <option value="">-- Seleccionar --</option>
-                  {branches?.map((b) => <option key={b._id} value={b._id}>{b.name}</option>)}
+                  {branches?.map((b) => (
+                    <option key={b._id} value={b._id}>
+                      {b.name}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-black text-kinal-orange uppercase tracking-widest">Empleado</label>
+                <label className="text-xs font-black text-kinal-orange uppercase tracking-widest">
+                  Empleado
+                </label>
                 <select
                   value={selectedEmpleadoId}
                   onChange={(e) => setSelectedEmpleadoId(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-white font-bold text-gray-700 disabled:bg-gray-100"
+                  disabled={isEditMode}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-white font-bold text-gray-700 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 >
                   <option value="">-- Seleccionar --</option>
                   {(isEditMode ? users : filteredEmployees).map((emp) => (
@@ -163,6 +238,7 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
               tables={tables}
               mesaId={mesaId}
               setMesaId={setMesaId}
+              disabled={isEditMode}
             />
 
             <OrderCart
@@ -179,10 +255,20 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
         {/* Footer fijo */}
         <div className="shrink-0 px-6 md:px-8 pb-6 md:pb-8 pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Total a cobrar</p>
+            <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">
+              {isEditMode ? "Suma a agregar" : "Total a cobrar"}
+            </p>
             <p className="text-3xl md:text-4xl font-black text-kinal-red leading-none">
               Q {totalOrder.toFixed(2)}
             </p>
+            {isEditMode && totalOrder > 0 && (
+              <p className="text-xs text-gray-400 font-bold mt-1">
+                Nuevo total:{" "}
+                <span className="text-gray-700">
+                  Q {((orderToEdit.total || 0) + totalOrder).toFixed(2)}
+                </span>
+              </p>
+            )}
           </div>
           <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
             <button
@@ -202,7 +288,7 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
                   : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
             >
-              Enviar a Cocina
+              {isEditMode ? "Agregar a la Orden" : "Enviar a Cocina"}
             </button>
           </div>
         </div>
