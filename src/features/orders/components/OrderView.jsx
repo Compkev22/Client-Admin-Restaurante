@@ -7,6 +7,7 @@ import { OrderModal } from "./OrderModal.jsx";
 import { OrderDetailModal } from "./OrderDetailModal.jsx";
 import { PaymentWizardModal } from "../../billing/components/PaymentModal.jsx";
 import { useOrderActions } from "../hooks/useOrderActions.js";
+import { useBillingStore } from "../../users/store/adminStore.js";
 
 export const OrderPage = () => {
   const [activeTab, setActiveTab] = useState("Todos");
@@ -18,10 +19,12 @@ export const OrderPage = () => {
   const [orderToEdit, setOrderToEdit] = useState(null);
 
   const { orders, fetchOrders } = useOrderActions();
+  const { billings, getBillings } = useBillingStore();
 
   useEffect(() => {
     fetchOrders();
-  }, [fetchOrders]);
+    getBillings();
+  }, [fetchOrders, getBillings]);
 
   const tabs = [
     "Todos",
@@ -36,6 +39,13 @@ export const OrderPage = () => {
     activeTab === "Todos"
       ? orders
       : orders.filter((o) => o.estado === activeTab);
+
+  // Busca la factura asociada a una orden para obtener el cliente real
+  const getBillingForOrder = (orderId) =>
+    billings.find((b) => {
+      const billingOrderId = b.Order?._id || b.Order;
+      return billingOrderId?.toString() === orderId?.toString();
+    }) || null;
 
   return (
     <div className="space-y-6 md:space-y-8 animate-fadeIn p-2 md:p-4">
@@ -70,13 +80,22 @@ export const OrderPage = () => {
         onClose={() => {
           setIsPaymentOpen(false);
           fetchOrders();
+          getBillings();
         }}
         orderData={selectedOrderToPay}
       />
       <OrderDetailModal
         isOpen={isDetailOpen}
-        onClose={() => setIsDetailOpen(false)}
+        onClose={() => {
+          setIsDetailOpen(false);
+          setSelectedOrderDetails(null);
+        }}
         orderData={selectedOrderDetails}
+        billingData={
+          selectedOrderDetails
+            ? getBillingForOrder(selectedOrderDetails._id)
+            : null
+        }
       />
     </div>
   );

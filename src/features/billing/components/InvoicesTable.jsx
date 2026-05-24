@@ -21,9 +21,7 @@ export const InvoicesTable = () => {
   };
 
   const handleOpenOrderDetailModal = (invoice) => {
-    // Le pasamos invoice.Order (el objeto Order populado) al modal de detalle,
-    // ya que OrderDetailModal espera un objeto de tipo Order, no un Billing.
-    setSelectedInvoice(invoice.Order);
+    setSelectedInvoice(invoice);
     setIsOrderDetailModalOpen(true);
   };
 
@@ -44,7 +42,6 @@ export const InvoicesTable = () => {
 
   return (
     <>
-      {/* Tabla con scroll horizontal en móvil */}
       <div className="overflow-x-auto -mx-4 md:mx-0">
         <table className="w-full text-left border-collapse min-w-[540px] px-4 md:px-0">
           <thead>
@@ -106,21 +103,27 @@ export const InvoicesTable = () => {
         </table>
       </div>
 
-      {isOrderDetailModalOpen && selectedInvoice && (
+      {isOrderDetailModalOpen && selectedInvoice?.Order && (
         <OrderDetailModal
           isOpen={isOrderDetailModalOpen}
           onClose={() => {
             setIsOrderDetailModalOpen(false);
             setSelectedInvoice(null);
           }}
-          orderData={selectedInvoice}
+          // La orden ya viene con populate profundo desde el backend
+          orderData={selectedInvoice.Order}
+          // El billing lleva el cliente real que pagó
+          billingData={selectedInvoice}
         />
       )}
 
       {isPaymentModalOpen && (
         <PaymentWizardModal
           isOpen={isPaymentModalOpen}
-          onClose={() => setIsPaymentModalOpen(false)}
+          onClose={() => {
+            setIsPaymentModalOpen(false);
+            setSelectedInvoice(null);
+          }}
           orderData={selectedInvoice}
         />
       )}

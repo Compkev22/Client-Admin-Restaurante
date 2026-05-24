@@ -14,6 +14,7 @@ import { showError, showSuccess } from "../../../shared/utils/toast.js";
 
 export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
   const isEditMode = !!orderToEdit;
+
   const [orderType, setOrderType] = useState("TAKEAWAY");
   const [orderList, setOrderList] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState("");
@@ -28,7 +29,6 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
   const { users, getUsers } = useUserStore();
   const { user } = useAuthStore();
 
-  // Efecto principal: carga de datos al abrir el modal
   useEffect(() => {
     if (!isOpen) return;
 
@@ -39,29 +39,21 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
     setOrderList([]);
 
     if (!isEditMode) {
-      setMesaId("");
       setOrderType("TAKEAWAY");
+      setMesaId("");
       setSelectedBranchId(user?.branchId || user?.branch?._id || "");
       setSelectedEmpleadoId(user?._id || user?.uid || "");
     } else {
-      const bId = orderToEdit.branchId?._id || orderToEdit.branchId || "";
-      setSelectedBranchId(bId);
       setOrderType(orderToEdit.orderType || "TAKEAWAY");
+      setSelectedBranchId(orderToEdit.branchId?._id || orderToEdit.branchId || "");
       setMesaId(orderToEdit.mesaId?._id || orderToEdit.mesaId || "");
-      // El empleado se setea en el efecto secundario de abajo,
-      // una vez que el store de users ya esté poblado.
+      setSelectedEmpleadoId(
+        orderToEdit.empleadoId?._id || orderToEdit.empleadoId || ""
+      );
     }
   }, [isOpen, orderToEdit]);
 
-  // Efecto secundario: en modo edición, espera a que users esté
-  // disponible en el store para pre-seleccionar el empleado correcto.
-  useEffect(() => {
-    if (!isOpen || !isEditMode || users.length === 0) return;
-
-    const eId = orderToEdit.empleadoId?._id || orderToEdit.empleadoId || "";
-    if (eId) setSelectedEmpleadoId(eId);
-  }, [isOpen, isEditMode, users, orderToEdit]);
-
+  // Empleados filtrados por sucursal seleccionada (solo para creación nueva)
   const filteredEmployees = users.filter((u) => {
     const uBranchId = u.branchId?._id || u.branchId || u.branch?._id || "";
     return uBranchId.toString() === selectedBranchId.toString();
@@ -85,10 +77,10 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
         ...orderList,
         {
           productId: selectedProduct,
-          type: p.type || p.categoria || "Individual",
-          name: p.name || p.nombre,
-          price: p.price || p.precio,
-          quantity: 1,
+          type:      p.type || p.categoria || "Individual",
+          name:      p.name || p.nombre,
+          price:     p.price || p.precio,
+          quantity:  1,
         },
       ]);
     }
@@ -106,10 +98,9 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
   const handleSubmit = async () => {
     if (!selectedBranchId) return showError("Debes seleccionar una sucursal.");
 
-    // En modo edición el empleado ya viene de la orden original,
-    // solo validamos que exista si estamos creando una orden nueva.
-    if (!isEditMode && !selectedEmpleadoId) {
-      return showError("Debes seleccionar un empleado.");
+    // Empleado solo obligatorio para órdenes DINE_IN nuevas
+    if (!isEditMode && orderType === "DINE_IN" && !selectedEmpleadoId) {
+      return showError("Debes seleccionar un empleado para órdenes en mesa.");
     }
 
     if (orderList.length === 0) return showError("Debes agregar al menos un producto.");
@@ -122,14 +113,16 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
         );
       } else {
         const finalEmpleadoId =
-          selectedEmpleadoId.length < 24
-            ? user?._id || user?.uid
-            : selectedEmpleadoId;
+          selectedEmpleadoId && selectedEmpleadoId.length >= 24
+            ? selectedEmpleadoId
+            : user?._id || user?.uid || null;
+
         const orderData = {
-          branchId: selectedBranchId,
+          branchId:   selectedBranchId,
           orderType,
-          mesaId: orderType === "DINE_IN" ? mesaId : null,
-          empleadoId: finalEmpleadoId,
+          // Solo enviamos mesaId y empleadoId si es DINE_IN
+          mesaId:     orderType === "DINE_IN" ? mesaId     : undefined,
+          empleadoId: orderType === "DINE_IN" ? finalEmpleadoId : undefined,
         };
         await createFullOrder(orderData, orderList);
         showSuccess("Orden creada y facturada automáticamente.");
@@ -189,8 +182,9 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
         {/* Cuerpo con scroll */}
         <div className="overflow-y-auto flex-1 px-6 md:px-8 py-6">
           <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-            {/* Sucursal y Empleado */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-orange-50 p-4 md:p-5 rounded-2xl border border-orange-100">
+
+            {/* Sucursal — siempre visible, solo bloqueada en edición */}
+            <div className="bg-orange-50 p-4 md:p-5 rounded-2xl border border-orange-100">
               <div className="space-y-1">
                 <label className="text-xs font-black text-kinal-orange uppercase tracking-widest">
                   Sucursal
@@ -212,26 +206,9 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
                   ))}
                 </select>
               </div>
-              <div className="space-y-1">
-                <label className="text-xs font-black text-kinal-orange uppercase tracking-widest">
-                  Empleado
-                </label>
-                <select
-                  value={selectedEmpleadoId}
-                  onChange={(e) => setSelectedEmpleadoId(e.target.value)}
-                  disabled={isEditMode}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-white font-bold text-gray-700 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                >
-                  <option value="">-- Seleccionar --</option>
-                  {(isEditMode ? users : filteredEmployees).map((emp) => (
-                    <option key={emp._id || emp.uid} value={emp._id || emp.uid}>
-                      {emp.UserName} {emp.UserSurname}
-                    </option>
-                  ))}
-                </select>
-              </div>
             </div>
 
+            {/* Tipo de orden, mesa/cliente y empleado (condicional) */}
             <OrderFormFields
               orderType={orderType}
               setOrderType={setOrderType}
@@ -239,6 +216,12 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
               mesaId={mesaId}
               setMesaId={setMesaId}
               disabled={isEditMode}
+              // Empleado solo se muestra si NO estamos en modo edición
+              // (en edición ya está bloqueado e irrelevante cambiarlo)
+              showEmpleado={!isEditMode}
+              users={filteredEmployees}
+              selectedEmpleadoId={selectedEmpleadoId}
+              setSelectedEmpleadoId={setSelectedEmpleadoId}
             />
 
             <OrderCart
