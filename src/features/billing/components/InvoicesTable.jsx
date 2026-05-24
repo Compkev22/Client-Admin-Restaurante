@@ -42,8 +42,69 @@ export const InvoicesTable = () => {
 
   return (
     <>
-      <div className="overflow-x-auto -mx-4 md:mx-0">
-        <table className="w-full text-left border-collapse min-w-[540px] px-4 md:px-0">
+      {/* ── TARJETAS MÓVIL (< md) ── */}
+      <div className="grid md:hidden gap-4">
+        {billings.map((inv) => (
+          <div
+            key={inv._id}
+            className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-3"
+          >
+            {/* Cabecera */}
+            <div className="flex justify-between items-start">
+              <span className="font-black text-gray-700">{inv.BillSerie}</span>
+              <span
+                className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
+                  inv.BillStatus === "PAYED"
+                    ? "bg-green-100 text-green-600"
+                    : "bg-yellow-100 text-yellow-700"
+                }`}
+              >
+                {inv.BillStatus === "PAYED" ? "Pagada" : "Pendiente"}
+              </span>
+            </div>
+
+            {/* Datos */}
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div>
+                <p className="text-[10px] font-black text-gray-400 uppercase">Cliente</p>
+                <p className="font-bold text-gray-700">
+                  {inv.client?.UserName
+                    ? `${inv.client.UserName} ${inv.client.UserSurname}`
+                    : "Consumidor Final"}
+                </p>
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-gray-400 uppercase">Total</p>
+                <p className="font-black text-gray-800">Q {inv.BillTotal?.toFixed(2)}</p>
+              </div>
+            </div>
+
+            {/* Acción */}
+            <div className="pt-2 border-t border-gray-100">
+              {inv.BillStatus === "PAYED" ? (
+                <button
+                  onClick={() => handleOpenOrderDetailModal(inv)}
+                  disabled={!inv.Order}
+                  className="w-full py-2 rounded-xl border border-gray-200 font-bold text-sm text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Ver Detalles
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleOpenPaymentModal(inv)}
+                  className="w-full bg-kinal-red text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-red-700 shadow-sm transition-colors"
+                >
+                  Cobrar
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── TABLA ESCRITORIO (≥ md) ── */}
+      <div className="hidden md:block overflow-x-auto">
+        <table className="w-full text-left border-collapse min-w-[540px]">
           <thead>
             <tr className="border-b border-gray-100">
               <th className="py-3 px-3 text-xs font-black text-gray-400 uppercase">Serie</th>
@@ -110,9 +171,7 @@ export const InvoicesTable = () => {
             setIsOrderDetailModalOpen(false);
             setSelectedInvoice(null);
           }}
-          // La orden ya viene con populate profundo desde el backend
           orderData={selectedInvoice.Order}
-          // El billing lleva el cliente real que pagó
           billingData={selectedInvoice}
         />
       )}

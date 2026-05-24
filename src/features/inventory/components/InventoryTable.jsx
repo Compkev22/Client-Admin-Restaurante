@@ -32,74 +32,158 @@ export const InventoryTable = ({ inventory, branches, loading, error, onEdit, on
   }
 
   return (
-    /*
-      overflow-x-auto permite scroll horizontal en móvil.
-      La tabla mantiene su estructura pero se puede deslizar.
-    */
-    <div className="overflow-x-auto -mx-0">
-      <table className="w-full text-left min-w-[600px]">
-        <thead className="bg-gray-50">
-          <tr>
-            {["Insumo", "Sucursal", "Stock", "Costo Unit.", "Estado", "Acciones"].map((col) => (
-              <th key={col} className="p-3 md:p-4 text-xs font-black text-gray-400 uppercase italic whitespace-nowrap">
-                {col}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-100">
-          {inventory.map((item) => {
-            const branchName =
-              item.branchId?.name ||
-              branches.find((b) => b._id === item.branchId)?.name ||
-              "N/A";
-            return (
-              <tr key={item._id} className="hover:bg-orange-50/30 transition-colors">
-                <td className="p-3 md:p-4">
-                  <p className="font-bold text-gray-800 text-sm">{item.name}</p>
-                  <p className="text-[10px] text-gray-400 font-medium">{item.description}</p>
-                </td>
-                <td className="p-3 md:p-4">
-                  <span className="text-xs font-black text-kinal-orange uppercase whitespace-nowrap">{branchName}</span>
-                </td>
-                <td className="p-3 md:p-4">
-                  <span className={`font-black text-sm ${item.stock <= 5 ? "text-red-500" : "text-gray-700"}`}>
+    <>
+      {/* ── TARJETAS MÓVIL (< md) ── */}
+      <div className="grid md:hidden gap-4">
+        {inventory.map((item) => {
+          const branchName =
+            item.branchId?.name ||
+            branches.find((b) => b._id === item.branchId)?.name ||
+            "N/A";
+
+          return (
+            <div
+              key={item._id}
+              className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-3"
+            >
+              {/* Cabecera */}
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-bold text-gray-800">{item.name}</p>
+                  {item.description && (
+                    <p className="text-[11px] text-gray-400 font-medium">{item.description}</p>
+                  )}
+                </div>
+                <span
+                  className={`shrink-0 ml-2 px-3 py-1 rounded-full text-[10px] font-black uppercase ${
+                    item.status === "ACTIVE"
+                      ? "bg-green-100 text-green-600"
+                      : "bg-red-100 text-red-600"
+                  }`}
+                >
+                  {item.status === "ACTIVE" ? "Activo" : "Inactivo"}
+                </span>
+              </div>
+
+              {/* Datos */}
+              <div className="grid grid-cols-3 gap-2 text-sm">
+                <div>
+                  <p className="text-[10px] font-black text-gray-400 uppercase">Sucursal</p>
+                  <p className="font-black text-kinal-orange text-xs uppercase">{branchName}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-gray-400 uppercase">Stock</p>
+                  <p className={`font-black ${item.stock <= 5 ? "text-red-500" : "text-gray-700"}`}>
                     {item.stock}
-                  </span>
-                </td>
-                <td className="p-3 md:p-4 font-bold text-kinal-red italic text-sm whitespace-nowrap">
-                  Q {item.unitCost?.toFixed(2)}
-                </td>
-                <td className="p-3 md:p-4">
-                  <span
-                    className={`px-2 md:px-3 py-1 rounded-full text-[10px] font-black uppercase whitespace-nowrap ${
-                      item.status === "ACTIVE"
-                        ? "bg-green-100 text-green-600"
-                        : "bg-red-100 text-red-600"
-                    }`}
-                  >
-                    {item.status === "ACTIVE" ? "Activo" : "Inactivo"}
-                  </span>
-                </td>
-                <td className="p-3 md:p-4">
-                  <div className="flex justify-center gap-3 md:gap-4">
-                    <button onClick={() => onEdit(item)} className="hover:scale-110 transition-transform p-1">
-                      <img src={iconEdit} className="w-5 h-5 opacity-60 hover:opacity-100" alt="Editar" />
-                    </button>
-                    <button onClick={() => onToggleStatus(item)} className="hover:scale-110 transition-transform p-1">
-                      <img
-                        src={iconDelete}
-                        className={`w-5 h-5 opacity-60 hover:opacity-100 ${item.status === "INACTIVE" ? "grayscale" : ""}`}
-                        alt="Cambiar estado"
-                      />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+                    {item.stock <= 5 && (
+                      <span className="ml-1 text-[9px] text-red-400 font-black">BAJO</span>
+                    )}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-gray-400 uppercase">Costo Unit.</p>
+                  <p className="font-bold text-kinal-red italic">Q {item.unitCost?.toFixed(2)}</p>
+                </div>
+              </div>
+
+              {/* Acciones */}
+              <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
+                <button
+                  onClick={() => onEdit(item)}
+                  className="flex items-center gap-2 flex-1 justify-center py-2 rounded-xl border border-gray-200 hover:bg-orange-50 transition-colors font-bold text-xs text-gray-600"
+                  aria-label="Editar insumo"
+                >
+                  <img src={iconEdit} className="w-4 h-4 opacity-60" alt="Editar" />
+                  Editar
+                </button>
+                <button
+                  onClick={() => onToggleStatus(item)}
+                  className={`flex items-center gap-2 flex-1 justify-center py-2 rounded-xl border transition-colors font-bold text-xs ${
+                    item.status === "ACTIVE"
+                      ? "border-red-200 hover:bg-red-50 text-red-500"
+                      : "border-green-200 hover:bg-green-50 text-green-600"
+                  }`}
+                  aria-label="Cambiar estado"
+                >
+                  <img
+                    src={iconDelete}
+                    className={`w-4 h-4 opacity-60 ${item.status === "INACTIVE" ? "grayscale" : ""}`}
+                    alt="Cambiar estado"
+                  />
+                  {item.status === "ACTIVE" ? "Desactivar" : "Activar"}
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── TABLA ESCRITORIO (≥ md) ── */}
+      <div className="hidden md:block overflow-x-auto">
+        <table className="w-full text-left min-w-[600px]">
+          <thead className="bg-gray-50">
+            <tr>
+              {["Insumo", "Sucursal", "Stock", "Costo Unit.", "Estado", "Acciones"].map((col) => (
+                <th key={col} className="p-3 md:p-4 text-xs font-black text-gray-400 uppercase italic whitespace-nowrap">
+                  {col}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {inventory.map((item) => {
+              const branchName =
+                item.branchId?.name ||
+                branches.find((b) => b._id === item.branchId)?.name ||
+                "N/A";
+              return (
+                <tr key={item._id} className="hover:bg-orange-50/30 transition-colors">
+                  <td className="p-3 md:p-4">
+                    <p className="font-bold text-gray-800 text-sm">{item.name}</p>
+                    <p className="text-[10px] text-gray-400 font-medium">{item.description}</p>
+                  </td>
+                  <td className="p-3 md:p-4">
+                    <span className="text-xs font-black text-kinal-orange uppercase whitespace-nowrap">{branchName}</span>
+                  </td>
+                  <td className="p-3 md:p-4">
+                    <span className={`font-black text-sm ${item.stock <= 5 ? "text-red-500" : "text-gray-700"}`}>
+                      {item.stock}
+                    </span>
+                  </td>
+                  <td className="p-3 md:p-4 font-bold text-kinal-red italic text-sm whitespace-nowrap">
+                    Q {item.unitCost?.toFixed(2)}
+                  </td>
+                  <td className="p-3 md:p-4">
+                    <span
+                      className={`px-2 md:px-3 py-1 rounded-full text-[10px] font-black uppercase whitespace-nowrap ${
+                        item.status === "ACTIVE"
+                          ? "bg-green-100 text-green-600"
+                          : "bg-red-100 text-red-600"
+                      }`}
+                    >
+                      {item.status === "ACTIVE" ? "Activo" : "Inactivo"}
+                    </span>
+                  </td>
+                  <td className="p-3 md:p-4">
+                    <div className="flex justify-center gap-3 md:gap-4">
+                      <button onClick={() => onEdit(item)} className="hover:scale-110 transition-transform p-1">
+                        <img src={iconEdit} className="w-5 h-5 opacity-60 hover:opacity-100" alt="Editar" />
+                      </button>
+                      <button onClick={() => onToggleStatus(item)} className="hover:scale-110 transition-transform p-1">
+                        <img
+                          src={iconDelete}
+                          className={`w-5 h-5 opacity-60 hover:opacity-100 ${item.status === "INACTIVE" ? "grayscale" : ""}`}
+                          alt="Cambiar estado"
+                        />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 };
