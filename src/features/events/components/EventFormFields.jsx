@@ -1,16 +1,26 @@
 // features/events/components/EventFormFields.jsx
-export const EventFormFields = ({ register, branches, users, minDateStr }) => (
+export const EventFormFields = ({ register, errors, branches, users, minDateStr }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
     {/* Nombre — ancho completo */}
     <div className="sm:col-span-2 space-y-1">
       <label className="text-[10px] font-black text-gray-400 uppercase ml-1 italic">
-        Nombre
+        Nombre del Evento
       </label>
       <input
-        {...register("name", { required: "Requerido" })}
+        type="text"
+        maxLength={100}
+        {...register("name", {
+          required: "El nombre es obligatorio",
+          minLength: { value: 5, message: "Mínimo 5 caracteres" },
+          maxLength: { value: 100, message: "Máximo 100 caracteres" },
+          validate: (v) => v.trim().length >= 5 || "El nombre no puede estar vacío",
+        })}
         className="w-full px-4 md:px-6 py-3 md:py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-700 outline-none text-sm"
       />
+      {errors?.name && (
+        <p className="text-red-500 text-[10px] font-bold ml-1">{errors.name.message}</p>
+      )}
     </div>
 
     {/* Cliente */}
@@ -19,7 +29,7 @@ export const EventFormFields = ({ register, branches, users, minDateStr }) => (
         Cliente
       </label>
       <select
-        {...register("clientId", { required: true })}
+        {...register("clientId", { required: "El cliente es obligatorio" })}
         className="w-full px-4 md:px-6 py-3 md:py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-600 outline-none text-sm"
       >
         <option value="">Elegir cliente...</option>
@@ -31,6 +41,9 @@ export const EventFormFields = ({ register, branches, users, minDateStr }) => (
             </option>
           ))}
       </select>
+      {errors?.clientId && (
+        <p className="text-red-500 text-[10px] font-bold ml-1">{errors.clientId.message}</p>
+      )}
     </div>
 
     {/* Sucursal */}
@@ -39,7 +52,7 @@ export const EventFormFields = ({ register, branches, users, minDateStr }) => (
         Sucursal
       </label>
       <select
-        {...register("branchId", { required: "Sucursal es requerida" })}
+        {...register("branchId", { required: "La sucursal es obligatoria" })}
         className="w-full px-4 md:px-6 py-3 md:py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-600 outline-none text-sm"
       >
         <option value="">Elegir sucursal...</option>
@@ -51,6 +64,9 @@ export const EventFormFields = ({ register, branches, users, minDateStr }) => (
             </option>
           ))}
       </select>
+      {errors?.branchId && (
+        <p className="text-red-500 text-[10px] font-bold ml-1">{errors.branchId.message}</p>
+      )}
     </div>
 
     {/* Fecha */}
@@ -62,11 +78,16 @@ export const EventFormFields = ({ register, branches, users, minDateStr }) => (
         type="date"
         min={minDateStr}
         {...register("eventDate", {
-          required: "Requerido",
-          min: { value: minDateStr, message: "La fecha debe ser al menos un mes en el futuro" },
+          required: "La fecha es obligatoria",
+          validate: (v) =>
+            new Date(v) >= new Date(minDateStr) ||
+            "La fecha debe ser al menos un mes en el futuro",
         })}
         className="w-full px-4 md:px-6 py-3 md:py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-600 outline-none text-sm"
       />
+      {errors?.eventDate && (
+        <p className="text-red-500 text-[10px] font-bold ml-1">{errors.eventDate.message}</p>
+      )}
     </div>
 
     {/* Personas */}
@@ -75,10 +96,23 @@ export const EventFormFields = ({ register, branches, users, minDateStr }) => (
         Personas
       </label>
       <input
-        {...register("numberOfPersons", { required: true })}
         type="number"
+        min="1"
+        max="1000"
+        onInput={(e) => {
+          if (e.target.value < 1) e.target.value = 1;
+          if (e.target.value > 1000) e.target.value = 1000;
+        }}
+        {...register("numberOfPersons", {
+          required: "Indica la cantidad de personas",
+          min: { value: 1, message: "Mínimo 1 persona" },
+          max: { value: 1000, message: "Máximo 1000 personas" },
+        })}
         className="w-full px-4 md:px-6 py-3 md:py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-600 outline-none text-sm"
       />
+      {errors?.numberOfPersons && (
+        <p className="text-red-500 text-[10px] font-bold ml-1">{errors.numberOfPersons.message}</p>
+      )}
     </div>
 
     {/* Hora inicio */}
@@ -87,12 +121,15 @@ export const EventFormFields = ({ register, branches, users, minDateStr }) => (
         Inicio (07:00 - 22:00)
       </label>
       <input
-        {...register("startTime", { required: true })}
         type="time"
         min="07:00"
         max="22:00"
+        {...register("startTime", { required: "La hora de inicio es obligatoria" })}
         className="w-full px-4 md:px-6 py-3 md:py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-600 outline-none text-sm"
       />
+      {errors?.startTime && (
+        <p className="text-red-500 text-[10px] font-bold ml-1">{errors.startTime.message}</p>
+      )}
     </div>
 
     {/* Hora fin */}
@@ -101,12 +138,15 @@ export const EventFormFields = ({ register, branches, users, minDateStr }) => (
         Fin (07:00 - 22:00)
       </label>
       <input
-        {...register("endTime", { required: true })}
         type="time"
         min="07:00"
         max="22:00"
+        {...register("endTime", { required: "La hora de fin es obligatoria" })}
         className="w-full px-4 md:px-6 py-3 md:py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-600 outline-none text-sm"
       />
+      {errors?.endTime && (
+        <p className="text-red-500 text-[10px] font-bold ml-1">{errors.endTime.message}</p>
+      )}
     </div>
 
     {/* Estado — ancho completo */}
@@ -122,6 +162,24 @@ export const EventFormFields = ({ register, branches, users, minDateStr }) => (
         <option value="Confirmado">Confirmado</option>
         <option value="Cancelado">Cancelado</option>
       </select>
+    </div>
+
+    <div className="sm:col-span-2 space-y-1">
+      <label className="text-[10px] font-black text-gray-400 uppercase ml-1 italic">
+        Notas (Opcional)
+      </label>
+      <textarea
+        rows="2"
+        maxLength={500}
+        {...register("notes", {
+          maxLength: { value: 500, message: "Máximo 500 caracteres" },
+        })}
+        placeholder="Indicaciones especiales, decoración, etc."
+        className="w-full px-4 md:px-6 py-3 md:py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-600 outline-none resize-none text-sm"
+      />
+      {errors?.notes && (
+        <p className="text-red-500 text-[10px] font-bold ml-1">{errors.notes.message}</p>
+      )}
     </div>
   </div>
 );

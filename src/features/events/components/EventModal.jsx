@@ -6,7 +6,7 @@ import { useBranchStore, useUserStore } from "../../users/store/adminStore.js";
 import { EventFormFields } from "./EventFormFields.jsx";
 
 export const EventModal = ({ isOpen, onClose, eventToEdit = null, onRefresh }) => {
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const { saveEvent } = useSaveEvent();
   const { branches, getBranches } = useBranchStore();
   const { users, getUsers } = useUserStore();
@@ -69,6 +69,7 @@ export const EventModal = ({ isOpen, onClose, eventToEdit = null, onRefresh }) =
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <EventFormFields
               register={register}
+              errors={errors}
               branches={branches}
               users={users}
               minDateStr={minDateStr}

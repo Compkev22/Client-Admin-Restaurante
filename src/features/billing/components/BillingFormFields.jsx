@@ -41,7 +41,7 @@ export const BillingFormFields = ({ formData, handleChange, users, branches, ord
       </select>
     </div>
 
-    {/* ORDEN — ancho completo en sm+ */}
+    {/* ORDEN */}
     <div className="sm:col-span-2 flex flex-col gap-1">
       <label className="text-sm font-bold text-gray-700">Orden</label>
       <select
@@ -69,6 +69,8 @@ export const BillingFormFields = ({ formData, handleChange, users, branches, ord
         value={formData.BillSerie}
         onChange={handleChange}
         placeholder="Ej: A-001"
+        minLength={3}
+        maxLength={35}
         className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none text-sm"
       />
     </div>
@@ -93,9 +95,11 @@ export const BillingFormFields = ({ formData, handleChange, users, branches, ord
       <input
         type="number"
         step="0.01"
+        min="0"
         name="BillSubtotal"
         value={formData.BillSubtotal}
         onChange={handleChange}
+        onInput={(e) => { if (e.target.value < 0) e.target.value = 0; }}
         placeholder="0.00"
         className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none text-sm"
       />
@@ -107,15 +111,17 @@ export const BillingFormFields = ({ formData, handleChange, users, branches, ord
       <input
         type="number"
         step="0.01"
+        min="0"
         name="BillIVA"
         value={formData.BillIVA}
         onChange={handleChange}
+        onInput={(e) => { if (e.target.value < 0) e.target.value = 0; }}
         placeholder="0.00"
         className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none text-sm"
       />
     </div>
 
-    {/* ESTADO — ancho completo en sm+ */}
+    {/* ESTADO */}
     <div className="sm:col-span-2 flex flex-col gap-1">
       <label className="text-sm font-bold text-gray-700">Estado de Factura</label>
       <select

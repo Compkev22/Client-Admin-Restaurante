@@ -8,18 +8,23 @@ export const ReservationFormFields = ({ register, errors, branches, users, isEdi
       <div className="flex flex-col gap-1">
         <label className="text-xs font-black uppercase text-gray-400">Sucursal</label>
         <select
-          {...register("branchId", { required: "Obligatorio" })}
-          className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-kinal-red outline-none bg-white font-bold"
+          {...register("branchId", { required: "La sucursal es obligatoria" })}
+          className={`w-full px-4 py-3 rounded-xl border-2 outline-none bg-white font-bold ${
+            errors.branchId ? "border-red-500" : "border-gray-100 focus:border-kinal-red"
+          }`}
         >
           <option value="">Selecciona...</option>
           {branches.map((b) => <option key={b._id} value={b._id}>{b.name}</option>)}
         </select>
+        {errors.branchId && <p className="text-red-500 text-[10px] font-bold">{errors.branchId.message}</p>}
       </div>
       <div className="flex flex-col gap-1">
         <label className="text-xs font-black uppercase text-gray-400">Cliente</label>
         <select
-          {...register("clientId", { required: "Obligatorio" })}
-          className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-kinal-red outline-none bg-white font-bold"
+          {...register("clientId", { required: "El cliente es obligatorio" })}
+          className={`w-full px-4 py-3 rounded-xl border-2 outline-none bg-white font-bold ${
+            errors.clientId ? "border-red-500" : "border-gray-100 focus:border-kinal-red"
+          }`}
         >
           <option value="">Selecciona cliente...</option>
           {users.filter((u) => u.role === "CLIENT").map((c) => {
@@ -27,6 +32,7 @@ export const ReservationFormFields = ({ register, errors, branches, users, isEdi
             return <option key={id} value={id}>{c.UserName} {c.UserSurname}</option>;
           })}
         </select>
+        {errors.clientId && <p className="text-red-500 text-[10px] font-bold">{errors.clientId.message}</p>}
       </div>
     </div>
 
@@ -37,7 +43,11 @@ export const ReservationFormFields = ({ register, errors, branches, users, isEdi
         <input
           type="date"
           min={todayISO}
-          {...register("date", { required: "Selecciona una fecha" })}
+          {...register("date", {
+            required: "Selecciona una fecha",
+            validate: (v) =>
+              new Date(v) >= new Date(todayISO) || "No puedes reservar en el pasado",
+          })}
           className={`w-full px-4 py-3 rounded-xl border-2 outline-none font-bold ${
             errors.date ? "border-red-500" : "border-gray-100 focus:border-kinal-red"
           }`}
@@ -59,7 +69,17 @@ export const ReservationFormFields = ({ register, errors, branches, users, isEdi
         <label className="text-xs font-black uppercase text-gray-400">Personas</label>
         <input
           type="number"
-          {...register("numberOfPersons", { required: "Ingresa la cantidad", min: { value: 1, message: "Mínimo 1" }, max: { value: 50, message: "Máximo 50" } })}
+          min="1"
+          max="50"
+          onInput={(e) => {
+            if (e.target.value < 1) e.target.value = 1;
+            if (e.target.value > 50) e.target.value = 50;
+          }}
+          {...register("numberOfPersons", {
+            required: "Ingresa la cantidad",
+            min: { value: 1, message: "Mínimo 1" },
+            max: { value: 50, message: "Máximo 50" },
+          })}
           className={`w-full px-4 py-3 rounded-xl border-2 outline-none font-bold ${
             errors.numberOfPersons ? "border-red-500" : "border-gray-100 focus:border-kinal-red"
           }`}
@@ -70,12 +90,17 @@ export const ReservationFormFields = ({ register, errors, branches, users, isEdi
 
     {/* Notas */}
     <div className="flex flex-col gap-1">
-      <label className="text-xs font-black uppercase text-gray-400">Notas</label>
+      <label className="text-xs font-black uppercase text-gray-400">Notas (Opcional)</label>
       <textarea
-        {...register("notes")}
         rows="2"
+        maxLength={250}
+        {...register("notes", {
+          maxLength: { value: 250, message: "Máximo 250 caracteres" },
+        })}
+        placeholder="Indicaciones especiales, alergias, etc."
         className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-kinal-red outline-none resize-none font-medium"
       />
+      {errors.notes && <p className="text-red-500 text-[10px] font-bold">{errors.notes.message}</p>}
     </div>
 
     {/* Estados */}

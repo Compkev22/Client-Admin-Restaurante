@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useSaveReservation } from "../hook/useSaveReservation.js";
 import { useReservationStore, useBranchStore, useUserStore } from "../../users/store/adminStore.js";
 import { Spinner } from "../../auth/components/Spinner.jsx";
-import { showSuccess } from "../../../shared/utils/toast.js";
+import { showSuccess, showError } from "../../../shared/utils/toast.js";
 import { showConfirmToast } from "../../auth/components/ConfirmModal.jsx";
 import { ReservationFormFields } from "./ReservationFormFields.jsx";
 
@@ -21,7 +21,16 @@ export const ReservationModal = ({ isOpen, onClose, item }) => {
     getUsers();
     if (item) {
       const formattedDate = item.date ? new Date(item.date).toISOString().split("T")[0] : "";
-      reset({ branchId: item.branchId?._id || item.branchId, clientId: item.clientId?._id || item.clientId, date: formattedDate, time: item.time, numberOfPersons: item.numberOfPersons, notes: item.notes, status: item.status, statusRes: item.statusRes });
+      reset({
+        branchId: item.branchId?._id || item.branchId,
+        clientId: item.clientId?._id || item.clientId,
+        date: formattedDate,
+        time: item.time,
+        numberOfPersons: item.numberOfPersons,
+        notes: item.notes || "",
+        status: item.status,
+        statusRes: item.statusRes,
+      });
     } else {
       reset({ branchId: "", clientId: "", date: "", time: "", numberOfPersons: 1, notes: "", status: "Pendiente", statusRes: "ACTIVADO" });
     }
@@ -30,15 +39,27 @@ export const ReservationModal = ({ isOpen, onClose, item }) => {
   const onSubmit = async (data) => {
     try {
       const response = await saveReservation(data, item?._id);
-      const mesaMsg = !item && response?.assignedTable ? ` - Mesa #${response.assignedTable.number} asignada` : "";
+      const mesaMsg = !item && response?.assignedTable
+        ? ` - Mesa #${response.assignedTable.number} asignada`
+        : "";
       showSuccess(`${item ? "Actualizada" : "Creada"} con éxito${mesaMsg}`);
       onClose();
-    } catch { /* el store/toast ya lo maneja */ }
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Error al procesar la reservación";
+      showError(msg);
+    }
   };
 
   const handleClose = () => {
     if (isDirty) {
-      showConfirmToast({ title: "Cambios sin guardar", message: "¿Deseas cerrar el formulario?", onConfirm: () => { reset(); onClose(); } });
+      showConfirmToast({
+        title: "Cambios sin guardar",
+        message: "¿Deseas cerrar el formulario?",
+        onConfirm: () => { reset(); onClose(); },
+      });
     } else {
       reset();
       onClose();
