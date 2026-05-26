@@ -16,13 +16,13 @@ export const TableModal = ({ isOpen, onClose, tableData = null }) => {
 
   useEffect(() => {
     if (tableData) {
-      setValue("branchId", tableData.branch?._id || "");
+      setValue("branchId", tableData.branchId?._id || tableData.branch?._id || "");
       setValue("numberTable", tableData.numberTable);
       setValue("capacity", tableData.capacity);
       setValue("availability", tableData.availability);
       setValue("TableStatus", tableData.TableStatus);
-      setValue("coordsX", tableData.coords?.[0] || 0);
-      setValue("coordsY", tableData.coords?.[1] || 0);
+      setValue("coordsX", tableData.Coordinates?.[0] ?? tableData.coords?.[0] ?? 0);
+      setValue("coordsY", tableData.Coordinates?.[1] ?? tableData.coords?.[1] ?? 0);
     } else {
       reset();
     }
@@ -30,17 +30,26 @@ export const TableModal = ({ isOpen, onClose, tableData = null }) => {
 
   const onSubmit = async (data) => {
     try {
-      const formattedData = { ...data, coords: [Number(data.coordsX), Number(data.coordsY)] };
+      const formattedData = {
+        ...data,
+        numberTable: Number(data.numberTable),
+        capacity: Number(data.capacity),
+        coords: [Number(data.coordsX), Number(data.coordsY)],
+      };
       if (tableData) {
         await updateTable(tableData._id, formattedData);
-        showSuccess("Mesa actualizada");
+        showSuccess("Mesa actualizada correctamente");
       } else {
         await createTable(formattedData);
-        showSuccess("Mesa creada");
+        showSuccess("Mesa creada correctamente");
       }
       onClose();
-    } catch {
-      showError("No se pudo guardar la mesa");
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "No se pudo guardar la mesa";
+      showError(msg);
     }
   };
 
@@ -91,7 +100,7 @@ export const TableModal = ({ isOpen, onClose, tableData = null }) => {
             form="table-form"
             className="flex-[2] bg-kinal-red text-white font-black py-3 px-8 rounded-xl shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest"
           >
-            Guardar Mesa
+            {tableData ? "Actualizar Mesa" : "Guardar Mesa"}
           </button>
         </div>
       </div>

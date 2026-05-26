@@ -17,7 +17,13 @@ export const ServiceModal = ({ isOpen, onClose, serviceData = null }) => {
   useEffect(() => {
     if (!isOpen) return;
     if (serviceData) {
-      reset({ Name: serviceData.Name || "", Description: serviceData.Description || "", AdditionalPrice: serviceData.AdditionalPrice || "", status: serviceData.status || "ACTIVE", image: null });
+      reset({
+        Name: serviceData.Name || "",
+        Description: serviceData.Description || "",
+        AdditionalPrice: serviceData.AdditionalPrice || "",
+        status: serviceData.status || "ACTIVE",
+        image: null,
+      });
       setPreview(serviceData.image?.url || null);
     } else {
       reset({ Name: "", Description: "", AdditionalPrice: "", status: "ACTIVE", image: null });
@@ -38,8 +44,8 @@ export const ServiceModal = ({ isOpen, onClose, serviceData = null }) => {
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
-      formData.append("Name", data.Name);
-      formData.append("Description", data.Description);
+      formData.append("Name", data.Name.trim());
+      formData.append("Description", data.Description.trim());
       formData.append("AdditionalPrice", Number(data.AdditionalPrice));
       formData.append("status", data.status);
       if (data.image?.[0]) formData.append("image", data.image[0]);
@@ -48,11 +54,18 @@ export const ServiceModal = ({ isOpen, onClose, serviceData = null }) => {
         ? await updateAdditionalService(serviceData._id, formData)
         : await createAdditionalService(formData);
 
-      if (!ok) { showError("Error al guardar el servicio"); return; }
+      if (!ok) {
+        showError("Error al guardar el servicio");
+        return;
+      }
       showSuccess(serviceData ? "Servicio actualizado correctamente" : "Servicio creado correctamente");
       handleClose();
-    } catch {
-      showError("Error al guardar el servicio");
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Error al guardar el servicio";
+      showError(msg);
     }
   };
 
