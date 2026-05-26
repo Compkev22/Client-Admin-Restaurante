@@ -1,4 +1,3 @@
-// features/events/components/EventHeader.jsx
 import createIcon from "../../../assets/icons/Create.svg";
 
 export const EventHeader = ({ onCreateClick }) => (

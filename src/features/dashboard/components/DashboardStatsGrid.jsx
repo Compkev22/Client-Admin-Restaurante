@@ -1,4 +1,3 @@
-// features/dashboard/components/DashboardStatsGrid.jsx
 import { DashboardStatCard } from './DashboardStatCard.jsx';
 
 import CashIcon  from '../../../assets/icons/Cash.svg';

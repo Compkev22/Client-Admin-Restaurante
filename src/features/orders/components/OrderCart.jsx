@@ -1,4 +1,3 @@
-// features/orders/components/OrderCart.jsx
 import iconDelete from "../../../assets/icons/Delete.svg";
 
 export const OrderCart = ({ menuProducts, orderList, selectedProduct, setSelectedProduct, onAdd, onRemove }) => (

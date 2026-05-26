@@ -1,4 +1,3 @@
-// features/dashboard/components/DashboardView.jsx
 import { useAuthStore }            from '../../auth/store/authStore.js';
 import { useDashboardData }        from '../hooks/useDashboardData.js';
 import { DashboardHeader }         from './DashboardHeader.jsx';

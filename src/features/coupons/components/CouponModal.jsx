@@ -1,4 +1,3 @@
-// features/coupons/components/CouponModal.jsx
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useSaveCoupon } from "../hook/useSaveCoupon.js";

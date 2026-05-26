@@ -1,6 +1,5 @@
 import { toast } from "react-hot-toast";
 
-// Colores y estilos personalizados
 const baseStyle = {
   borderRadius: "8px",
   fontWeight: 600,

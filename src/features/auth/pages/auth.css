@@ -6,7 +6,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Amarillo pastel/crema suave para no lastimar la vista */
   background-color: #fef3c7; 
   font-family: 'Inter', system-ui, sans-serif;
 }
@@ -30,7 +29,6 @@
   margin-bottom: 2rem;
 }
 
-/* ¡Aquí controlamos al pollo rebelde! */
 .login-logo {
   height: 120px;
   width: auto;

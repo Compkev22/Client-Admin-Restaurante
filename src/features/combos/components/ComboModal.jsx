@@ -153,7 +153,6 @@ export const ComboModal = ({ isOpen, onClose, comboData = null }) => {
           </button>
         </div>
 
-        {/* Cuerpo con scroll */}
         <div className="overflow-y-auto px-6 md:px-8 pb-6 md:pb-8 flex-1">
           <form onSubmit={handleSubmit} className="space-y-5">
 

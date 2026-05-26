@@ -1,4 +1,3 @@
-// features/inventory/components/InventoryHeader.jsx
 import createIcon from "../../../assets/icons/Create.svg";
 
 export const InventoryHeader = ({ onCreateClick }) => {

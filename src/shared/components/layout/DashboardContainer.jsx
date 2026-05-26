@@ -1,11 +1,9 @@
-// src/shared/components/layout/DashboardContainer.jsx
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Navbar } from "./Navbar.jsx";
 import { Sidebar } from "./Sidebar.jsx";
 
 export const DashboardContainer = () => {
-  // Estado del menú hamburguesa para móvil/tablet
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (

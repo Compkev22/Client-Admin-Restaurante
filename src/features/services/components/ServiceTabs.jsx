@@ -1,4 +1,3 @@
-// features/services/components/ServiceTabs.jsx
 const TABS = ["Todos", "Activos", "Inactivos"];
 
 export const ServiceTabs = ({ activeTab, onTabChange }) => (

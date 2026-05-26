@@ -1,4 +1,3 @@
-// features/branches/components/BranchCard.jsx
 import { useBranchStore } from "../../users/store/adminStore.js";
 import { showConfirmToast } from "../../auth/components/ConfirmModal.jsx";
 

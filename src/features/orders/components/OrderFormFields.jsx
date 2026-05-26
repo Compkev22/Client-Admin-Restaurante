@@ -1,4 +1,3 @@
-// features/orders/components/OrderFormFields.jsx
 export const OrderFormFields = ({
   orderType,
   setOrderType,
@@ -6,7 +5,6 @@ export const OrderFormFields = ({
   mesaId,
   setMesaId,
   disabled = false,
-  // Props para el selector de empleado
   users = [],
   selectedEmpleadoId = "",
   setSelectedEmpleadoId = () => {},
@@ -32,7 +30,7 @@ export const OrderFormFields = ({
         </select>
       </div>
 
-      {/* Mesa (solo DINE_IN) o nombre de cliente (solo no-DINE_IN) */}
+      {/* Mesa */}
       {orderType === "DINE_IN" ? (
         <div className="flex flex-col gap-1 animate-fadeIn">
           <label className="text-xs font-black text-gray-500 uppercase tracking-widest">

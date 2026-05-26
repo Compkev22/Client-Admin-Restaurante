@@ -1,4 +1,3 @@
-// features/inventory/components/InventoryView.jsx
 import { useEffect, useState } from "react";
 import { useInventoryStore, useBranchStore } from "../../users/store/adminStore.js";
 import { showConfirmToast } from "../../auth/components/ConfirmModal.jsx";

@@ -1,4 +1,3 @@
-// features/branches/components/BranchModal.jsx
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useBranchStore } from "../../users/store/adminStore.js";
@@ -78,11 +77,6 @@ export const BranchModal = ({ isOpen, onClose, branch }) => {
   if (!isOpen) return null;
 
   return (
-    /*
-      Overlay que ocupa toda la pantalla.
-      El panel usa mx-4 para margen lateral en móvil, max-w-2xl en desktop.
-      max-h asegura que en pantallas pequeñas el modal tenga scroll interno.
-    */
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn p-4">
       <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[92vh]">
 
@@ -101,13 +95,13 @@ export const BranchModal = ({ isOpen, onClose, branch }) => {
           </button>
         </div>
 
-        {/* Cuerpo con scroll interno — esencial en móvil con muchos campos */}
+        {/* Cuerpo con scroll interno */}
         <div className="overflow-y-auto px-6 md:px-8 pb-6 md:pb-8 flex-1">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <BranchImageUpload preview={preview} register={register} />
             <BranchFormFields register={register} errors={errors} />
 
-            {/* Botones de acción: columna en móvil muy pequeño, fila en sm+ */}
+            {/* Botones de acción */}
             <div className="pt-4 flex flex-col sm:flex-row gap-3">
               <button
                 type="button"

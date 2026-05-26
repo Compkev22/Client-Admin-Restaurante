@@ -1,4 +1,3 @@
-// features/services/components/ServiceCard.jsx
 import iconEdit from "../../../assets/icons/Edit.svg";
 import iconDelete from "../../../assets/icons/Delete.svg";
 

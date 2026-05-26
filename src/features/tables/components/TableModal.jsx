@@ -1,4 +1,3 @@
-// features/tables/components/TableModal.jsx
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useTableStore, useBranchStore } from "../../users/store/adminStore.js";

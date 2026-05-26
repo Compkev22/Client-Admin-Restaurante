@@ -1,4 +1,3 @@
-// features/dashboard/components/DashboardHeader.jsx
 import HelloIcon from '../../../assets/icons/Hello.svg';
 
 const formatTodayDate = () => {

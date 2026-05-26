@@ -1,4 +1,3 @@
-// src/features/reviews/components/ReviewTabs.jsx
 export const ReviewTabs = ({ activeTab, setActiveTab }) => {
   const tabs = ["TODAS", "5 ESTRELLAS", "BUENAS (3-4)", "CRÍTICAS (1-2)", "OCULTAS"];
 

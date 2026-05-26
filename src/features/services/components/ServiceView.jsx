@@ -1,4 +1,3 @@
-// features/services/components/ServiceView.jsx
 import { useEffect, useState } from "react";
 import { useAdditionalServicesStore } from "../../users/store/adminStore.js";
 import { Spinner } from "../../auth/components/Spinner.jsx";

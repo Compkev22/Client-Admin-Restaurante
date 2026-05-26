@@ -3,7 +3,6 @@ import { showSuccess, showError } from "../../../shared/utils/toast";
 
 export const useSaveEvent = () => {
     const saveEvent = async (data, eventId = null) => {
-        // Extraemos solo los IDs limpios de los objetos populados para evitar fallos de casteo en Mongo
         const cleanBranchId = typeof data.branchId === 'object' ? data.branchId?._id : data.branchId;
         const cleanClientId = typeof data.clientId === 'object' ? data.clientId?._id || data.clientId?.uid : data.clientId;
 
@@ -41,10 +40,8 @@ export const useSaveEvent = () => {
         }
     };
 
-    // Método para cambiar lógicamente el estado a Cancelado
     const cancelEvent = async (id, currentEventData) => {
         try {
-            // Mandamos el payload con el estado actualizado
             const payload = {
                 ...currentEventData,
                 branchId: currentEventData.branchId?._id || currentEventData.branchId,
@@ -60,7 +57,6 @@ export const useSaveEvent = () => {
         }
     };
 
-    // Método para eliminar físicamente el registro de la DB
     const deleteEventPermanently = async (id) => {
         try {
             await axiosAdmin.delete(`/events/${id}`);

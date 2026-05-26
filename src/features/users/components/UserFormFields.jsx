@@ -1,4 +1,3 @@
-// src/features/users/components/UserFormFields.jsx
 export const UserFormFields = ({ register, errors = {}, userData, selectedRole, setSelectedRole, setValue, branches }) => (
   <div className="space-y-5">
     {/* Nombres y Apellidos */}
@@ -66,7 +65,7 @@ export const UserFormFields = ({ register, errors = {}, userData, selectedRole, 
       {errors.UserPhone && <p className="text-red-500 text-[10px] font-bold mt-0.5">{errors.UserPhone.message}</p>}
     </div>
 
-    {/* Contraseña solo en creación */}
+    {/* Contraseña */}
     {!userData && (
       <div className="flex flex-col gap-1">
         <label className="text-xs font-black text-gray-500 uppercase tracking-widest">Contraseña Temporal</label>

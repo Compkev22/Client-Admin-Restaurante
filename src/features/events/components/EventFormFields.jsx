@@ -1,8 +1,7 @@
-// features/events/components/EventFormFields.jsx
 export const EventFormFields = ({ register, errors, branches, users, minDateStr }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-    {/* Nombre — ancho completo */}
+    {/* Nombre */}
     <div className="sm:col-span-2 space-y-1">
       <label className="text-[10px] font-black text-gray-400 uppercase ml-1 italic">
         Nombre del Evento
@@ -149,7 +148,7 @@ export const EventFormFields = ({ register, errors, branches, users, minDateStr 
       )}
     </div>
 
-    {/* Estado — ancho completo */}
+    {/* Estado */}
     <div className="sm:col-span-2 space-y-1">
       <label className="text-[10px] font-black text-gray-400 uppercase ml-1 italic">
         Estado del Evento

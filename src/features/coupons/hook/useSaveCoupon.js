@@ -19,7 +19,6 @@ export const useSaveCoupon = () => {
                 await createCoupon(couponPayload);
             }
         } catch (err) {
-            // Re-lanzar el error para que el Modal pueda mostrar el mensaje real
             throw err;
         }
     };

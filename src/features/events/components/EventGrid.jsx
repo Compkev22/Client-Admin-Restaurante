@@ -1,4 +1,3 @@
-// features/events/components/EventGrid.jsx
 import { EventCard } from "./EventCard.jsx";
 
 export const EventGrid = ({ events, onEdit, onAction }) => (

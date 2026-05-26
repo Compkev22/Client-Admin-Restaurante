@@ -1,4 +1,3 @@
-// src/features/auth/components/ShowConfirmToast.jsx
 import toast from "react-hot-toast";
 
 export function ShowConfirmToast({ title, message, onConfirm }) {

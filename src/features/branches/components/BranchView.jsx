@@ -1,4 +1,3 @@
-// features/branches/components/BranchView.jsx
 import { useEffect, useState } from "react";
 import { useBranchStore } from "../../users/store/adminStore.js";
 import { showError } from "../../../shared/utils/toast.js";

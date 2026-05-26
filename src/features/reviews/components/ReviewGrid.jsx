@@ -1,4 +1,3 @@
-// src/features/reviews/components/ReviewGrid.jsx
 import { ReviewCard } from "./ReviewCard.jsx";
 
 export const ReviewGrid = ({ reviews, onEdit, onDelete }) => (

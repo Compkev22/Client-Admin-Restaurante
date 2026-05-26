@@ -1,8 +1,6 @@
-// ComboListTable.jsx
 import iconDelete from "../../../assets/icons/Delete.svg";
 
 export const ComboListTable = ({ comboList, onQuantityChange, onRemove }) => (
-  /* overflow-x-auto permite scroll horizontal en móvil sin romper el layout */
   <div className="bg-white rounded-xl border border-gray-200 overflow-hidden min-h-[120px]">
     {comboList.length > 0 ? (
       <div className="overflow-x-auto">

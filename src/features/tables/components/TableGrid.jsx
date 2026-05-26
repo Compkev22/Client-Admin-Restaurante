@@ -1,4 +1,3 @@
-// features/tables/components/TableGrid.jsx
 import { Spinner } from "../../auth/components/Spinner.jsx";
 import { TableCard } from "./TableCard.jsx";
 

@@ -21,10 +21,8 @@ import { UserPage } from "../../features/users/components/UserPage.jsx";
 
 export const AppRoutes = () => (
   <Routes>
-    {/* PÚBLICO: Login */}
     <Route path="/" element={<AuthPage />} />
 
-    {/* PROTEGIDO: Verifica auth antes de renderizar el dashboard */}
     <Route element={<ProtectedRoute />}>
       <Route path="/dashboard" element={<DashboardContainer />}>
         <Route index element={<DashboardOverview />} />
@@ -44,7 +42,6 @@ export const AppRoutes = () => (
       </Route>
     </Route>
 
-    {/* 404 */}
     <Route
       path="*"
       element={

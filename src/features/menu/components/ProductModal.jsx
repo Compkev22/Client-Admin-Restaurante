@@ -1,4 +1,3 @@
-// features/menu/components/ProductModal.jsx
 import { useEffect, useState } from "react";
 import iconDelete from "../../../assets/icons/Delete.svg";
 import { useBranchStore, useInventoryStore } from "../../users/store/adminStore.js";
@@ -163,7 +162,6 @@ export const ProductModal = ({ isOpen, onClose, productData = null }) => {
           </button>
         </div>
 
-        {/* Cuerpo con scroll */}
         <div className="overflow-y-auto px-6 md:px-8 py-6 md:py-8 flex-1">
           <form onSubmit={handleSubmit} className="space-y-6">
 

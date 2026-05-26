@@ -22,7 +22,6 @@
   animation: fadeIn 0.15s ease-out;
 }
 
-/* Oculta la scrollbar de los tabs horizontales sin quitar el scroll funcional */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -31,7 +30,6 @@
   display: none;
 }
 
-/* Evita desbordamiento horizontal global en móvil */
 html, body, #root {
   overflow-x: hidden;
 }

@@ -1,4 +1,3 @@
-// src/features/auth/components/Spinner.jsx
 export const Spinner = ({ small = false }) => {
     if (small) {
         return (

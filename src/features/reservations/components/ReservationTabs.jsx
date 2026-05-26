@@ -1,4 +1,3 @@
-// features/reservations/components/ReservationTabs.jsx
 const TABS = ["Todas", "Pendiente", "Confirmada", "Completada", "Cancelada"];
 
 export const ReservationTabs = ({ activeTab, onTabChange }) => (

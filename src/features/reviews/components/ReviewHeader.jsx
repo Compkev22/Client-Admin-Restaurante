@@ -1,4 +1,3 @@
-// src/features/reviews/components/ReviewHeader.jsx
 export const ReviewHeader = ({ stats }) => (
   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
     <div>

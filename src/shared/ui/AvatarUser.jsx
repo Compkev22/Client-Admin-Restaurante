@@ -1,13 +1,9 @@
-// src/shared/ui/AvatarUser.jsx
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-// Ajusta esta ruta a donde tengas realmente tu useAuthStore en el restaurante
 import { useAuthStore } from "../../features/auth/store/authStore"; 
-// NUEVO IMPORT DE TU IMAGEN
 import defaultAvatarImg from "../../assets/img/defaultAvatar.jpeg";
 
 export const AvatarUser = () => {
-    // Simulamos el usuario mientras conectas el Zustand real
     const { user, logout } = useAuthStore() || { user: { username: "Kevin Velásquez", email: "admin@kfc.com" }, logout: () => {} };
     const [open, setOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -30,7 +26,6 @@ export const AvatarUser = () => {
         navigate("/", { replace: true });
     };
 
-    // Usamos tu imagen local por defecto
     const avatarSrc = user?.profilePictureUrl && user.profilePictureUrl.trim() !== ""
         ? user.profilePictureUrl
         : defaultAvatarImg;
@@ -47,7 +42,6 @@ export const AvatarUser = () => {
                         src={avatarSrc} 
                         alt={user?.username} 
                         className="w-full h-full object-cover"
-                        // Añadimos el onError por si la base de datos devuelve una URL rota
                         onError={(e) => {
                             e.target.onerror = null;
                             e.target.src = defaultAvatarImg;

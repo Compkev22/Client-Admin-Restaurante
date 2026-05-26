@@ -1,4 +1,3 @@
-// features/branches/components/BranchGrid.jsx
 import { BranchCard } from "./BranchCard.jsx";
 import { Spinner } from "../../auth/components/Spinner.jsx";
 

@@ -1,4 +1,3 @@
-// BillingView.jsx
 import { useState } from "react";
 import { BillingStats } from "./BillingStats.jsx";
 import { InvoicesTable } from "./InvoicesTable.jsx";

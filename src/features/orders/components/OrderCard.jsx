@@ -1,4 +1,3 @@
-// features/orders/components/OrderCard.jsx
 import orderTimeIcon from "../../../assets/icons/orderTime.svg";
 
 export const getOrderTypeStyle = (type) => {

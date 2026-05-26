@@ -1,9 +1,7 @@
-// src/features/auth/components/ForgotPasswordForm.jsx
 export const ForgotPasswordForm = ({ onSwitch }) => {
     
     const handleSubmit = (e) => {
         e.preventDefault();
-        // TODO: Integrar Axios
         alert("Si el correo existe, te enviaremos las instrucciones.");
         onSwitch(); 
     };

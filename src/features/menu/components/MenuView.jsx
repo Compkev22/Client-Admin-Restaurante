@@ -1,4 +1,3 @@
-// features/menu/components/MenuView.jsx
 import { useEffect, useState } from "react";
 import { ProductModal } from "./ProductModal.jsx";
 import { useProductStore } from "../../../features/users/store/adminStore.js";

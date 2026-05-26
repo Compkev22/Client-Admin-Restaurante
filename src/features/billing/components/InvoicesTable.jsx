@@ -42,7 +42,7 @@ export const InvoicesTable = () => {
 
   return (
     <>
-      {/* ── TARJETAS MÓVIL (< md) ── */}
+      {/* ── TARJETAS MÓVIL */}
       <div className="grid md:hidden gap-4">
         {billings.map((inv) => (
           <div
@@ -102,7 +102,7 @@ export const InvoicesTable = () => {
         ))}
       </div>
 
-      {/* ── TABLA ESCRITORIO (≥ md) ── */}
+      {/* ── TABLA ESCRITORIO */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left border-collapse min-w-[540px]">
           <thead>

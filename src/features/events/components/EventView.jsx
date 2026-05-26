@@ -1,4 +1,3 @@
-// features/events/components/EventView.jsx
 import { useState, useEffect, useCallback } from "react";
 import { EventModal } from "./EventModal.jsx";
 import { EventGrid } from "./EventGrid.jsx";

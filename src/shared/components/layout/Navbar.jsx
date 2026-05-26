@@ -1,8 +1,6 @@
-// src/shared/components/layout/Navbar.jsx
 import imgLogo from "../../../assets/img/KinalFriedChickenLogo.png";
 import { AvatarUser } from "../../ui/AvatarUser.jsx";
 
-// Recibe onMenuToggle para abrir/cerrar el sidebar en móvil
 export const Navbar = ({ onMenuToggle }) => {
   return (
     <nav className="bg-gray-100 border-b border-gray-200 sticky top-0 z-50">

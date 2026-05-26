@@ -1,4 +1,3 @@
-// features/branches/components/BranchFormFields.jsx
 export const BranchFormFields = ({ register, errors }) => {
   const inputClass =
     "w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-kinal-orange outline-none text-sm transition-colors";
@@ -99,7 +98,7 @@ export const BranchFormFields = ({ register, errors }) => {
         </select>
       </div>
 
-      {/* Teléfono — type="tel" + bloqueo de no-numéricos + maxLength 8 */}
+      {/* Teléfono */}
       <div className="flex flex-col gap-1">
         <label className={labelClass}>
           Teléfono <span className="text-gray-400 font-normal text-xs">(8 dígitos)</span>

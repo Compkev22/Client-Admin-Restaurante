@@ -1,4 +1,3 @@
-// features/tables/components/TableHeader.jsx
 import createIcon from "../../../assets/icons/Create.svg";
 
 export const TableHeader = ({ onCreateClick }) => (

@@ -1,4 +1,3 @@
-// features/services/components/ServiceFormFields.jsx
 export const ServiceFormFields = ({ register, errors }) => (
   <div className="grid grid-cols-1 gap-4">
 

@@ -22,7 +22,6 @@ export const useSaveReservation = () => {
                 return await createReservation(reservationPayload);
             }
         } catch (err) {
-            // Re-lanzar para que el Modal muestre el mensaje real del backend
             throw err;
         }
     };

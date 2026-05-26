@@ -9,7 +9,6 @@ export const AuthPage = () => {
     return (
         <div className="min-h-screen w-full flex items-center justify-center bg-kinal-yellow/20 relative overflow-hidden">
             
-            {/* El card ahora con clases de Tailwind v4 */}
             <div className="w-full max-w-md p-10 bg-white rounded-3xl shadow-2xl z-10 mx-4 border border-gray-100 animate-fadeIn">
                 
                 <div className="flex flex-col items-center mb-8">

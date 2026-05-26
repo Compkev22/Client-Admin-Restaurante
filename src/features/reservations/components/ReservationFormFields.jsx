@@ -1,9 +1,6 @@
-// features/reservations/components/ReservationFormFields.jsx
 const todayISO = new Date().toISOString().split("T")[0];
 
 export const ReservationFormFields = ({ register, errors, branches, users, isEditing }) => {
-  // FIX #2: Excluir "Consumidor Final" — no tiene sentido que un cliente
-  // anónimo realice una reservación. Se filtra por nombre además del rol.
   const clientOptions = users.filter(
     (u) =>
       u.role === "CLIENT" &&

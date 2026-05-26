@@ -1,4 +1,3 @@
-// features/orders/components/OrderModal.jsx
 import { useState, useEffect } from "react";
 import { OrderFormFields } from "./OrderFormFields.jsx";
 import { OrderCart } from "./OrderCart.jsx";
@@ -166,7 +165,6 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
           </button>
         </div>
 
-        {/* Banner informativo en modo edición */}
         {isEditMode && (
           <div className="mx-6 md:mx-8 mt-4 bg-orange-50 border border-orange-200 rounded-2xl px-4 py-3 flex items-start gap-3 shrink-0">
             <span className="text-kinal-orange text-lg leading-none mt-0.5">ℹ</span>
@@ -179,11 +177,10 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
           </div>
         )}
 
-        {/* Cuerpo con scroll */}
         <div className="overflow-y-auto flex-1 px-6 md:px-8 py-6">
           <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
 
-            {/* Sucursal — siempre visible, solo bloqueada en edición */}
+            {/* Sucursal */}
             <div className="bg-orange-50 p-4 md:p-5 rounded-2xl border border-orange-100">
               <div className="space-y-1">
                 <label className="text-xs font-black text-kinal-orange uppercase tracking-widest">
@@ -208,7 +205,7 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
               </div>
             </div>
 
-            {/* Tipo de orden, mesa/cliente y empleado (condicional) */}
+            {/* Tipo de orden */}
             <OrderFormFields
               orderType={orderType}
               setOrderType={setOrderType}
@@ -216,8 +213,6 @@ export const OrderModal = ({ isOpen, onClose, orderToEdit = null }) => {
               mesaId={mesaId}
               setMesaId={setMesaId}
               disabled={isEditMode}
-              // Empleado solo se muestra si NO estamos en modo edición
-              // (en edición ya está bloqueado e irrelevante cambiarlo)
               showEmpleado={!isEditMode}
               users={filteredEmployees}
               selectedEmpleadoId={selectedEmpleadoId}

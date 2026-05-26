@@ -1,4 +1,3 @@
-// src/features/users/components/UserModal.jsx
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useSaveUser } from "../hooks/useSaveUser.js";
@@ -56,7 +55,6 @@ export const UserModal = ({ isOpen, onClose, userData = null }) => {
           </button>
         </div>
 
-        {/* Cuerpo con scroll */}
         <div className="overflow-y-auto flex-1 px-6 md:px-8 py-6">
           <form onSubmit={handleSubmit(onSubmit)} id="user-form">
             <UserFormFields

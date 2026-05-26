@@ -1,4 +1,3 @@
-// features/tables/components/TableFormFields.jsx
 export const TableFormFields = ({ register, errors, branches }) => (
   <div className="space-y-5">
 

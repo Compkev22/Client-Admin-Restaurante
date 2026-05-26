@@ -1,4 +1,3 @@
-// features/reservations/components/ReservationGrid.jsx
 import { Spinner } from "../../auth/components/Spinner.jsx";
 import { ReservationCard } from "./ReservationCard.jsx";
 

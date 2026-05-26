@@ -1,4 +1,3 @@
-// features/dashboard/components/DashboardUpcomingRes.jsx
 import { useNavigate } from 'react-router-dom';
 
 const STATUS_COLORS_RES = {

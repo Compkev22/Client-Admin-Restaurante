@@ -1,4 +1,3 @@
-// features/branches/components/BranchHeader.jsx
 import createIcon from "../../../assets/icons/Create.svg";
 
 export const BranchHeader = ({ onCreateClick }) => {

@@ -1,4 +1,3 @@
-// BillingFormFields.jsx
 export const BillingFormFields = ({ formData, handleChange, users, branches, orders }) => (
   <>
     {/* CLIENTE */}

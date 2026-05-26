@@ -1,4 +1,3 @@
-// src/features/users/components/UserPage.jsx
 import { useState, useEffect } from "react";
 import { UserModal } from "./UserModal.jsx";
 import { UserCard } from "./UserCard.jsx";

@@ -1,4 +1,3 @@
-// features/dashboard/components/DashboardRecentOrders.jsx
 import { useNavigate } from 'react-router-dom';
 
 import DineInIcon   from '../../../assets/icons/DineIn.svg';

@@ -1,4 +1,3 @@
-// src/features/auth/store/authStore.js
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { toast } from 'react-hot-toast';
@@ -24,11 +23,11 @@ export const useAuthStore = create(
                 const user = get().user;
                 const isAdmin = user?.role === "PLATFORM_ADMIN";
 
-                // SIEMPRE que inicie la app, reseteamos loading y error para evitar bloqueos
+
                 set({ loading: false, error: null, isLoadingAuth: false });
 
                 if (token && !isAdmin) {
-                    get().logout(); // Usamos la función logout que ya tienes para limpiar todo
+                    get().logout(); 
                     set({ error: "No tienes permiso para acceder como administrador" });
                 }
             },
@@ -43,9 +42,7 @@ export const useAuthStore = create(
                 })
             },
 
-            // ------------------------------------------------------------------
             login: async ({ emailOrUsername, password }) => {
-                // 1. Limpieza total antes de empezar
                 set({ loading: true, error: null });
 
                 try {
@@ -56,7 +53,7 @@ export const useAuthStore = create(
                         const message = "No tienes permisos para acceder como administrador";
                         set({
                             user: null, token: null, isAuthenticated: false,
-                            loading: false, // <--- DESBLOQUEO
+                            loading: false, 
                             error: message
                         });
                         toast.error(message);
@@ -67,7 +64,7 @@ export const useAuthStore = create(
                         user: data.userDetails,
                         token: data.accessToken || data.token,
                         isAuthenticated: true,
-                        loading: false, // <--- DESBLOQUEO EXITOSO
+                        loading: false, 
                     });
                     return { success: true };
 
@@ -78,7 +75,6 @@ export const useAuthStore = create(
                         errorMessage = "Usuario o contraseña incorrectos";
                     }
 
-                    // 2. DESBLOQUEO CRÍTICO: Si no haces esto, el botón se queda "Iniciando..." para siempre
                     set({ loading: false, error: errorMessage });
                     toast.error(errorMessage);
                     return { success: false, error: errorMessage };

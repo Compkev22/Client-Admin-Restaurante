@@ -1,4 +1,3 @@
-// features/tables/components/TableView.jsx
 import { useEffect, useState } from "react";
 import { useTableStore } from "../../users/store/adminStore.js";
 import { showConfirmToast } from "../../auth/components/ConfirmModal.jsx";

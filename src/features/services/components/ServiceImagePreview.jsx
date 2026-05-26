@@ -1,4 +1,3 @@
-// features/services/components/ServiceImagePreview.jsx
 export const ServiceImagePreview = ({ preview, register }) => (
   <div className="space-y-4">
     <div className="flex justify-center">

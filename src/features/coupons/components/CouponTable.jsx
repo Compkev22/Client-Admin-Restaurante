@@ -1,4 +1,3 @@
-// features/coupons/components/CouponTable.jsx
 import { Spinner } from "../../auth/components/Spinner.jsx";
 import iconEdit from "../../../assets/icons/Edit.svg";
 import iconDelete from "../../../assets/icons/Delete.svg";
@@ -20,7 +19,7 @@ export const CouponTable = ({ coupons, loading, error, onEdit, onToggleStatus })
 
   return (
     <>
-      {/* ── TARJETAS MÓVIL (< md) ── */}
+      {/* TARJETAS MÓVIL */}
       <div className="grid md:hidden gap-4">
         {coupons.map((c) => (
           <div
@@ -94,7 +93,7 @@ export const CouponTable = ({ coupons, loading, error, onEdit, onToggleStatus })
         ))}
       </div>
 
-      {/* ── TABLA ESCRITORIO (≥ md) ── */}
+      {/* TABLA ESCRITORIO */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left min-w-[580px]">
           <thead className="bg-gray-50">

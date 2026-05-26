@@ -1,4 +1,3 @@
-// features/orders/components/OrderView.jsx
 import { useState, useEffect } from "react";
 import { OrderHeader } from "./OrderHeader.jsx";
 import { OrderTabs } from "./OrderTabs.jsx";

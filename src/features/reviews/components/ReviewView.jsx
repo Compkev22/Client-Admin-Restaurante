@@ -1,4 +1,3 @@
-// src/features/reviews/components/ReviewView.jsx
 import { useState, useEffect, useMemo } from "react";
 import { ReviewModal } from "./ReviewModal.jsx";
 import { ReviewHeader } from "./ReviewHeader.jsx";

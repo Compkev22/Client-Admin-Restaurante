@@ -1,4 +1,3 @@
-// BillingStats.jsx
 export const BillingStats = () => {
   const stats = [
     { label: "Ventas del Día", value: "Q 4,250.00", color: "bg-yellow-400", text: "text-red-900" },

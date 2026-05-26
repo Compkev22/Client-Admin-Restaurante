@@ -1,4 +1,3 @@
-// features/tables/components/TableTabs.jsx
 const TABS = ["Todas", "Disponible", "Ocupada", "Mantenimiento"];
 
 export const TableTabs = ({ activeTab, onTabChange }) => (

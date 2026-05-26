@@ -1,4 +1,3 @@
-// features/coupons/components/CouponHeader.jsx
 import createIcon from "../../../assets/icons/Create.svg";
 
 export const CouponHeader = ({ onCreateClick }) => {

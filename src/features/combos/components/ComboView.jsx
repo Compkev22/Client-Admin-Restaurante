@@ -1,4 +1,3 @@
-// ComboView.jsx
 import { useEffect, useState } from "react";
 import { ComboCard } from "./ComboCard.jsx";
 import { ComboModal } from "./ComboModal.jsx";

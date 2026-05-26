@@ -1,4 +1,3 @@
-// src/features/users/components/UserCard.jsx
 import iconEdit from "../../../assets/icons/Edit.svg";
 import iconDelete from "../../../assets/icons/Delete.svg";
 import UserVerifyIcon from "../../../assets/icons/UserVerify.svg";
@@ -20,7 +19,7 @@ export const UserCard = ({ user, onEdit, onDelete }) => {
   return (
     <div className={`bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all flex flex-col ${isInactive ? "opacity-60 grayscale" : ""}`}>
 
-      {/* Avatar + info */}
+      {/* Avatar */}
       <div className="flex items-start gap-3 md:gap-4 mb-5">
         <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center font-black text-lg md:text-xl border-2 shrink-0 ${style.bg} ${style.text} border-white ring-2 ring-gray-100`}>
           {initials}
@@ -60,7 +59,6 @@ export const UserCard = ({ user, onEdit, onDelete }) => {
         )}
       </div>
 
-      {/* Footer de la card */}
       <div className="flex justify-between items-center border-t border-gray-50 pt-4">
         <span className={`text-[10px] font-black uppercase px-2 py-1 rounded shrink-0 ${
           isInactive ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"

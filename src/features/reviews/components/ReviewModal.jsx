@@ -1,4 +1,3 @@
-// src/features/reviews/components/ReviewModal.jsx
 import { useState, useEffect } from "react";
 
 export const ReviewModal = ({ isOpen, onClose, reviewData, onModerate }) => {
@@ -34,7 +33,6 @@ export const ReviewModal = ({ isOpen, onClose, reviewData, onModerate }) => {
           </button>
         </header>
 
-        {/* Cuerpo con scroll */}
         <form onSubmit={handleSubmit} className="overflow-y-auto flex-1 px-6 md:px-8 py-6 space-y-5">
           <div className="bg-gray-50 rounded-3xl p-5 text-center">
             <div className="flex justify-center gap-2">
@@ -71,7 +69,6 @@ export const ReviewModal = ({ isOpen, onClose, reviewData, onModerate }) => {
             </label>
           </div>
 
-          {/* Botones dentro del scroll para que no queden cortados en pantallas pequeñas */}
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <button
               type="button"

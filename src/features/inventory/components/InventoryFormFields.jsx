@@ -1,4 +1,3 @@
-// features/inventory/components/InventoryFormFields.jsx
 export const InventoryFormFields = ({ register, errors, branches }) => {
   return (
     <div className="grid grid-cols-1 gap-4">

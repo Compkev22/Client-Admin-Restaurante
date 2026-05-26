@@ -1,4 +1,3 @@
-// features/coupons/components/CouponView.jsx
 import { useEffect, useState } from "react";
 import { useCouponStore } from "../../users/store/adminStore.js";
 import { CouponModal } from "./CouponModal.jsx";

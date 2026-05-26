@@ -17,7 +17,6 @@ export const useSaveBranch = () => {
     formData.append("OpenedAt", data.OpenedAt);
     formData.append("ClosedAt", data.ClosedAt);
 
-    // Si seleccionó una imagen, la adjuntamos con la llave 'Photos'
     if (data.photo && data.photo.length > 0) {
       formData.append("Photos", data.photo[0]);
     }

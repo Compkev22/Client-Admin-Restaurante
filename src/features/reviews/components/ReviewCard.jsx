@@ -1,4 +1,3 @@
-// src/features/reviews/components/ReviewCard.jsx
 export const ReviewCard = ({ review, onEdit, onDelete }) => (
   <div className="bg-white p-5 md:p-8 rounded-3xl shadow-sm border border-gray-50 relative group transition-all hover:shadow-xl flex flex-col justify-between">
     <div>

@@ -1,4 +1,3 @@
-// PaymentModal.jsx
 import { useEffect, useState } from "react";
 import { useBillingStore } from "../../../features/users/store/adminStore.js";
 import { useUserStore } from "../../users/store/adminStore.js";
@@ -29,7 +28,6 @@ export const PaymentWizardModal = ({ isOpen, onClose, orderData }) => {
   useEffect(() => {
     if (isOpen) {
       getUsers();
-      // Resetear estado al abrir
       setStep(1);
       setSearchTerm("");
       setSelectedClient(null);
@@ -81,8 +79,6 @@ export const PaymentWizardModal = ({ isOpen, onClose, orderData }) => {
       onClose();
     } catch (error) {
       console.error(error);
-      // El backend devuelve el mensaje "Este cliente ya se encuentra registrado"
-      // u otros errores — lo mostramos directamente con Toast
       showError(error.response?.data?.message || "Error al procesar el pago");
     } finally {
       setLoading(false);
@@ -151,7 +147,6 @@ export const PaymentWizardModal = ({ isOpen, onClose, orderData }) => {
           </div>
         </div>
 
-        {/* CUERPO con scroll */}
         <div className="p-6 md:p-8 overflow-y-auto flex-1">
 
           {/* ── PASO 1: Cliente + Método de pago ── */}
@@ -362,7 +357,7 @@ export const PaymentWizardModal = ({ isOpen, onClose, orderData }) => {
                 </div>
               )}
 
-              {/* TARJETA — vista visual interactiva */}
+              {/* TARJETA */}
               {paymentMethod === "CARD" && (
                 <div className="space-y-5">
                   {/* Tarjeta visual */}
@@ -390,7 +385,6 @@ export const PaymentWizardModal = ({ isOpen, onClose, orderData }) => {
                         </p>
                       </div>
                     </div>
-                    {/* Decoración de fondo */}
                     <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/5" />
                     <div className="absolute -right-4 -bottom-12 w-32 h-32 rounded-full bg-white/5" />
                   </div>
@@ -435,7 +429,6 @@ export const PaymentWizardModal = ({ isOpen, onClose, orderData }) => {
                 </div>
               )}
 
-              {/* Botones paso 2 */}
               <div className="pt-4 flex flex-col sm:flex-row gap-3 border-t border-gray-100 mt-6">
                 <button
                   type="button"

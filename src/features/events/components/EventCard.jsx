@@ -1,4 +1,3 @@
-// features/events/components/EventCard.jsx
 import iconEdit from "../../../assets/icons/Edit.svg";
 import iconDelete from "../../../assets/icons/Delete.svg";
 import iconEventDate from "../../../assets/icons/EventDate.svg";

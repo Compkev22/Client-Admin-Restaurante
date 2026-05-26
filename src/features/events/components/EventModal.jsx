@@ -1,4 +1,3 @@
-// features/events/components/EventModal.jsx
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useSaveEvent } from "../hooks/useSaveEvent.js";
@@ -64,7 +63,6 @@ export const EventModal = ({ isOpen, onClose, eventToEdit = null, onRefresh }) =
           </button>
         </header>
 
-        {/* Cuerpo con scroll */}
         <div className="overflow-y-auto px-6 md:px-8 py-6 md:py-8 flex-1">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <EventFormFields

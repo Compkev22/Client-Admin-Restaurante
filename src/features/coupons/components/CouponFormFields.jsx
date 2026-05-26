@@ -1,4 +1,3 @@
-// features/coupons/components/CouponFormFields.jsx
 export const CouponFormFields = ({ register, errors }) => {
   const today = new Date().toISOString().split("T")[0];
 
@@ -30,7 +29,7 @@ export const CouponFormFields = ({ register, errors }) => {
         )}
       </div>
 
-      {/* Descuento + Límite */}
+      {/* Descuento */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col">
           <label className="text-xs font-black uppercase text-gray-400 mb-1">% Descuento</label>

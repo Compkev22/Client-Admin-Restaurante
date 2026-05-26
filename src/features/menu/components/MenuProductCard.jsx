@@ -1,4 +1,3 @@
-// features/menu/components/MenuProductCard.jsx
 import iconEdit from "../../../assets/icons/Edit.svg";
 import iconDelete from "../../../assets/icons/Delete.svg";
 
@@ -10,7 +9,7 @@ export const MenuProductCard = ({ product, onEdit, onDelete }) => (
         : "bg-white border-gray-100 hover:shadow-xl"
     }`}
   >
-    {/* Badges de estado — posición absoluta, shrink-0 implícito */}
+    {/* Badges de estado  */}
     <div className="absolute top-3 right-3 flex flex-col gap-1 items-end z-10">
       {product.estado !== "Disponible" && (
         <span className="bg-yellow-100 text-yellow-700 text-[10px] font-black px-2 py-1 rounded-full uppercase">

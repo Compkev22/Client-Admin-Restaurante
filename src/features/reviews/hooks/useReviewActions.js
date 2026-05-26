@@ -2,10 +2,8 @@ import { useReviewStore } from "../../users/store/adminStore";
 import { showSuccess, showError } from "../../../shared/utils/toast";
 
 export const useReviewActions = () => {
-    // Traemos los datos y funciones reales del store
     const { reviews, getReviews, deleteReview: moderateReviewAPI } = useReviewStore();
 
-    // Mantenemos el nombre 'deleteReview' para que ReviewPage.jsx no se rompa
     const deleteReview = async (id) => {
         const success = await moderateReviewAPI(id);
         if (success) {

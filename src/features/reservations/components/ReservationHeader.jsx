@@ -1,4 +1,3 @@
-// features/reservations/components/ReservationHeader.jsx
 import createIcon from "../../../assets/icons/Create.svg";
 
 export const ReservationHeader = ({ onCreateClick }) => (

@@ -1,4 +1,3 @@
-// features/reservations/components/ReservationModal.jsx
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useSaveReservation } from "../hook/useSaveReservation.js";
@@ -88,7 +87,6 @@ export const ReservationModal = ({ isOpen, onClose, item }) => {
           </button>
         </div>
 
-        {/* Cuerpo con scroll */}
         <div className="overflow-y-auto flex-1 px-6 md:px-8 py-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" id="reservation-form">
             <ReservationFormFields

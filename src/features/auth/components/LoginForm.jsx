@@ -19,18 +19,15 @@ export const LoginForm = ({ onForgot }) => {
     try {
         const res = await login(data);
         
-        // Si 'res' trae un mensaje de error o devuelve falso, lo detenemos aquí
         if (res?.error || res === false) {
             toast.error(res?.error || "Credenciales incorrectas");
-            return; // El return hace que la función muera aquí y no navegue
+            return; 
         }
 
-        // Si todo salió bien, entra al sistema
         navigate("/dashboard");
         toast.success("¡Bienvenido al sistema!");
         
     } catch (error) {
-        // Por si el servidor se apaga repentinamente
         toast.error("Error al conectar con el servidor.");
     }
 };
@@ -80,7 +77,6 @@ export const LoginForm = ({ onForgot }) => {
                 {loading ? "Iniciando..." : "Iniciar Sesión"}
             </button>
 
-            {/* Enlaces inferiores adaptados al contexto corporativo */}
             <div className="text-center text-sm space-y-4 pt-6 border-t border-gray-100">
                 <button
                     type="button"

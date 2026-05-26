@@ -7,16 +7,13 @@ export const ProtectedRoute = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
 
-  // Sin sesión → al login
   if (!token || !isAuthenticated) {
     return <Navigate to="/" replace />;
   }
 
-  // Rol incorrecto → al login (doble seguridad además del authStore)
   if (user?.role !== "PLATFORM_ADMIN") {
     return <Navigate to="/" replace />;
   }
 
-  // Todo bien → renderiza la ruta solicitada
   return <Outlet />;
 };

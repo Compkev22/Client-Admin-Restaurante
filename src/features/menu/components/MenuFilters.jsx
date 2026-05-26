@@ -1,7 +1,4 @@
-// features/menu/components/MenuFilters.jsx
 export const MenuFilters = ({ categories, activeCategory, onSelect }) => (
-  /* scrollbar-hide + overflow-x-auto para que los filtros se deslicen
-     en móvil sin saltar a una segunda línea */
   <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide">
     {categories.map((cat) => (
       <button

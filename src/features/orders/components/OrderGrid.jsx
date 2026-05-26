@@ -1,4 +1,3 @@
-// features/orders/components/OrderGrid.jsx
 import { OrderCard } from "./OrderCard.jsx";
 
 export const OrderGrid = ({ orders, onPay, onDetail, onEdit }) => (

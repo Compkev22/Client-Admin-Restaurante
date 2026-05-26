@@ -1,4 +1,3 @@
-// BillingModal.jsx
 import { useState, useEffect } from "react";
 import {
   useBillingStore,

@@ -1,4 +1,3 @@
-// src/shared/components/layout/Sidebar.jsx
 import { Link, useLocation } from "react-router-dom";
 
 import iconDashboard from "../../../assets/icons/Dashboard.svg";
@@ -16,7 +15,6 @@ import iconBranches from "../../../assets/icons/Branches.svg";
 import iconUsers from "../../../assets/icons/Users.svg";
 import iconService from "../../../assets/icons/ExtraServices.svg";
 
-// Recibe onClose para cerrar el drawer al navegar en móvil
 export const Sidebar = ({ onClose }) => {
   const location = useLocation();
   const currentUserRole = "PLATFORM_ADMIN_ROLE";
@@ -67,10 +65,6 @@ export const Sidebar = ({ onClose }) => {
   );
 
   return (
-    /*
-      w-64 fija — en móvil el posicionamiento lo controla DashboardContainer.
-      overflow-y-auto permite scroll interno si el contenido es largo.
-    */
     <div className="w-64 bg-white h-full min-h-[calc(100vh-4rem)] shadow-xl border-r border-gray-100 flex flex-col justify-between overflow-y-auto">
       <div className="p-4 space-y-6">
         {visibleGroups.map((group, groupIndex) => (
@@ -88,7 +82,6 @@ export const Sidebar = ({ onClose }) => {
                   <li key={item.label}>
                     <Link
                       to={item.to}
-                      // Al hacer clic en un link, cerramos el drawer en móvil
                       onClick={onClose}
                       className={`
                         flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold transition-all

@@ -1,4 +1,3 @@
-// features/inventory/components/InventoryTable.jsx
 import { Spinner } from "../../auth/components/Spinner.jsx";
 import iconEdit from "../../../assets/icons/Edit.svg";
 import iconDelete from "../../../assets/icons/Delete.svg";
@@ -33,7 +32,7 @@ export const InventoryTable = ({ inventory, branches, loading, error, onEdit, on
 
   return (
     <>
-      {/* ── TARJETAS MÓVIL (< md) ── */}
+      {/* TARJETAS MÓVIL */}
       <div className="grid md:hidden gap-4">
         {inventory.map((item) => {
           const branchName =
@@ -118,7 +117,7 @@ export const InventoryTable = ({ inventory, branches, loading, error, onEdit, on
         })}
       </div>
 
-      {/* ── TABLA ESCRITORIO (≥ md) ── */}
+      {/* TABLA ESCRITORIO */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left min-w-[600px]">
           <thead className="bg-gray-50">

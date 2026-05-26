@@ -1,11 +1,6 @@
-// features/branches/components/BranchImageUpload.jsx
 export const BranchImageUpload = ({ preview, register }) => {
   return (
-    /*
-      En móvil: columna centrada.
-      En sm+: fila con la preview a la izquierda y el input a la derecha.
-      Esto evita que el input quede aplastado en pantallas pequeñas.
-    */
+
     <div className="flex flex-col sm:flex-row items-center gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
 
       {/* Vista previa de imagen */}

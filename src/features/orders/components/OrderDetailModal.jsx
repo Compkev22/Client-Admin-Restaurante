@@ -1,4 +1,3 @@
-// features/orders/components/OrderDetailModal.jsx
 import { useEffect } from "react";
 import { OrderDetailTicket } from "./OrderDetailTicket.jsx";
 import { useOrderActions } from "../hooks/useOrderActions.js";
@@ -24,13 +23,11 @@ export const OrderDetailModal = ({ isOpen, onClose, orderData, billingData = nul
   const subtotal = realOrderDetails.reduce((acc, item) => acc + item.subtotal, 0);
   const total = orderData.total || subtotal;
 
-  // Datos del empleado (viene populado desde getOrders)
   const empleado = orderData.empleadoId;
   const empleadoNombre = empleado
     ? `${empleado.UserName} ${empleado.UserSurname}`
     : "No asignado";
 
-  // Datos de la sucursal
   const sucursal = orderData.branchId;
   const sucursalNombre = sucursal?.name || "N/A";
 
@@ -38,14 +35,12 @@ export const OrderDetailModal = ({ isOpen, onClose, orderData, billingData = nul
   const mesa = orderData.mesaId;
   const mesaInfo = mesa ? `Mesa ${mesa.numberTable} (cap. ${mesa.capacity})` : "N/A";
 
-  // Cliente: puede venir del billingData (cuando se abre desde Facturación)
-  // o no estar disponible si la orden aún no está pagada.
+
   const clienteFactura = billingData?.client;
   const clienteNombre = clienteFactura
     ? `${clienteFactura.UserName} ${clienteFactura.UserSurname}`
     : "Consumidor Final";
 
-  // Cupón / descuento
   const couponCode = orderData.coupon ? "SÍ" : "N/A";
   const discountApplied = orderData.discountApplied || 0;
 
