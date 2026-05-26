@@ -12,7 +12,7 @@ export const OrderPage = () => {
   const [activeTab, setActiveTab] = useState("Todos");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
-  const [selectedOrderToPay, setSelectedOrderToPay] = useState(null);
+  const [selectedBillingToPay, setSelectedBillingToPay] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
   const [orderToEdit, setOrderToEdit] = useState(null);
@@ -39,12 +39,23 @@ export const OrderPage = () => {
       ? orders
       : orders.filter((o) => o.estado === activeTab);
 
-  // Busca la factura asociada a una orden para obtener el cliente real
   const getBillingForOrder = (orderId) =>
     billings.find((b) => {
       const billingOrderId = b.Order?._id || b.Order;
       return billingOrderId?.toString() === orderId?.toString();
     }) || null;
+
+
+  const handlePayOrder = (order) => {
+    const billing = getBillingForOrder(order._id);
+    if (!billing) {
+
+      setSelectedBillingToPay(order);
+    } else {
+      setSelectedBillingToPay(billing);
+    }
+    setIsPaymentOpen(true);
+  };
 
   return (
     <div className="space-y-6 md:space-y-8 animate-fadeIn p-2 md:p-4">
@@ -52,10 +63,7 @@ export const OrderPage = () => {
       <OrderTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
       <OrderGrid
         orders={filteredOrders}
-        onPay={(order) => {
-          setSelectedOrderToPay(order);
-          setIsPaymentOpen(true);
-        }}
+        onPay={handlePayOrder}
         onDetail={(order) => {
           setSelectedOrderDetails(order);
           setIsDetailOpen(true);
@@ -74,14 +82,16 @@ export const OrderPage = () => {
         }}
         orderToEdit={orderToEdit}
       />
+
       <PaymentWizardModal
         isOpen={isPaymentOpen}
         onClose={() => {
           setIsPaymentOpen(false);
+          setSelectedBillingToPay(null);
           fetchOrders();
           getBillings();
         }}
-        orderData={selectedOrderToPay}
+        orderData={selectedBillingToPay}
       />
       <OrderDetailModal
         isOpen={isDetailOpen}
