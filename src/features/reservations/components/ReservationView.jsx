@@ -10,13 +10,15 @@ import { ReservationModal } from "./ReservationModal.jsx";
 
 export const ReservationPage = () => {
   const { reservations, loading, error, getReservations, deleteReservation } = useReservationStore();
-  const { branches } = useBranchStore();
-  const { users } = useUserStore();
+  const { branches, getBranches } = useBranchStore();
+  const { users, getUsers } = useUserStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [activeTab, setActiveTab] = useState("Todas");
 
   useEffect(() => { getReservations(); }, [getReservations]);
+  useEffect(() => { getBranches(); }, [getBranches]);
+  useEffect(() => { getUsers(); }, [getUsers]);
   useEffect(() => { if (error) showError(error); }, [error]);
 
   const safeReservations = reservations || [];
@@ -50,6 +52,7 @@ export const ReservationPage = () => {
         onToggleStatus={handleToggleStatus}
       />
       <ReservationModal
+        key={selectedItem?._id ?? "new"}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         item={selectedItem}

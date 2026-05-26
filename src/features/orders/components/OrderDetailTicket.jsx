@@ -1,5 +1,3 @@
-// features/orders/components/OrderDetailTicket.jsx
-
 const ORDER_TYPE_LABELS = {
   DINE_IN: "Comer en Restaurante",
   TAKEAWAY: "Para Llevar",
@@ -85,10 +83,13 @@ export const OrderDetailTicket = ({
       </h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
 
-        <div>
-          <p className="text-xs font-bold text-gray-400 uppercase">Atendido por</p>
-          <p className="font-bold text-gray-800">{empleadoNombre}</p>
-        </div>
+        {/* FIX #3: Solo visible para DINE_IN */}
+        {orderData.orderType === "DINE_IN" && (
+          <div>
+            <p className="text-xs font-bold text-gray-400 uppercase">Atendido por</p>
+            <p className="font-bold text-gray-800">{empleadoNombre}</p>
+          </div>
+        )}
 
         <div>
           <p className="text-xs font-bold text-gray-400 uppercase">Cliente / Facturado a</p>
