@@ -27,7 +27,7 @@ export const useAuthStore = create(
                 set({ loading: false, error: null, isLoadingAuth: false });
 
                 if (token && !isAdmin) {
-                    get().logout(); 
+                    get().logout();
                     set({ error: "No tienes permiso para acceder como administrador" });
                 }
             },
@@ -42,18 +42,22 @@ export const useAuthStore = create(
                 })
             },
 
+            // ✅ DESPUÉS
             login: async ({ emailOrUsername, password }) => {
                 set({ loading: true, error: null });
 
                 try {
                     const { data } = await loginRequest({ emailOrUsername, password });
 
-                    const role = data?.userDetails?.role;
+                    // .NET sin CamelCase policy → claves raíz en PascalCase
+                    const details = data?.UserDetails;
+                    const role = details?.role;
+
                     if (role !== "PLATFORM_ADMIN") {
                         const message = "No tienes permisos para acceder como administrador";
                         set({
                             user: null, token: null, isAuthenticated: false,
-                            loading: false, 
+                            loading: false,
                             error: message
                         });
                         toast.error(message);
@@ -61,10 +65,10 @@ export const useAuthStore = create(
                     }
 
                     set({
-                        user: data.userDetails,
-                        token: data.accessToken || data.token,
+                        user: details,
+                        token: data.Token,
                         isAuthenticated: true,
-                        loading: false, 
+                        loading: false,
                     });
                     return { success: true };
 

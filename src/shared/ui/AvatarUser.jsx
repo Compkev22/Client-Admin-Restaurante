@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuthStore } from "../../features/auth/store/authStore"; 
+import { useAuthStore } from "../../features/auth/store/authStore";
 import defaultAvatarImg from "../../assets/img/defaultAvatar.jpeg";
 
 export const AvatarUser = () => {
-    const { user, logout } = useAuthStore() || { user: { username: "Kevin Velásquez", email: "admin@kfc.com" }, logout: () => {} };
+    const { user, logout } = useAuthStore() || { user: { username: "Kevin Velásquez", email: "admin@kfc.com" }, logout: () => { } };
     const [open, setOpen] = useState(false);
     const dropdownRef = useRef(null);
     const navigate = useNavigate();
@@ -26,8 +26,8 @@ export const AvatarUser = () => {
         navigate("/", { replace: true });
     };
 
-    const avatarSrc = user?.profilePictureUrl && user.profilePictureUrl.trim() !== ""
-        ? user.profilePictureUrl
+    const avatarSrc = user?.profilePicture && user.profilePicture.trim() !== ""
+        ? user.profilePicture
         : defaultAvatarImg;
 
     return (
@@ -35,12 +35,11 @@ export const AvatarUser = () => {
             <div className="flex items-center gap-4 cursor-pointer" onClick={toggleMenu}>
                 <div className="text-right hidden sm:block">
                     <p className="text-xs text-gray-500 font-medium">Administrador</p>
-                    <p className="text-sm font-bold text-gray-800">{user?.username}</p>
-                </div>
+                    <p className="text-sm font-bold text-gray-800">{user?.systemUsername}</p>                </div>
                 <div className="w-10 h-10 rounded-full border-2 border-kinal-yellow bg-white overflow-hidden shadow-sm">
-                    <img 
-                        src={avatarSrc} 
-                        alt={user?.username} 
+                    <img
+                        src={avatarSrc}
+                        alt={user?.systemUsername}
                         className="w-full h-full object-cover"
                         onError={(e) => {
                             e.target.onerror = null;
@@ -53,8 +52,8 @@ export const AvatarUser = () => {
             {open && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg animate-fadeIn z-50">
                     <div className="px-4 py-3 border-b">
-                        <p className="font-semibold text-gray-800">{user?.username}</p>
-                        <p className="text-sm text-gray-500 truncate">{user?.email}</p>
+                        <p className="font-semibold text-gray-800">{user?.systemUsername}</p>
+                        <p className="text-sm text-gray-500 truncate">{user?.userEmail}</p>
                     </div>
 
                     <ul className="p-2 text-sm text-gray-700 font-medium">
