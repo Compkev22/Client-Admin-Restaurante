@@ -2,7 +2,7 @@ import { Spinner } from "../../auth/components/Spinner.jsx";
 import iconEdit from "../../../assets/icons/Edit.svg";
 import iconDelete from "../../../assets/icons/Delete.svg";
 
-export const CouponTable = ({ coupons, loading, error, onEdit, onToggleStatus }) => {
+export const CouponTable = ({ coupons, loading, error, onEdit, onToggleStatus, onHistory }) => {
   if (loading)
     return (
       <div className="p-16 md:p-20 flex justify-center">
@@ -30,11 +30,10 @@ export const CouponTable = ({ coupons, loading, error, onEdit, onToggleStatus })
             <div className="flex justify-between items-start">
               <span className="text-lg font-black text-kinal-red tracking-wider">{c.code}</span>
               <span
-                className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
-                  c.status === "ACTIVE"
-                    ? "bg-green-100 text-green-600"
-                    : "bg-red-100 text-red-600"
-                }`}
+                className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${c.status === "ACTIVE"
+                  ? "bg-green-100 text-green-600"
+                  : "bg-red-100 text-red-600"
+                  }`}
               >
                 {c.status === "ACTIVE" ? "Activo" : "Inactivo"}
               </span>
@@ -63,10 +62,17 @@ export const CouponTable = ({ coupons, loading, error, onEdit, onToggleStatus })
             </div>
 
             {/* Acciones */}
-            <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
+            <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+              <button
+                onClick={() => onHistory(c)}
+                className="flex items-center gap-1.5 flex-1 justify-center py-2 rounded-xl border border-blue-200 hover:bg-blue-50 transition-colors font-bold text-xs text-blue-600"
+                aria-label="Ver historial"
+              >
+                Historial
+              </button>
               <button
                 onClick={() => onEdit(c)}
-                className="flex items-center gap-2 flex-1 justify-center py-2 rounded-xl border border-gray-200 hover:bg-orange-50 transition-colors font-bold text-xs text-gray-600"
+                className="flex items-center gap-1.5 flex-1 justify-center py-2 rounded-xl border border-gray-200 hover:bg-orange-50 transition-colors font-bold text-xs text-gray-600"
                 aria-label="Editar cupón"
               >
                 <img src={iconEdit} className="w-4 h-4 opacity-60" alt="Editar" />
@@ -74,11 +80,10 @@ export const CouponTable = ({ coupons, loading, error, onEdit, onToggleStatus })
               </button>
               <button
                 onClick={() => onToggleStatus(c)}
-                className={`flex items-center gap-2 flex-1 justify-center py-2 rounded-xl border transition-colors font-bold text-xs ${
-                  c.status === "ACTIVE"
-                    ? "border-red-200 hover:bg-red-50 text-red-500"
-                    : "border-green-200 hover:bg-green-50 text-green-600"
-                }`}
+                className={`flex items-center gap-1.5 flex-1 justify-center py-2 rounded-xl border transition-colors font-bold text-xs ${c.status === "ACTIVE"
+                  ? "border-red-200 hover:bg-red-50 text-red-500"
+                  : "border-green-200 hover:bg-green-50 text-green-600"
+                  }`}
                 aria-label="Cambiar estado"
               >
                 <img
@@ -98,7 +103,7 @@ export const CouponTable = ({ coupons, loading, error, onEdit, onToggleStatus })
         <table className="w-full text-left min-w-[580px]">
           <thead className="bg-gray-50">
             <tr>
-              {["Código", "Descuento", "Uso", "Expira", "Estado", "Acciones"].map((col) => (
+              {["Código", "Descuento", "Uso", "Expira", "Estado", "Historial", "Acciones"].map((col) => (
                 <th
                   key={col}
                   className="p-3 md:p-4 text-xs font-black text-gray-400 uppercase italic"
@@ -128,14 +133,22 @@ export const CouponTable = ({ coupons, loading, error, onEdit, onToggleStatus })
                 </td>
                 <td className="p-3 md:p-4">
                   <span
-                    className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
-                      c.status === "ACTIVE"
-                        ? "bg-green-100 text-green-600"
-                        : "bg-red-100 text-red-600"
-                    }`}
+                    className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${c.status === "ACTIVE"
+                      ? "bg-green-100 text-green-600"
+                      : "bg-red-100 text-red-600"
+                      }`}
                   >
                     {c.status === "ACTIVE" ? "Activo" : "Inactivo"}
                   </span>
+                </td>
+                <td className="p-3 md:p-4">
+                  <button
+                    onClick={() => onHistory(c)}
+                    className="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-black transition-colors whitespace-nowrap"
+                    aria-label="Ver historial de uso"
+                  >
+                    Ver historial
+                  </button>
                 </td>
                 <td className="p-3 md:p-4">
                   <div className="flex items-center gap-3">
@@ -157,9 +170,8 @@ export const CouponTable = ({ coupons, loading, error, onEdit, onToggleStatus })
                     >
                       <img
                         src={iconDelete}
-                        className={`w-5 h-5 opacity-60 hover:opacity-100 ${
-                          c.status === "INACTIVE" ? "grayscale sepia" : ""
-                        }`}
+                        className={`w-5 h-5 opacity-60 hover:opacity-100 ${c.status === "INACTIVE" ? "grayscale sepia" : ""
+                          }`}
                         alt="Cambiar estado"
                       />
                     </button>

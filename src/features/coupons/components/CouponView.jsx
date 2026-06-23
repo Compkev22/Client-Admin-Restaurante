@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useCouponStore } from "../../users/store/adminStore.js";
 import { CouponModal } from "./CouponModal.jsx";
+import { CouponUsageModal } from "./CouponUsageModal.jsx";
 import { CouponHeader } from "./CouponHeader.jsx";
 import { CouponTable } from "./CouponTable.jsx";
 import { showConfirmToast } from "../../auth/components/ConfirmModal.jsx";
@@ -8,8 +9,9 @@ import { showError } from "../../../shared/utils/toast.js";
 
 export const CouponPage = () => {
   const { coupons, loading, error, getCoupons, deleteCoupon } = useCouponStore();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCoupon, setSelectedCoupon] = useState(null);
+  const [isModalOpen, setIsModalOpen]           = useState(false);
+  const [isUsageModalOpen, setIsUsageModalOpen] = useState(false);
+  const [selectedCoupon, setSelectedCoupon]     = useState(null);
 
   useEffect(() => { getCoupons(); }, [getCoupons]);
   useEffect(() => { if (error) showError(error); }, [error]);
@@ -22,6 +24,11 @@ export const CouponPage = () => {
   const handleCreate = () => {
     setSelectedCoupon(null);
     setIsModalOpen(true);
+  };
+
+  const handleHistory = (coupon) => {
+    setSelectedCoupon(coupon);
+    setIsUsageModalOpen(true);
   };
 
   const handleToggleStatus = (coupon) => {
@@ -43,11 +50,17 @@ export const CouponPage = () => {
           error={error}
           onEdit={handleEdit}
           onToggleStatus={handleToggleStatus}
+          onHistory={handleHistory}
         />
       </div>
       <CouponModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        coupon={selectedCoupon}
+      />
+      <CouponUsageModal
+        isOpen={isUsageModalOpen}
+        onClose={() => setIsUsageModalOpen(false)}
         coupon={selectedCoupon}
       />
     </div>

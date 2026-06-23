@@ -41,6 +41,7 @@ export const getCoupons = async () => await axiosAdmin.get("/coupons");
 export const createCoupon = async (data) => await axiosAdmin.post("/coupons", data);
 export const updateCoupon = async (id, data) => await axiosAdmin.put(`/coupons/${id}`, data);
 export const deleteCoupon = async (id) => await axiosAdmin.patch(`/coupons/${id}/status`);
+export const getCouponUsage = async (id, page = 1) => await axiosAdmin.get(`/coupons/${id}/usage?page=${page}&limit=10`);
 
 // ================= TABLES (MESAS) =================
 export const getTables = async (params) => await axiosAdmin.get("/tables", { params });
