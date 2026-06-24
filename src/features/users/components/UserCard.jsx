@@ -6,6 +6,7 @@ import { useBranchStore } from "../../users/store/adminStore.js";
 export const UserCard = ({ user, onEdit, onDelete }) => {
   const isInactive = user.UserStatus === "INACTIVE";
   const initials = `${user.UserName?.charAt(0)}${user.UserSurname?.charAt(0)}`.toUpperCase();
+  const addresses = user.addresses || [];
 
   const roleStyles = {
     PLATFORM_ADMIN: { bg: "bg-purple-100", text: "text-purple-700", label: "Admin Plataforma" },
@@ -55,6 +56,25 @@ export const UserCard = ({ user, onEdit, onDelete }) => {
                 useBranchStore.getState().branches.find((b) => b._id === user.branchId)?.name ||
                 "Sin asignar"}
             </p>
+          </div>
+        )}
+        {user.role === "CLIENT" && addresses.length > 0 && (
+          <div>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
+              Direcciones Favoritas
+            </p>
+            <div className="space-y-1.5">
+              {addresses.map((addr, i) => (
+                <div key={addr.addressId || i} className="flex items-start gap-1.5">
+                  <span className="text-[10px] font-black text-gray-500 shrink-0">
+                    {addr.label}{addr.isDefault ? " ★" : ""}:
+                  </span>
+                  <span className="text-xs font-bold text-gray-700 truncate">
+                    {addr.address}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
