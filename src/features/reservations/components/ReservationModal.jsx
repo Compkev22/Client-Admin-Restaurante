@@ -8,20 +8,16 @@ import { showConfirmToast } from "../../auth/components/ConfirmModal.jsx";
 import { ReservationFormFields } from "./ReservationFormFields.jsx";
 
 export const ReservationModal = ({ isOpen, onClose, item }) => {
-  const formattedDate = item?.date
-    ? new Date(item.date).toISOString().split("T")[0]
-    : "";
-
   const { register, handleSubmit, reset, formState: { errors, isDirty } } = useForm({
     defaultValues: {
-      branchId: item?.branchId?._id || item?.branchId || "",
-      clientId: item?.clientId?._id || item?.clientId || "",
-      date: formattedDate,
-      time: item?.time || "",
-      numberOfPersons: item?.numberOfPersons || 1,
-      notes: item?.notes || "",
-      status: item?.status || "Pendiente",
-      statusRes: item?.statusRes || "ACTIVADO",
+      branchId: "",
+      clientId: "",
+      date: "",
+      time: "",
+      numberOfPersons: 1,
+      notes: "",
+      status: "Pendiente",
+      statusRes: "ACTIVADO",
     },
   });
 
@@ -30,11 +26,42 @@ export const ReservationModal = ({ isOpen, onClose, item }) => {
   const { branches, getBranches } = useBranchStore();
   const { users, getUsers } = useUserStore();
 
+  // Cargar listas al abrir
   useEffect(() => {
     if (!isOpen) return;
     getBranches();
     getUsers();
   }, [isOpen, getBranches, getUsers]);
+
+  // Resetear form cuando las listas ya estén disponibles
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!branches.length || !users.length) return;
+
+    if (item) {
+      const formattedDate = item.date
+        ? new Date(item.date).toISOString().split("T")[0]
+        : "";
+
+      const clientId = item.clientId?.uid || item.clientId?._id || item.clientId || "";
+
+      reset({
+        branchId: item.branchId?._id || item.branchId || "",
+        clientId,
+        date: formattedDate,
+        time: item.time || "",
+        numberOfPersons: item.numberOfPersons || 1,
+        notes: item.notes || "",
+        status: item.status || "Pendiente",
+        statusRes: item.statusRes || "ACTIVADO",
+      });
+    } else {
+      reset({
+        branchId: "", clientId: "", date: "", time: "",
+        numberOfPersons: 1, notes: "", status: "Pendiente", statusRes: "ACTIVADO",
+      });
+    }
+  }, [isOpen, item, branches, users, reset]);
 
   const onSubmit = async (data) => {
     try {

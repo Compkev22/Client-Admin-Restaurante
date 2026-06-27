@@ -14,26 +14,31 @@ export const EventModal = ({ isOpen, onClose, eventToEdit = null, onRefresh }) =
     .toISOString()
     .split("T")[0];
 
-  useEffect(() => {
-    if (isOpen) {
-      getBranches();
-      getUsers();
-    }
-    if (eventToEdit && isOpen) {
-      const date = new Date(eventToEdit.eventDate).toISOString().split("T")[0];
-      reset({
-        ...eventToEdit,
-        eventDate: date,
-        branchId: eventToEdit.branchId?._id || eventToEdit.branchId,
-        clientId:
-          eventToEdit.clientId?._id ||
-          eventToEdit.clientId?.uid ||
-          eventToEdit.clientId,
-      });
+useEffect(() => {
+    if (!isOpen) return;
+    getBranches();
+    getUsers();
+}, [isOpen, getBranches, getUsers]);
+
+useEffect(() => {
+    if (!isOpen) return;
+    if (!branches.length || !users.length) return;
+
+    if (eventToEdit) {
+        const date = new Date(eventToEdit.eventDate)
+            .toISOString().split('T')[0];
+        reset({
+            ...eventToEdit,
+            eventDate: date,
+            branchId: eventToEdit.branchId?._id || eventToEdit.branchId,
+            clientId: eventToEdit.clientId?._id ||
+                      eventToEdit.clientId?.uid  ||
+                      eventToEdit.clientId,
+        });
     } else {
-      reset({ status: "Pendiente" });
+        reset({ status: 'Pendiente' });
     }
-  }, [eventToEdit, isOpen, reset, getBranches, getUsers]);
+}, [isOpen, eventToEdit, branches, users, reset]);
 
   const onSubmit = async (data) => {
     if (await saveEvent(data, eventToEdit?._id)) {

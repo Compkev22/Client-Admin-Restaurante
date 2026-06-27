@@ -14,17 +14,15 @@ export const EventCard = ({ event, onEdit, onAction }) => {
 
   return (
     <div
-      className={`bg-white rounded-3xl p-4 md:p-6 shadow-md border transition-all relative flex flex-col ${
-        isCancelado
+      className={`bg-white rounded-3xl p-4 md:p-6 shadow-md border transition-all relative flex flex-col ${isCancelado
           ? "opacity-60 border-red-100"
           : "border-gray-100 hover:shadow-xl"
-      }`}
+        }`}
     >
       {/* Badge de estado */}
       <span
-        className={`self-start text-[10px] font-black uppercase px-3 py-1 rounded-full border shrink-0 ${
-          statusColors[event.status] || statusColors.Pendiente
-        }`}
+        className={`self-start text-[10px] font-black uppercase px-3 py-1 rounded-full border shrink-0 ${statusColors[event.status] || statusColors.Pendiente
+          }`}
       >
         {event.status || "Pendiente"}
       </span>
@@ -39,7 +37,7 @@ export const EventCard = ({ event, onEdit, onAction }) => {
         <div className="flex items-center gap-2">
           <img src={iconEventDate} className="w-4 h-4 opacity-50 shrink-0" alt="Fecha" />
           <span className="text-sm">
-            {new Date(event.eventDate).toLocaleDateString()}
+            {new Intl.DateTimeFormat('es-GT', { timeZone: 'UTC' }).format(new Date(event.eventDate))}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -63,9 +61,8 @@ export const EventCard = ({ event, onEdit, onAction }) => {
         )}
         <button
           onClick={() => onAction(event)}
-          className={`p-2 rounded-lg transition-colors ${
-            isCancelado ? "bg-red-600 text-white" : "hover:bg-red-50"
-          }`}
+          className={`p-2 rounded-lg transition-colors ${isCancelado ? "bg-red-600 text-white" : "hover:bg-red-50"
+            }`}
           aria-label={isCancelado ? "Eliminar permanente" : "Cancelar evento"}
         >
           <img
