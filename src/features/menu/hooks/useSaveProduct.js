@@ -6,7 +6,7 @@ export const useSaveProduct = () => {
     createProduct,
     updateProduct
   } = useProductStore();
-  
+
   const saveProduct = async (data, id = null) => {
     try {
       const payload = {
@@ -26,8 +26,8 @@ export const useSaveProduct = () => {
       }
       return true;
     } catch (error) {
-      console.log("SAVE PRODUCT ERROR:", error.response?.data || error);
-      return false;
+      // Relanzar para que ProductModal pueda capturarlo y mostrar el mensaje real
+      throw error;
     }
   };
   return { saveProduct };

@@ -889,7 +889,7 @@ export const useOrderStore = create((set, get) => ({
       }
 
       await api.syncBillingWithOrder(orderId);
- 
+
       await get().getOrders();
       set({ loading: false });
       return true;
@@ -938,8 +938,7 @@ export const useComboStore = create((set, get) => ({
       await get().getCombos();
       return true;
     } catch (error) {
-      console.error(error);
-      return false;
+      throw error;
     }
   },
 
@@ -949,8 +948,7 @@ export const useComboStore = create((set, get) => ({
       await get().getCombos();
       return true;
     } catch (error) {
-      console.error(error);
-      return false;
+      throw error;
     }
   },
 

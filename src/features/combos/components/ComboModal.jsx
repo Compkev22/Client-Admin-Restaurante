@@ -1,6 +1,5 @@
-// ComboModal.jsx
 import { useState, useEffect } from "react";
-import { useComboStore } from "../../users/store/adminStore.js";
+import { useComboStore, useBranchStore } from "../../users/store/adminStore.js";
 import { getProducts } from "../../../shared/api/admin.js";
 import { ComboListTable } from "./ComboListTable.jsx";
 import { ComboImageUpload } from "./ComboImageUpload.jsx";
@@ -12,6 +11,7 @@ export const ComboModal = ({ isOpen, onClose, comboData = null }) => {
     ComboDescription: "",
     ComboDiscount: 0,
   });
+  const [selectedBranchId, setSelectedBranchId] = useState("");
   const [comboList, setComboList] = useState([]);
   const [availableProducts, setAvailableProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState("");
@@ -19,11 +19,12 @@ export const ComboModal = ({ isOpen, onClose, comboData = null }) => {
   const [preview, setPreview] = useState(null);
 
   const { saveCombo, updateCombo } = useComboStore();
+  const { branches, getBranches } = useBranchStore();
 
+  // Cargar sucursales al abrir
   useEffect(() => {
     if (!isOpen) return;
-
-    getProducts().then((res) => setAvailableProducts(res.data.data));
+    getBranches();
 
     if (comboData) {
       setFormData({
@@ -39,15 +40,37 @@ export const ComboModal = ({ isOpen, onClose, comboData = null }) => {
           cantidad: item.cantidad,
         })) || []
       );
+      // Pre-seleccionar la primera sucursal del combo si ya tiene
+      const firstBranch = comboData.Branches?.[0]?.BranchId?._id
+        || comboData.Branches?.[0]?.BranchId
+        || "";
+      setSelectedBranchId(firstBranch?.toString() || "");
       setPreview(comboData.image?.url || null);
     } else {
       setFormData({ ComboName: "", ComboDescription: "", ComboDiscount: 0 });
       setComboList([]);
+      setSelectedBranchId("");
       setPreview(null);
     }
 
     setImageFile(null);
-  }, [isOpen, comboData]);
+    setSelectedProduct("");
+  }, [isOpen, comboData, getBranches]);
+
+  // Cuando cambia la sucursal, cargar solo los productos de esa sucursal
+  useEffect(() => {
+    if (!selectedBranchId) {
+      setAvailableProducts([]);
+      return;
+    }
+    getProducts({ branchId: selectedBranchId, estado: "Disponible", ProductStatus: "ACTIVE" })
+      .then((res) => setAvailableProducts(res.data.data || []))
+      .catch(() => setAvailableProducts([]));
+
+    // Si cambia la sucursal, limpiar el combo y el producto seleccionado
+    setComboList([]);
+    setSelectedProduct("");
+  }, [selectedBranchId]);
 
   if (!isOpen) return null;
 
@@ -84,6 +107,9 @@ export const ComboModal = ({ isOpen, onClose, comboData = null }) => {
     const name = formData.ComboName.trim();
     const desc = formData.ComboDescription.trim();
 
+    if (!selectedBranchId) {
+      return showError("Debes seleccionar una sucursal para el combo.");
+    }
     if (!name || name.length < 3) {
       return showError("El nombre debe tener al menos 3 caracteres");
     }
@@ -111,6 +137,10 @@ export const ComboModal = ({ isOpen, onClose, comboData = null }) => {
           cantidad: item.cantidad,
         }))
       )
+    );
+    payload.append(
+      "Branches",
+      JSON.stringify([{ BranchId: selectedBranchId }])
     );
     if (imageFile) payload.append("image", imageFile);
 
@@ -159,6 +189,26 @@ export const ComboModal = ({ isOpen, onClose, comboData = null }) => {
             {/* Imagen */}
             <ComboImageUpload preview={preview} onFileChange={handleFileChange} />
 
+            {/* Sucursal — va primero porque filtra los productos disponibles */}
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">
+                Sucursal
+              </label>
+              <select
+                value={selectedBranchId}
+                onChange={(e) => setSelectedBranchId(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-kinal-orange text-sm bg-white"
+                required
+              >
+                <option value="">Selecciona una sucursal...</option>
+                {branches.map((b) => (
+                  <option key={b._id} value={b._id}>
+                    {b.name} {b.zone ? `— Zona ${b.zone}` : ""}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* Datos básicos */}
             <div className="space-y-3 bg-gray-50 p-4 rounded-2xl border border-gray-100">
               <input
@@ -200,14 +250,17 @@ export const ComboModal = ({ isOpen, onClose, comboData = null }) => {
               </div>
             </div>
 
-            {/* Agregar producto */}
+            {/* Agregar producto — deshabilitado si no hay sucursal */}
             <div className="flex flex-col sm:flex-row gap-2">
               <select
                 value={selectedProduct}
                 onChange={(e) => setSelectedProduct(e.target.value)}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 outline-none text-sm bg-white"
+                disabled={!selectedBranchId}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 outline-none text-sm bg-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <option value="">Selecciona producto...</option>
+                <option value="">
+                  {selectedBranchId ? "Selecciona producto..." : "Primero elige una sucursal"}
+                </option>
                 {availableProducts.map((p) => (
                   <option key={p._id} value={p._id}>
                     {p.nombre} (Q{p.precio})
@@ -217,7 +270,8 @@ export const ComboModal = ({ isOpen, onClose, comboData = null }) => {
               <button
                 type="button"
                 onClick={handleAddProduct}
-                className="w-full sm:w-auto bg-kinal-orange text-white px-6 py-2.5 rounded-xl font-bold hover:bg-orange-600 transition-colors text-sm"
+                disabled={!selectedBranchId || !selectedProduct}
+                className="w-full sm:w-auto bg-kinal-orange text-white px-6 py-2.5 rounded-xl font-bold hover:bg-orange-600 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Agregar
               </button>
